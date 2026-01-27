@@ -14,6 +14,9 @@ const SKIP_PATH_PATTERNS = [
   /^\/sitemap/,
 ];
 
+// Supabase error code for no rows returned
+const PGRST_NO_ROWS_ERROR = 'PGRST116';
+
 function shouldSkipPath(pathname: string): boolean {
   // Check exact matches
   if (SKIP_PATHS.some(path => pathname.startsWith(path))) {
@@ -37,20 +40,22 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    // Query the seo_redirects table
+    const now = new Date().toISOString();
+    
+    // Query the seo_redirects table with parameterized filters
     const { data, error } = await supabase
       .from('seo_redirects')
       .select('*')
       .eq('from_path', pathname)
       .eq('is_active', true)
-      .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString())
+      .or(`expires_at.is.null,expires_at.gt.${now}`)
       .order('priority', { ascending: true })
       .limit(1)
       .single();
 
     if (error) {
       // No redirect found or database error - continue normally
-      if (error.code === 'PGRST116') {
+      if (error.code === PGRST_NO_ROWS_ERROR) {
         // No rows returned - this is expected behavior
         return NextResponse.next();
       }
@@ -72,6 +77,12 @@ export async function middleware(request: NextRequest) {
       // Handle 301 and 302 redirects
       if (statusCode === 301 || statusCode === 302) {
         const toPath = data.to_path;
+        
+        // Security: Validate that toPath is a relative path to prevent open redirects
+        if (!toPath || toPath.startsWith('http://') || toPath.startsWith('https://') || toPath.startsWith('//')) {
+          console.warn('Invalid redirect path detected:', toPath);
+          return NextResponse.next();
+        }
         
         // Construct the redirect URL with preserved querystring
         const redirectUrl = new URL(toPath, request.url);

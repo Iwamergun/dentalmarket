@@ -1,4 +1,5 @@
 import { Header } from '@/components/layout/header'
+import { CategoryBar } from '@/components/layout/category-bar'
 import { Footer } from '@/components/layout/footer'
 
 export default function PublicLayout({
@@ -9,6 +10,7 @@ export default function PublicLayout({
   return (
     <>
       <Header />
+      <CategoryBar />
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>

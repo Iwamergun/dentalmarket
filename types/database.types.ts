@@ -112,6 +112,7 @@ export interface Database {
           sku: string | null
           barcode: string | null
           manufacturer_code: string | null
+          primary_image: string | null
           seo_title: string | null
           seo_description: string | null
           canonical_url: string | null
@@ -131,6 +132,7 @@ export interface Database {
           sku?: string | null
           barcode?: string | null
           manufacturer_code?: string | null
+          primary_image?: string | null
           seo_title?: string | null
           seo_description?: string | null
           canonical_url?: string | null
@@ -150,6 +152,7 @@ export interface Database {
           sku?: string | null
           barcode?: string | null
           manufacturer_code?: string | null
+          primary_image?: string | null
           seo_title?: string | null
           seo_description?: string | null
           canonical_url?: string | null

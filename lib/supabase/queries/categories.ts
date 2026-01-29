@@ -1,24 +1,7 @@
-import { createClient } from '../server'
-import type { Category } from '@/types/catalog.types'
+import { createClient } from '@/lib/supabase/server'
+import { Category } from '@/types/catalog.types'
 
-export async function getCategories() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching categories:', error)
-    return []
-  }
-
-  return data as Category[]
-}
-
-export async function getCategoryBySlug(slug: string) {
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   const supabase = await createClient()
   
   const { data, error } = await supabase
@@ -30,31 +13,14 @@ export async function getCategoryBySlug(slug: string) {
 
   if (error) {
     console.error('Error fetching category:', error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
     return null
   }
 
   return data as Category
 }
 
-export async function getRootCategories() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .is('parent_id', null)
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
-
-  if (error) {
-    console.error('Error fetching root categories:', error)
-    return []
-  }
-
-  return data as Category[]
-}
-
-export async function getChildCategories(parentId: string) {
+export async function getChildCategories(parentId: string): Promise<Category[]> {
   const supabase = await createClient()
   
   const { data, error } = await supabase
@@ -69,5 +35,40 @@ export async function getChildCategories(parentId: string) {
     return []
   }
 
-  return data as Category[]
+  return (data || []) as Category[]
+}
+
+export async function getAllCategories(): Promise<Category[]> {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
+
+  return (data || []) as Category[]
+}
+
+export async function getRootCategories(): Promise<Category[]> {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .is('parent_id', null)
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching root categories:', error)
+    return []
+  }
+
+  return (data || []) as Category[]
 }

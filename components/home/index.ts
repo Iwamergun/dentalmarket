@@ -1,0 +1,6 @@
+export { HeroSection } from './hero-section'
+export { CampaignSection } from './campaign-section'
+export { BestSellersSection } from './best-sellers-section'
+export { AllProductsSection } from './all-products-section'
+export { TrustSection } from './trust-section'
+export { ProductCardHome } from './product-card-home'

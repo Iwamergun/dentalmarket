@@ -3,6 +3,9 @@ import { getRootCategories } from '@/lib/supabase/queries/categories'
 import { CategoryCard } from '@/components/catalog/category-card'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 
+// Force dynamic rendering to ensure cookies() works correctly
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Kategoriler - Dental Market',
   description: 'Diş hekimliği ürün kategorilerini keşfedin',

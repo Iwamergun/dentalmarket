@@ -1,10 +1,12 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getCategoryBySlug, getChildCategories } from '@/lib/supabase/queries/categories'
-import { getProductsByCategory } from '@/lib/supabase/queries/products'
+import { createClient } from '@/lib/supabase/server'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
-import { ProductGrid } from '@/components/catalog/product-grid'
-import { CategoryCard } from '@/components/catalog/category-card'
+import { ProductImageCard } from '@/components/catalog/product-image-card'
+import { Category, Product } from '@/types/catalog.types'
+
+// Force dynamic rendering to ensure cookies work properly
+export const dynamic = 'force-dynamic'
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>
@@ -12,33 +14,67 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params
-  const category = await getCategoryBySlug(slug)
+  const supabase = await createClient()
+  
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .order('created_at', { ascending: true })
+    .limit(1)
+  
+  const category = categories?.[0] as Category | undefined
   
   if (!category) return {}
 
   return {
     title: category.seo_title || category.name,
     description: category.seo_description || category.description,
-    alternates: {
-      canonical: category.canonical_url || `/kategoriler/${category.slug}`,
-    },
-    robots: {
-      index: !category.noindex,
-      follow: !category.noindex,
-    },
   }
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params
-  const category = await getCategoryBySlug(slug)
   
-  if (!category) notFound()
+  let supabase
+  try {
+    supabase = await createClient()
+  } catch (error) {
+    console.error('Failed to create Supabase client:', error)
+    notFound()
+  }
+  
+  // Kategoriyi çek - limit(1) kullanarak duplicate slug durumunu handle et
+  const { data: categories, error: catError } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .order('created_at', { ascending: true })
+    .limit(1)
+  
+  const category = categories?.[0] as Category | undefined
+  
+  if (catError || !category) {
+    console.error('Category error:', catError?.message, catError?.code, catError?.details)
+    notFound()
+  }
 
-  const [products, childCategories] = await Promise.all([
-    getProductsByCategory(category.id, 20, 0),
-    getChildCategories(category.id),
-  ])
+  // Ürünleri çek (basit query)
+  const { data: productsData, error: prodError } = await supabase
+    .from('catalog_products')
+    .select('*')
+    .eq('primary_category_id', category.id)
+    .eq('is_active', true)
+    .limit(20)
+
+  const products = (productsData || []) as Product[]
+
+  console.log('Category:', category.name)
+  console.log('Products count:', products.length)
+  console.log('Products error:', prodError)
+  console.log('Products data:', JSON.stringify(products, null, 2))
 
   const breadcrumbItems = [
     { label: 'Ana Sayfa', href: '/' },
@@ -57,22 +93,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         )}
       </div>
 
-      {childCategories.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold">Alt Kategoriler</h2>
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold">Ürünler ({products?.length || 0})</h2>
+        
+        {products && products.length > 0 ? (
           <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {childCategories.map((childCategory) => (
-              <CategoryCard key={childCategory.id} category={childCategory} />
+            {products.map((product) => (
+              <ProductImageCard 
+                key={product.id} 
+                product={product} 
+                href={`/urunler/${product.slug}`}
+              />
             ))}
           </div>
-        </div>
-      )}
-
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold">Ürünler</h2>
-        <div className="mt-4">
-          <ProductGrid products={products} />
-        </div>
+        ) : (
+          <p className="mt-4 text-gray-500">Henüz ürün bulunmamaktadır.</p>
+        )}
       </div>
     </div>
   )

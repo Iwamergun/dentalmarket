@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Dental Market - Diş Hekimliği Ürünleri ve Ekipmanları",
@@ -14,7 +18,21 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className="antialiased">
-        {children}
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              {children}
+              <Toaster 
+                position="bottom-right" 
+                richColors 
+                closeButton
+                toastOptions={{
+                  duration: 3000,
+                }}
+              />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

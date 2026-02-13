@@ -1,6 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
+import { WishlistButton } from '@/components/WishlistButton'
 import type { ProductWithRelations } from '@/types/catalog.types'
 
 interface ProductCardProps {
@@ -9,8 +13,17 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <Link href={`/urunler/${product.slug}`}>
-      <Card className="h-full transition-shadow hover:shadow-md">
+    <Card className="h-full flex flex-col transition-shadow hover:shadow-md relative group">
+      {/* Wishlist Button */}
+      <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <WishlistButton 
+          productId={product.id} 
+          productName={product.name}
+          size="sm"
+        />
+      </div>
+      
+      <Link href={`/urunler/${product.slug}`} className="flex-1">
         <CardHeader>
           <div className="mb-2 flex items-center justify-between">
             {product.brand && (
@@ -26,12 +39,17 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           )}
         </CardContent>
-        <CardFooter>
-          {product.sku && (
-            <span className="text-xs text-gray-500">SKU: {product.sku}</span>
-          )}
-        </CardFooter>
-      </Card>
-    </Link>
+      </Link>
+      <CardFooter className="flex flex-col gap-3 pt-0">
+        {product.sku && (
+          <span className="text-xs text-gray-500 self-start">SKU: {product.sku}</span>
+        )}
+        <AddToCartButton 
+          productId={product.id}
+          productName={product.name}
+          fullWidth
+        />
+      </CardFooter>
+    </Card>
   )
 }

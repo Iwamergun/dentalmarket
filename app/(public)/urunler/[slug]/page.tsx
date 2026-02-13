@@ -1,8 +1,13 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getProductBySlug } from '@/lib/supabase/queries/products'
+import { getProductBySlug, getProductsByCategory } from '@/lib/supabase/queries/products'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
-import { Badge } from '@/components/ui/badge'
+import { ProductDetailClient } from '@/components/product'
+import { RelatedProducts } from '@/components/product'
+import { ProductReviews } from '@/components/reviews'
+import { getImageUrl } from '@/lib/utils/imageHelper'
+import { formatPrice } from '@/lib/utils/format'
+import { siteConfig } from '@/lib/constants/site-config'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -14,15 +19,32 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   
   if (!product) return {}
 
+  const imageUrl = getImageUrl(product.primary_image)
+  const title = product.seo_title || `${product.name} | ${siteConfig.name}`
+  const description = product.seo_description || product.short_description || product.description?.slice(0, 160) || ''
+
   return {
-    title: product.seo_title || product.name,
-    description: product.seo_description || product.short_description,
+    title,
+    description,
     alternates: {
       canonical: product.canonical_url || `/urunler/${product.slug}`,
     },
     robots: {
       index: !product.noindex,
       follow: !product.noindex,
+    },
+    openGraph: {
+      title: product.seo_title || product.name,
+      description,
+      images: imageUrl ? [{ url: imageUrl, alt: product.name }] : [],
+      type: 'website',
+      siteName: siteConfig.name,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.seo_title || product.name,
+      description,
+      images: imageUrl ? [imageUrl] : [],
     },
   }
 }
@@ -33,70 +55,100 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   if (!product) notFound()
 
+  // Benzer ürünleri çek (aynı kategoriden)
+  let relatedProducts: Awaited<ReturnType<typeof getProductsByCategory>> = []
+  if (product.primary_category_id) {
+    relatedProducts = await getProductsByCategory(product.primary_category_id, 5)
+  }
+
+  // Breadcrumb öğeleri
   const breadcrumbItems = [
     { label: 'Ana Sayfa', href: '/' },
-    { label: 'Ürünler', href: '/urunler' },
+    ...(product.category ? [{ 
+      label: product.category.name, 
+      href: `/kategoriler/${product.category.slug}` 
+    }] : [{ 
+      label: 'Ürünler', 
+      href: '/urunler' 
+    }]),
     { label: product.name, href: `/urunler/${product.slug}` },
   ]
 
-  const productSchema = {
+  // Schema.org yapılandırılmış veri
+  const productSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description,
+    description: product.description || product.short_description || '',
+    image: getImageUrl(product.primary_image),
     sku: product.sku,
     brand: product.brand ? {
       '@type': 'Brand',
       name: product.brand.name,
     } : undefined,
+    category: product.category?.name,
+  }
+
+  // Fiyat ve stok bilgisi varsa offers ekle
+  if (product.price) {
+    productSchema.offers = {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'TRY',
+      availability: product.stock_quantity !== null && product.stock_quantity > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: siteConfig.name,
+      },
+    }
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Yapılandırılmış Veri */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
       
+      {/* Breadcrumb */}
       <Breadcrumbs items={breadcrumbItems} />
       
+      {/* Ürün Detay - Client Component */}
       <div className="mt-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">{product.name}</h1>
-            {product.brand && (
-              <div className="mt-2">
-                <Badge variant="secondary">{product.brand.name}</Badge>
-              </div>
-            )}
-          </div>
-          {product.sku && (
-            <div className="text-right">
-              <p className="text-sm text-gray-500">SKU</p>
-              <p className="font-mono text-sm">{product.sku}</p>
-            </div>
-          )}
-        </div>
-
-        {product.short_description && (
-          <p className="mt-4 text-xl text-gray-600">{product.short_description}</p>
-        )}
-
-        {product.description && (
-          <div className="mt-8 prose max-w-none">
-            <h2 className="text-2xl font-bold">Ürün Açıklaması</h2>
-            <p className="mt-4 text-gray-700">{product.description}</p>
-          </div>
-        )}
-
-        {product.manufacturer_code && (
-          <div className="mt-8">
-            <p className="text-sm text-gray-500">
-              Üretici Kodu: <span className="font-mono">{product.manufacturer_code}</span>
-            </p>
-          </div>
-        )}
+        <ProductDetailClient product={product} />
       </div>
+
+      {/* Sekmeler: Açıklama, Özellikler, Kargo */}
+      <ProductTabs description={product.description} />
+
+      {/* Ürün İncelemeleri */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Müşteri Yorumları</h2>
+        <ProductReviews productId={product.id} />
+      </div>
+
+      {/* Benzer Ürünler */}
+      <RelatedProducts 
+        products={relatedProducts} 
+        currentProductId={product.id} 
+      />
     </div>
   )
 }
+
+/* ─── Tabs Bileşeni (Server Component) ─── */
+
+function ProductTabs({ description }: { description: string | null }) {
+  return (
+    <div className="mt-12">
+      {/* Tab panellerini statik render et, client tarafında tab switching yapılabilir */}
+      <ProductTabsClient description={description} />
+    </div>
+  )
+}
+
+/* Tabs client wrapper - aşağıda import edilen bileşen */
+import { ProductTabsClient } from '@/components/product/ProductTabsClient'

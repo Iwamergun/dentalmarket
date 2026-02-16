@@ -4,13 +4,34 @@ import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
 import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
+import { createClient } from '@/lib/supabase/client'
+import { Shield } from 'lucide-react'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
   const { user, loading } = useAuth()
+
+  // Check admin role
+  useEffect(() => {
+    async function checkAdmin() {
+      if (!user) {
+        setIsAdmin(false)
+        return
+      }
+      const supabase = createClient()
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      setIsAdmin(profile?.role === 'admin')
+    }
+    checkAdmin()
+  }, [user])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -151,6 +172,20 @@ export function Header() {
                         Adreslerim
                       </Link>
                     </div>
+
+                    {/* Admin Panel Link */}
+                    {isAdmin && (
+                      <div className="border-t border-border pt-1 mt-1">
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-primary hover:bg-background-deep transition-colors"
+                        >
+                          <Shield className="w-5 h-5" />
+                          Admin Panel
+                        </Link>
+                      </div>
+                    )}
 
                     {/* Logout */}
                     <div className="border-t border-border pt-1 mt-1">

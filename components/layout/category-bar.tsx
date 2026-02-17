@@ -33,11 +33,11 @@ export function CategoryBar() {
 
   if (isLoading) {
     return (
-      <nav className="hidden lg:block bg-white border-b border-border">
+      <nav className="hidden lg:block bg-gradient-to-r from-background to-background-elevated border-b-2 border-border shadow-sm">
         <div className="container-main">
-          <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 h-14 overflow-x-auto scrollbar-hide">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-6 w-24 bg-background-elevated rounded animate-pulse" />
+              <div key={i} className="h-8 w-28 bg-background-elevated rounded-lg animate-pulse" />
             ))}
           </div>
         </div>
@@ -46,25 +46,29 @@ export function CategoryBar() {
   }
 
   return (
-    <nav className="hidden lg:block bg-white border-b border-border">
+    <nav className="hidden lg:block bg-gradient-to-r from-white via-background to-white border-b-2 border-border shadow-sm">
       <div className="container-main">
-        <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 h-14 overflow-x-auto scrollbar-hide">
           {categories.map((category) => (
             <Link
               key={category.id}
               href={`/kategoriler/${category.slug}`}
-              className="relative shrink-0 px-4 py-2 text-sm text-text-secondary hover:text-secondary transition-all duration-200 group"
+              className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 font-semibold transition-all duration-300 whitespace-nowrap border-2 border-transparent hover:border-accent/20 transform hover:scale-105"
             >
-              {category.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-200 group-hover:w-full" />
+              <span>{category.name}</span>
+              <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           ))}
           <Link
             href="/kategoriler"
-            className="relative shrink-0 px-4 py-2 text-sm text-accent hover:text-accent-dark transition-all duration-200 font-medium group"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent to-accent-light text-white font-bold transition-all duration-300 whitespace-nowrap hover:shadow-glow-accent transform hover:scale-105"
           >
-            Tüm Kategoriler →
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
+            <span>Tümü</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </Link>
         </div>
       </div>

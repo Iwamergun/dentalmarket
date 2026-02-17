@@ -17,46 +17,61 @@ export default {
           elevated: 'var(--background-elevated)',
         },
         foreground: 'var(--foreground)',
-        // Primary - Dark Navy
+        // Primary - Rich Dark Blue (Amazon-inspired)
         primary: {
-          DEFAULT: '#0F172A',
-          dark: '#020617',
-          light: '#1E293B',
+          DEFAULT: '#131921',
+          dark: '#0A0E14',
+          light: '#232F3E',
         },
-        // Secondary - Blue
+        // Secondary - Electric Blue
         secondary: {
-          DEFAULT: '#2563EB',
-          dark: '#1D4ED8',
-          light: '#3B82F6',
+          DEFAULT: '#146EB4',
+          dark: '#0F5A8F',
+          light: '#1E88E5',
         },
-        // Accent - CTA Amber
+        // Accent - Vibrant Orange (Amazon-inspired)
         accent: {
-          DEFAULT: '#F59E0B',
-          dark: '#D97706',
-          light: '#FBB040',
+          DEFAULT: '#FF9900',
+          dark: '#F57C00',
+          light: '#FFB84D',
+        },
+        // Purple Accent for Premium
+        purple: {
+          DEFAULT: '#9C27B0',
+          dark: '#7B1FA2',
+          light: '#BA68C8',
+        },
+        // Teal Accent
+        teal: {
+          DEFAULT: '#00ACC1',
+          dark: '#00838F',
+          light: '#26C6DA',
         },
         // Text colors
         text: {
           primary: '#0F172A',
-          secondary: '#475569',
-          muted: '#94A3B8',
+          secondary: '#565959',
+          muted: '#8B949E',
         },
         // Border colors
         border: {
-          DEFAULT: '#E2E8F0',
-          light: '#CBD5E1',
-          focus: '#2563EB',
+          DEFAULT: '#D5D9D9',
+          light: '#E7E7E7',
+          focus: '#FF9900',
         },
         // Status colors
-        success: '#10B981',
-        warning: '#F59E0B',
+        success: '#00C853',
+        warning: '#FF9900',
         error: '#EF4444',
       },
       boxShadow: {
-        'card': '0 1px 3px rgba(0, 0, 0, 0.1)',
-        'card-hover': '0 4px 6px rgba(0, 0, 0, 0.1)',
+        'card': '0 2px 4px rgba(0, 0, 0, 0.08)',
+        'card-hover': '0 8px 16px rgba(255, 153, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
         'subtle': '0 1px 2px rgba(0, 0, 0, 0.05)',
-        'premium': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
+        'premium': '0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
+        'glow-accent': '0 6px 16px rgba(255, 153, 0, 0.4)',
+        'glow-purple': '0 6px 16px rgba(156, 39, 176, 0.4)',
+        'glow-teal': '0 6px 16px rgba(0, 172, 193, 0.4)',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',

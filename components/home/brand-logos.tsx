@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Award, Sparkles } from 'lucide-react'
 import type { Brand } from '@/types/catalog.types'
 
 interface BrandLogosProps {
@@ -10,37 +11,64 @@ export function BrandLogos({ brands }: BrandLogosProps) {
   const displayBrands = brands.slice(0, 12)
 
   return (
-    <section className="py-12 md:py-16 bg-background border-y border-border">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-background to-white border-y-2 border-border">
       <div className="container-main">
-        <div className="text-center mb-10">
-          <h2 className="section-title">Güvenilir Markalar</h2>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple/10 to-teal/10 rounded-full mb-4">
+            <Award className="w-5 h-5 text-purple" />
+            <span className="text-sm font-bold text-purple">GÜVENİLİR MARKALAR</span>
+          </div>
+          <h2 className="section-title">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Dünya Çapında Tanınan Markalar
+            </span>
+          </h2>
           <p className="section-subtitle">
-            Dünya çapında tanınan markalarla çalışıyoruz
+            <span className="font-bold text-accent">500+</span> premium marka ile çalışıyoruz
           </p>
         </div>
 
+        {/* Brand Grid with Animation */}
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
-          {displayBrands.map((brand) => (
-            <Link
-              key={brand.id}
-              href={`/markalar/${brand.slug}`}
-              className="flex items-center justify-center p-6 bg-white rounded-lg border border-border hover:border-secondary hover:shadow-card transition-all duration-200 group"
-            >
-              <span className="text-sm font-semibold text-text-secondary group-hover:text-secondary transition-colors text-center">
-                {brand.name}
-              </span>
-            </Link>
-          ))}
+          {displayBrands.map((brand, index) => {
+            return (
+              <Link
+                key={brand.id}
+                href={`/markalar/${brand.slug}`}
+                className="group relative flex items-center justify-center p-6 bg-white rounded-xl border-2 border-border hover:border-transparent transition-all duration-300 overflow-hidden"
+              >
+                {/* Gradient Border Effect on Hover - cycles through colors */}
+                <div className={`absolute inset-0 ${
+                  index % 4 === 0 ? 'bg-gradient-to-br from-accent to-accent-light' :
+                  index % 4 === 1 ? 'bg-gradient-to-br from-purple to-purple-light' :
+                  index % 4 === 2 ? 'bg-gradient-to-br from-teal to-teal-light' :
+                  'bg-gradient-to-br from-secondary to-secondary-light'
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <div className="absolute inset-[2px] bg-white rounded-[10px] z-10" />
+                
+                {/* Brand Name */}
+                <div className="relative z-20 text-center">
+                  <Sparkles className="w-6 h-6 mx-auto mb-2 text-text-muted group-hover:text-accent transition-colors" />
+                  <span className="text-sm font-bold text-text-secondary group-hover:text-accent transition-colors">
+                    {brand.name}
+                  </span>
+                </div>
+              </Link>
+            )
+          })}
         </div>
 
-        <div className="text-center mt-8">
+        {/* View All Button */}
+        <div className="text-center mt-10">
           <Link
             href="/markalar"
-            className="inline-flex items-center gap-2 text-secondary hover:text-secondary-dark font-medium transition-colors"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple to-purple-light text-white font-bold rounded-xl hover:shadow-glow-purple transition-all duration-300 transform hover:scale-105"
           >
-            Tüm Markaları Gör
+            <Award className="w-5 h-5" />
+            <span>Tüm Markaları Keşfet</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>

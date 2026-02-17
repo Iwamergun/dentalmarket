@@ -2,6 +2,8 @@
 
 A modern B2B e-commerce marketplace for dental products and equipment built with Next.js 15, TypeScript, Supabase, and TailwindCSS.
 
+> **🇹🇷 Türkçe:** [README.tr.md](./README.tr.md) dosyasını okuyun.
+
 ## Features
 
 - 🚀 **Next.js 15** with App Router for optimal performance
@@ -11,6 +13,15 @@ A modern B2B e-commerce marketplace for dental products and equipment built with
 - 📱 **Responsive Design** works on all devices
 - 🌐 **Turkish Language Support**
 - 🏗️ **TypeScript** for type safety
+
+## 🎨 New Premium Design
+
+The project features a premium e-commerce design inspired by Amazon, eBay, and StoreEnvy:
+
+- 🌈 **Vibrant Color Palette** - Orange (#FF9900), purple, teal, and blue gradients
+- ✨ **Premium Animations** - Hover effects, scale transforms, glow shadows
+- 🎯 **Enhanced UX** - Larger buttons, bold fonts, better visual hierarchy
+- 💎 **E-commerce Best Practices** - Sale badges, urgency indicators, trust signals
 
 ## Project Structure
 
@@ -74,6 +85,13 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_NAME=Dental Market
 ```
 
+**Quick setup:** Copy the example file and edit it with your Supabase credentials:
+
+```bash
+cp .env.example .env.local
+# Then edit .env.local with your actual Supabase keys
+```
+
 **Important:** Replace `your_anon_key_here` and `your_service_role_key_here` with your actual Supabase keys.
 
 ### 4. Run the development server
@@ -90,6 +108,31 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+
+## Troubleshooting
+
+### Port 3000 already in use
+
+If port 3000 is already in use, specify a different port:
+
+```bash
+npm run dev -- -p 3001
+```
+
+### Supabase connection errors
+
+1. Ensure `.env.local` is in the project root directory
+2. Verify your Supabase URL and keys are correct
+3. Check that your Supabase project is active
+
+### Build errors
+
+```bash
+# Clean and reinstall
+rm -rf node_modules .next
+npm install
+npm run build
+```
 
 ## Database Schema
 

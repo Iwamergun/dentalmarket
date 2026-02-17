@@ -43,7 +43,7 @@ export function SheetTrigger({ children, asChild }: SheetTriggerProps) {
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
       onClick: () => onOpenChange(true),
-    } as any)
+    } as React.HTMLAttributes<HTMLElement>)
   }
 
   return (

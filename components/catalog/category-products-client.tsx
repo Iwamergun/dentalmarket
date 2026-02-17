@@ -28,7 +28,7 @@ export function CategoryProductsClient({
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
       {/* Desktop Sidebar - Hidden on mobile */}
       <aside className="hidden lg:block">
-        <div className="sticky top-[120px]">
+        <div className="sticky top-[160px]">
           <FilterSidebar 
             categories={categories} 
             brands={brands} 

@@ -19,8 +19,8 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   const { items: wishlistItems, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist()
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
 
-  // Use first 8 products
-  const displayProducts = products.slice(0, 8)
+  // Use first 8 products (changed to 6 for better 3-column grid)
+  const displayProducts = products.slice(0, 6)
 
   const handleAddToCart = async (product: Product) => {
     setLoadingStates(prev => ({ ...prev, [product.id]: true }))
@@ -54,56 +54,72 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
     return wishlistItems.some(item => item.product_id === productId)
   }
 
-  // TODO: Replace with actual price from product offers
-  // Mock price function - would come from offers in real scenario
-  const getProductPrice = () => {
-    // This is a placeholder - actual price would come from product.offers
-    return 1250 // Mock price
+  // TODO: Replace with actual price and stock from product offers
+  // Mock data - would come from offers in real scenario
+  const getProductData = (index: number) => {
+    const prices = [1250, 890, 2340, 670, 1890, 450]
+    const discounts = [20, 0, 15, 0, 25, 10]
+    const stocks = [45, 12, 78, 3, 156, 89]
+    
+    return {
+      price: prices[index % prices.length],
+      discount: discounts[index % discounts.length],
+      stock: stocks[index % stocks.length],
+    }
   }
 
   return (
     <section className="py-12 md:py-16 bg-white">
-      <div className="container-main">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-10">
-          <h2 className="section-title">Öne Çıkan Ürünler</h2>
-          <p className="section-subtitle">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-body-text mb-3">Öne Çıkan Ürünler</h2>
+          <p className="text-secondary-text text-lg">
             En çok tercih edilen ürünler
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {displayProducts.map((product) => {
-            const price = getProductPrice()
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayProducts.map((product, index) => {
+            const { price, discount, stock } = getProductData(index)
+            const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price
+            const isLowStock = stock < 10
             
             return (
               <div
                 key={product.id}
-                className="group card-base overflow-hidden"
+                className="group bg-gradient-to-br from-white to-muted/30 border-2 border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:border-primary/40 transition-all duration-300"
               >
                 {/* Image */}
-                <div className="relative aspect-square bg-background overflow-hidden">
+                <div className="relative aspect-square bg-muted overflow-hidden">
                   <Link href={`/urunler/${product.slug}`}>
                     {product.primary_image ? (
                       <Image
-                        src={product.primary_image}
+                        src={product.primary_image.startsWith('/') ? product.primary_image : `/${product.primary_image}`}
                         alt={product.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-background-elevated">
-                        <ShoppingCart className="w-12 h-12 text-text-muted" />
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <ShoppingCart className="w-16 h-16 text-secondary-text" />
                       </div>
                     )}
                   </Link>
                   
+                  {/* Discount Badge */}
+                  {discount > 0 && (
+                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r from-destructive to-destructive/80 text-white text-xs font-bold rounded-lg border-2 border-white shadow-lg">
+                      %{discount} İndirim
+                    </div>
+                  )}
+                  
                   {/* Wishlist Button */}
                   <button
                     onClick={() => handleToggleWishlist(product.id)}
-                    className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
+                    className={`absolute top-3 right-3 p-2.5 rounded-xl bg-white/95 backdrop-blur shadow-md transition-all duration-200 ${
                       isInWishlist(product.id)
-                        ? 'bg-red-500 text-white'
-                        : 'bg-white/80 text-text-muted hover:text-red-500'
+                        ? 'text-destructive scale-110'
+                        : 'text-secondary-text hover:text-destructive hover:scale-110'
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
@@ -111,55 +127,71 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
+                <div className="p-5">
                   {/* Brand */}
                   {product.brand_id && (
-                    <p className="text-xs text-text-muted mb-1">Marka</p>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em] mb-2">PREMIUM BRAND</p>
                   )}
 
                   {/* Title */}
                   <Link href={`/urunler/${product.slug}`}>
-                    <h3 className="font-medium text-text-primary mb-2 line-clamp-2 group-hover:text-secondary transition-colors">
+                    <h3 className="font-bold text-body-text mb-3 line-clamp-2 group-hover:text-primary transition-colors min-h-[3rem]">
                       {product.name}
                     </h3>
                   </Link>
 
-                  {/* Rating - TODO: Replace with actual product rating from database */}
-                  <div className="flex items-center gap-1 mb-2">
+                  {/* Rating */}
+                  <div className="flex items-center gap-1 mb-3">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={`w-4 h-4 ${
                           i < 4
-                            ? 'text-accent fill-accent'
+                            ? 'text-warning fill-warning'
                             : 'text-gray-300'
                         }`}
                       />
                     ))}
-                    <span className="text-xs text-text-muted ml-1">(4.0)</span>
+                    <span className="text-xs text-secondary-text ml-1 font-medium">(4.0)</span>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-lg font-bold text-primary">
+                  <div className="mb-4">
+                    {discount > 0 && (
+                      <p className="text-sm text-secondary-text line-through mb-1">
                         {formatPrice(price)}
                       </p>
-                    </div>
+                    )}
+                    <p className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                      {formatPrice(discountedPrice)}
+                    </p>
+                  </div>
+
+                  {/* Stock Info */}
+                  <div className="mb-4">
+                    {isLowStock ? (
+                      <p className="text-xs text-destructive font-bold bg-destructive/10 px-2.5 py-1 rounded-full inline-block animate-pulse">
+                        Son {stock} Ürün!
+                      </p>
+                    ) : (
+                      <p className="text-xs text-success font-bold bg-success/10 px-2.5 py-1 rounded-full inline-block">
+                        Stokta ({stock} adet)
+                      </p>
+                    )}
                   </div>
 
                   {/* Add to Cart Button */}
                   <button
                     onClick={() => handleAddToCart(product)}
                     disabled={loadingStates[product.id]}
-                    className="w-full py-2 bg-secondary text-white font-medium rounded-lg hover:bg-secondary-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-accent via-warning to-accent hover:from-warning hover:via-accent hover:to-warning text-white font-bold rounded-xl h-12 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loadingStates[product.id] ? (
-                      <span className="text-sm">Ekleniyor...</span>
+                      <span>Ekleniyor...</span>
                     ) : (
                       <>
-                        <ShoppingCart className="w-4 h-4" />
-                        <span className="text-sm">Sepete Ekle</span>
+                        <ShoppingCart className="w-5 h-5" />
+                        <span>Sepete Ekle</span>
                       </>
                     )}
                   </button>
@@ -169,10 +201,10 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           })}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-10">
           <Link
             href="/urunler"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all duration-200"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
           >
             Tüm Ürünleri Gör
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

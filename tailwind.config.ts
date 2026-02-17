@@ -9,48 +9,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Light theme backgrounds
-        background: {
-          DEFAULT: 'var(--background)',
-          deep: 'var(--background-deep)',
-          card: 'var(--background-card)',
-          elevated: 'var(--background-elevated)',
-        },
+        // SPARK OKLCH Color System
+        background: 'var(--background)',
         foreground: 'var(--foreground)',
-        // Primary - Dark Navy
-        primary: {
-          DEFAULT: '#0F172A',
-          dark: '#020617',
-          light: '#1E293B',
-        },
-        // Secondary - Blue
-        secondary: {
-          DEFAULT: '#2563EB',
-          dark: '#1D4ED8',
-          light: '#3B82F6',
-        },
-        // Accent - CTA Amber
-        accent: {
-          DEFAULT: '#F59E0B',
-          dark: '#D97706',
-          light: '#FBB040',
-        },
-        // Text colors
-        text: {
-          primary: '#0F172A',
-          secondary: '#475569',
-          muted: '#94A3B8',
-        },
-        // Border colors
-        border: {
-          DEFAULT: '#E2E8F0',
-          light: '#CBD5E1',
-          focus: '#2563EB',
-        },
-        // Status colors
-        success: '#10B981',
-        warning: '#F59E0B',
-        error: '#EF4444',
+        card: 'var(--card)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        accent: 'var(--accent)',
+        destructive: 'var(--destructive)',
+        muted: 'var(--muted)',
+        border: 'var(--border)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        info: 'var(--info)',
+        'body-text': 'var(--body-text)',
+        'secondary-text': 'var(--secondary-text)',
+        'gradient-start': 'var(--gradient-start)',
+        'gradient-end': 'var(--gradient-end)',
       },
       boxShadow: {
         'card': '0 1px 3px rgba(0, 0, 0, 0.1)',

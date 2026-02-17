@@ -1,85 +1,76 @@
 import Link from 'next/link'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ShieldCheck, Truck, Award } from 'lucide-react'
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-light to-secondary">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent rounded-full blur-3xl" />
-      </div>
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
+      {/* Radial gradient overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-secondary/10 via-transparent to-transparent" />
       
-      <div className="container-main relative py-16 md:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
-          <div className="space-y-6 text-white">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 border border-accent/30 rounded-full backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-accent text-sm font-medium">Yeni Ürünler Geldi!</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              Diş Hekimleri İçin
-              <span className="block text-accent">
-                Premium Ekipman
-              </span>
-            </h1>
-            
-            <p className="text-lg text-gray-200 max-w-lg">
-              Türkiye&apos;nin en güvenilir dental B2B platformunda binlerce ürün, 
-              yüzlerce marka ve en uygun fiyatlar sizleri bekliyor.
-            </p>
-            
-            <div className="flex flex-wrap gap-4">
-              <Link href="/urunler" className="px-6 py-3 bg-accent text-white font-medium rounded-lg hover:bg-accent-dark transition-all duration-200 shadow-lg hover:shadow-xl">
-                Ürünleri Keşfet
-              </Link>
-              <Link href="/kategoriler" className="px-6 py-3 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-200">
-                Kategorileri Gör
-              </Link>
-            </div>
-            
-            {/* Stats */}
-            <div className="flex gap-8 pt-8 border-t border-white/20">
-              <div>
-                <p className="text-3xl font-bold text-accent">500+</p>
-                <p className="text-sm text-gray-300">Marka</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-accent">10K+</p>
-                <p className="text-sm text-gray-300">Ürün</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-accent">5K+</p>
-                <p className="text-sm text-gray-300">Klinik</p>
-              </div>
-            </div>
+      <div className="container mx-auto px-4 relative py-16 md:py-24">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-accent to-warning text-white border-0 rounded-full shadow-lg animate-fade-in">
+            <Sparkles className="w-5 h-5" />
+            <span className="font-bold text-sm" role="img" aria-label="Kutlama">🎉</span>
+            <span className="font-bold text-sm">Yeni Ürünler Geldi - Özel Fırsatlar!</span>
           </div>
           
-          {/* Visual */}
-          <div className="hidden lg:block relative">
-            <div className="relative w-full aspect-square max-w-md mx-auto">
-              {/* Decorative circles */}
-              <div className="absolute inset-0 border-2 border-white/20 rounded-full" />
-              <div className="absolute inset-8 border-2 border-accent/30 rounded-full" />
-              <div className="absolute inset-16 border-2 border-white/30 rounded-full" />
-              
-              {/* Center content */}
-              <div className="absolute inset-24 bg-gradient-to-br from-accent to-secondary rounded-full flex items-center justify-center shadow-2xl">
-                <div className="text-center text-white">
-                  <p className="text-4xl font-bold">DM</p>
-                  <p className="text-xs mt-1 opacity-80">Premium B2B</p>
-                </div>
+          {/* Main Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
+            <span className="bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+              Diş Hekimleri İçin
+              <br />
+              Premium B2B Platform
+            </span>
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-lg md:text-xl text-secondary-text max-w-2xl mx-auto">
+            Türkiye&apos;nin en güvenilir dental ekipman tedarikçisi. Binlerce ürün, 
+            yüzlerce marka ve en uygun fiyatlar sizleri bekliyor.
+          </p>
+          
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link 
+              href="/urunler" 
+              className="px-8 py-4 bg-gradient-to-r from-primary via-secondary to-primary text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105"
+            >
+              Ürünleri Keşfet
+            </Link>
+            <Link 
+              href="/kategoriler" 
+              className="px-8 py-4 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
+            >
+              Kategoriler
+            </Link>
+          </div>
+          
+          {/* Trust Indicators */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-border hover:border-primary/30 transition-all duration-200">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <ShieldCheck className="w-8 h-8 text-white" />
               </div>
-              
-              {/* Floating badges */}
-              <div className="absolute top-10 right-0 bg-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
-                <p className="text-sm text-primary font-medium">🚚 Hızlı Teslimat</p>
+              <h3 className="font-bold text-body-text mb-2">Güvenli Ödeme</h3>
+              <p className="text-sm text-secondary-text">256-bit SSL şifreleme</p>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-border hover:border-secondary/30 transition-all duration-200">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
+                <Truck className="w-8 h-8 text-white" />
               </div>
-              <div className="absolute bottom-20 left-0 bg-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
-                <p className="text-sm text-primary font-medium">🔒 Güvenli Ödeme</p>
+              <h3 className="font-bold text-body-text mb-2">Hızlı Teslimat</h3>
+              <p className="text-sm text-secondary-text">2-5 iş günü kargo</p>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-border hover:border-accent/30 transition-all duration-200">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-accent to-warning flex items-center justify-center">
+                <Award className="w-8 h-8 text-white" />
               </div>
+              <h3 className="font-bold text-body-text mb-2">Kalite Garantisi</h3>
+              <p className="text-sm text-secondary-text">Orijinal ürün garantisi</p>
             </div>
           </div>
         </div>

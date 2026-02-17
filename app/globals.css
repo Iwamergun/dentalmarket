@@ -3,34 +3,42 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Theme - Primary Colors */
-  --background: #0B1120;
-  --background-deep: #060A14;
-  --background-card: #111827;
-  --background-elevated: #1A2332;
-  --foreground: #F0F4F8;
+  /* SPARK Premium Light Theme */
+  --background: #F8FAFC;
+  --background-deep: #FFFFFF;
+  --background-card: #FFFFFF;
+  --background-elevated: #F1F5F9;
+  --foreground: #0F172A;
   
-  /* Primary - Medical Blue */
-  --primary: #0A84FF;
-  --primary-dark: #0066CC;
-  --primary-light: #3399FF;
-  --primary-glow: rgba(10, 132, 255, 0.4);
+  /* Primary - Dark Navy */
+  --primary: #0F172A;
+  --primary-dark: #020617;
+  --primary-light: #1E293B;
+  --primary-glow: rgba(15, 23, 42, 0.1);
   
-  /* Accent - Dental Mint/Cyan */
-  --accent: #00D9C0;
-  --accent-dark: #00B3A0;
-  --accent-light: #33E6D1;
-  --accent-glow: rgba(0, 217, 192, 0.4);
+  /* Accent - CTA Amber */
+  --accent: #F59E0B;
+  --accent-dark: #D97706;
+  --accent-light: #FBB040;
+  --accent-glow: rgba(245, 158, 11, 0.1);
+  
+  /* Secondary - Blue */
+  --secondary: #2563EB;
+  --secondary-dark: #1D4ED8;
+  --secondary-light: #3B82F6;
+  
+  /* Success */
+  --success: #10B981;
   
   /* Text */
-  --text-primary: #F0F4F8;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
   
   /* Borders */
-  --border: #1E293B;
-  --border-light: #334155;
-  --border-focus: #0A84FF;
+  --border: #E2E8F0;
+  --border-light: #CBD5E1;
+  --border-focus: #2563EB;
 }
 
 * {
@@ -38,7 +46,7 @@
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -52,7 +60,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background-deep);
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -66,7 +74,7 @@ body {
 
 /* Focus Styles for Accessibility */
 *:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--secondary);
   outline-offset: 2px;
 }
 
@@ -74,39 +82,41 @@ body {
   /* Card Styles */
   .card-base {
     @apply bg-background-card border border-border rounded-xl;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 200ms ease-out;
   }
   
   .card-base:hover {
     @apply border-border-light;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
   
   .card-elevated {
-    @apply bg-background-elevated border border-border rounded-xl;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    @apply bg-background-card border border-border rounded-xl;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  /* Button Glow Effects */
+  /* Button Styles */
   .btn-glow-primary {
     @apply bg-primary text-white font-medium rounded-lg px-6 py-3;
     transition: all 200ms ease-out;
   }
   
   .btn-glow-primary:hover {
-    box-shadow: 0 0 20px var(--primary-glow), 0 4px 12px rgba(0, 0, 0, 0.3);
+    @apply bg-primary-light;
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);
     transform: translateY(-1px);
   }
   
   .btn-glow-accent {
-    @apply bg-accent text-background-deep font-medium rounded-lg px-6 py-3;
+    @apply bg-accent text-white font-medium rounded-lg px-6 py-3;
     transition: all 200ms ease-out;
   }
   
   .btn-glow-accent:hover {
-    box-shadow: 0 0 20px var(--accent-glow), 0 4px 12px rgba(0, 0, 0, 0.3);
+    @apply bg-accent-dark;
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
     transform: translateY(-1px);
   }
   
@@ -116,8 +126,7 @@ body {
   }
   
   .btn-outline:hover {
-    @apply border-primary text-primary;
-    box-shadow: 0 0 15px var(--primary-glow);
+    @apply border-secondary text-secondary bg-secondary/5;
   }
   
   /* Section Titles */
@@ -129,22 +138,13 @@ body {
     @apply text-text-secondary mt-2;
   }
   
-  /* Glow Effects */
-  .glow-primary {
-    box-shadow: 0 0 20px var(--primary-glow);
-  }
-  
-  .glow-accent {
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-  
   /* Badge Styles */
   .badge-primary {
-    @apply bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded;
+    @apply bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded;
   }
   
   .badge-accent {
-    @apply bg-accent/20 text-accent text-xs font-medium px-2 py-1 rounded;
+    @apply bg-accent/10 text-accent text-xs font-medium px-2 py-1 rounded;
   }
   
   /* Container */

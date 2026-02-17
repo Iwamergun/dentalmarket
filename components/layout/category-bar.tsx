@@ -33,7 +33,7 @@ export function CategoryBar() {
 
   if (isLoading) {
     return (
-      <nav className="hidden lg:block bg-background-card border-b border-border">
+      <nav className="hidden lg:block bg-white border-b border-border">
         <div className="container-main">
           <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
             {[...Array(6)].map((_, i) => (
@@ -46,23 +46,25 @@ export function CategoryBar() {
   }
 
   return (
-    <nav className="hidden lg:block bg-background-card border-b border-border">
+    <nav className="hidden lg:block bg-white border-b border-border">
       <div className="container-main">
         <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
           {categories.map((category) => (
             <Link
               key={category.id}
               href={`/kategoriler/${category.slug}`}
-              className="shrink-0 px-4 py-2 text-sm text-text-secondary hover:text-primary hover:bg-background-elevated rounded-lg transition-all duration-200"
+              className="relative shrink-0 px-4 py-2 text-sm text-text-secondary hover:text-secondary transition-all duration-200 group"
             >
               {category.name}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-200 group-hover:w-full" />
             </Link>
           ))}
           <Link
             href="/kategoriler"
-            className="shrink-0 px-4 py-2 text-sm text-accent hover:text-accent-light hover:bg-background-elevated rounded-lg transition-all duration-200 font-medium"
+            className="relative shrink-0 px-4 py-2 text-sm text-accent hover:text-accent-dark transition-all duration-200 font-medium group"
           >
             Tüm Kategoriler →
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
           </Link>
         </div>
       </div>

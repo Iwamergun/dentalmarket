@@ -12,7 +12,8 @@ export function HeroSection() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-accent to-warning text-white border-0 rounded-full shadow-lg animate-fade-in">
             <Sparkles className="w-5 h-5" />
-            <span className="font-bold text-sm">🎉 Yeni Ürünler Geldi - Özel Fırsatlar!</span>
+            <span className="font-bold text-sm" role="img" aria-label="Kutlama">🎉</span>
+            <span className="font-bold text-sm">Yeni Ürünler Geldi - Özel Fırsatlar!</span>
           </div>
           
           {/* Main Title */}

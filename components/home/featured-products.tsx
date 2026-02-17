@@ -7,6 +7,7 @@ import { Heart, ShoppingCart, Star } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
 import { useWishlist } from '@/app/contexts/WishlistContext'
 import { formatPrice } from '@/lib/utils/format'
+import { getImageUrl } from '@/lib/utils/imageHelper'
 import { toast } from 'sonner'
 import type { Product } from '@/types/catalog.types'
 
@@ -91,7 +92,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   <Link href={`/urunler/${product.slug}`}>
                     {product.primary_image ? (
                       <Image
-                        src={product.primary_image.startsWith('/') ? product.primary_image : `/${product.primary_image}`}
+                        src={getImageUrl(product.primary_image)}
                         alt={product.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"

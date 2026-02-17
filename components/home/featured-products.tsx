@@ -61,6 +61,10 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
     return 1250 // Mock price
   }
 
+  // Discount percentage for display (TODO: Get from actual product discount data)
+  const MOCK_DISCOUNT_PERCENT = 20
+  const MOCK_ORIGINAL_PRICE_MULTIPLIER = 1.25 // Original price = current price * 1.25 (20% off)
+
   return (
     <section className="py-12 md:py-16 bg-white">
       <div className="container-main">
@@ -161,11 +165,11 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                         {formatPrice(price)}
                       </p>
                       <p className="text-xs text-text-muted line-through">
-                        {formatPrice(price * 1.2)}
+                        {formatPrice(price * MOCK_ORIGINAL_PRICE_MULTIPLIER)}
                       </p>
                     </div>
                     <div className="px-2 py-1 bg-gradient-to-r from-success/10 to-success/20 rounded-full">
-                      <span className="text-xs font-bold text-success">-20%</span>
+                      <span className="text-xs font-bold text-success">-{MOCK_DISCOUNT_PERCENT}%</span>
                     </div>
                   </div>
 

@@ -32,29 +32,25 @@ export function BrandLogos({ brands }: BrandLogosProps) {
         {/* Brand Grid with Animation */}
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
           {displayBrands.map((brand, index) => {
-            // Cycle through gradient colors
-            const gradients = [
-              'from-accent to-accent-light',
-              'from-purple to-purple-light',
-              'from-teal to-teal-light',
-              'from-secondary to-secondary-light',
-            ]
-            const gradientClass = gradients[index % gradients.length]
-
             return (
               <Link
                 key={brand.id}
                 href={`/markalar/${brand.slug}`}
                 className="group relative flex items-center justify-center p-6 bg-white rounded-xl border-2 border-border hover:border-transparent transition-all duration-300 overflow-hidden"
               >
-                {/* Gradient Border Effect on Hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                {/* Gradient Border Effect on Hover - cycles through colors */}
+                <div className={`absolute inset-0 ${
+                  index % 4 === 0 ? 'bg-gradient-to-br from-accent to-accent-light' :
+                  index % 4 === 1 ? 'bg-gradient-to-br from-purple to-purple-light' :
+                  index % 4 === 2 ? 'bg-gradient-to-br from-teal to-teal-light' :
+                  'bg-gradient-to-br from-secondary to-secondary-light'
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 <div className="absolute inset-[2px] bg-white rounded-[10px] z-10" />
                 
                 {/* Brand Name */}
                 <div className="relative z-20 text-center">
                   <Sparkles className="w-6 h-6 mx-auto mb-2 text-text-muted group-hover:text-accent transition-colors" />
-                  <span className="text-sm font-bold text-text-secondary group-hover:text-transparent group-hover:bg-gradient-to-br group-hover:bg-clip-text transition-all duration-300" style={{ backgroundImage: `linear-gradient(to bottom right, var(--accent), var(--purple))` }}>
+                  <span className="text-sm font-bold text-text-secondary group-hover:text-accent transition-colors">
                     {brand.name}
                   </span>
                 </div>

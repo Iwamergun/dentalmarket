@@ -33,11 +33,11 @@ export function CategoryBar() {
 
   if (isLoading) {
     return (
-      <nav className="hidden lg:block bg-white border-b border-border">
-        <div className="container-main">
+      <nav className="hidden lg:block bg-gradient-to-r from-primary/5 to-secondary/5 border-b-2 border-primary/10">
+        <div className="container mx-auto px-4">
           <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-6 w-24 bg-background-elevated rounded animate-pulse" />
+              <div key={i} className="h-6 w-24 bg-muted rounded animate-pulse" />
             ))}
           </div>
         </div>
@@ -46,25 +46,25 @@ export function CategoryBar() {
   }
 
   return (
-    <nav className="hidden lg:block bg-white border-b border-border">
-      <div className="container-main">
+    <nav className="hidden lg:block bg-gradient-to-r from-primary/5 to-secondary/5 border-b-2 border-primary/10">
+      <div className="container mx-auto px-4">
         <div className="flex items-center gap-1 h-12 overflow-x-auto scrollbar-hide">
           {categories.map((category) => (
             <Link
               key={category.id}
               href={`/kategoriler/${category.slug}`}
-              className="relative shrink-0 px-4 py-2 text-sm text-text-secondary hover:text-secondary transition-all duration-200 group"
+              className="relative shrink-0 px-4 py-2 text-sm font-medium text-secondary-text hover:text-secondary hover:bg-white rounded-xl transition-all duration-200 group"
             >
               {category.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-200 group-hover:w-full" />
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-200 group-hover:w-full rounded-full" />
             </Link>
           ))}
           <Link
             href="/kategoriler"
-            className="relative shrink-0 px-4 py-2 text-sm text-accent hover:text-accent-dark transition-all duration-200 font-medium group"
+            className="relative shrink-0 px-4 py-2 text-sm text-accent hover:text-accent/80 transition-all duration-200 font-bold group"
           >
             Tüm Kategoriler →
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-accent to-warning transition-all duration-200 group-hover:w-full rounded-full" />
           </Link>
         </div>
       </div>

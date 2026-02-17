@@ -15,8 +15,8 @@ interface FeaturedProductsProps {
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
-  const { addItem } = useCart()
-  const { items: wishlistItems, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist()
+  const { addToCart } = useCart()
+  const { items: wishlistItems, addToWishlist, removeFromWishlist } = useWishlist()
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
 
   // Use first 8 products (changed to 6 for better 3-column grid)
@@ -25,7 +25,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   const handleAddToCart = async (product: Product) => {
     setLoadingStates(prev => ({ ...prev, [product.id]: true }))
     try {
-      await addItem(product.id, 1)
+      await addToCart(product.id, null, 1)
       toast.success('Ürün sepete eklendi')
     } catch (error) {
       toast.error('Bir hata oluştu')
@@ -39,11 +39,8 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
     const isInWishlist = wishlistItems.some(item => item.product_id === productId)
     
     if (isInWishlist) {
-      const wishlistItem = wishlistItems.find(item => item.product_id === productId)
-      if (wishlistItem) {
-        await removeFromWishlist(wishlistItem.id)
-        toast.success('Favorilerden çıkarıldı')
-      }
+      await removeFromWishlist(productId)
+      toast.success('Favorilerden çıkarıldı')
     } else {
       await addToWishlist(productId)
       toast.success('Favorilere eklendi')

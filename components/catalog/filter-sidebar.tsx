@@ -31,11 +31,11 @@ export function FilterSidebar({
   // Get current filters from URL
   const [selectedCategories, setSelectedCategories] = React.useState<string[]>(() => {
     const cat = searchParams.get('category')
-    return cat ? [cat] : selectedCategoryId ? [selectedCategoryId] : []
+    return cat ? cat.split(',') : selectedCategoryId ? [selectedCategoryId] : []
   })
   const [selectedBrands, setSelectedBrands] = React.useState<string[]>(() => {
     const brand = searchParams.get('brand')
-    return brand ? [brand] : selectedBrandId ? [selectedBrandId] : []
+    return brand ? brand.split(',') : selectedBrandId ? [selectedBrandId] : []
   })
   const [minPrice, setMinPrice] = React.useState(searchParams.get('minPrice') || '')
   const [maxPrice, setMaxPrice] = React.useState(searchParams.get('maxPrice') || '')
@@ -54,12 +54,12 @@ export function FilterSidebar({
     params.delete('minRating')
     params.delete('inStock')
 
-    // Add new filters
+    // Add new filters - support multiple categories and brands
     if (selectedCategories.length > 0) {
-      params.set('category', selectedCategories[0]) // For simplicity, use first selected
+      params.set('category', selectedCategories.join(','))
     }
     if (selectedBrands.length > 0) {
-      params.set('brand', selectedBrands[0]) // For simplicity, use first selected
+      params.set('brand', selectedBrands.join(','))
     }
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)

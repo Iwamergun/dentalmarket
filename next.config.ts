@@ -2,11 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // Pre-existing type error in address edit page - not part of this PR
+    // Pre-existing type error in app/(public)/profil/adreslerim/[id]/duzenle/page.tsx
+    // This is not part of this PR and will be fixed separately
     ignoreBuildErrors: true,
   },
   eslint: {
-    // Ignore pre-existing warnings - not part of this PR
+    // Pre-existing warnings in profile and admin pages
+    // These are not part of this PR and will be fixed separately
     ignoreDuringBuilds: true,
   },
   images: {

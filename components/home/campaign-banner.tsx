@@ -13,7 +13,8 @@ export function CampaignBanner() {
   })
 
   useEffect(() => {
-    // Set campaign end date (7 days from now for demo)
+    // TODO: Fetch campaign end date from backend/database
+    // For now, set to 7 days from now for demo purposes
     const targetDate = new Date()
     targetDate.setDate(targetDate.getDate() + 7)
 

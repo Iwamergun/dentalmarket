@@ -8,11 +8,13 @@ import { getRootCategories } from '@/lib/supabase/queries/categories'
 import { getProducts } from '@/lib/supabase/queries/products'
 import { getBrands } from '@/lib/supabase/queries/brands'
 
+const FEATURED_PRODUCTS_COUNT = 8
+
 export default async function HomePage() {
   // Fetch data from Supabase
   const [categories, products, brands] = await Promise.all([
     getRootCategories(),
-    getProducts(8, 0), // Get first 8 products
+    getProducts(FEATURED_PRODUCTS_COUNT, 0),
     getBrands(),
   ])
 

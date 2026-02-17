@@ -54,6 +54,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
     return wishlistItems.some(item => item.product_id === productId)
   }
 
+  // TODO: Replace with actual price from product offers
   // Mock price function - would come from offers in real scenario
   const getProductPrice = () => {
     // This is a placeholder - actual price would come from product.offers
@@ -123,7 +124,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     </h3>
                   </Link>
 
-                  {/* Rating */}
+                  {/* Rating - TODO: Replace with actual product rating from database */}
                   <div className="flex items-center gap-1 mb-2">
                     {[...Array(5)].map((_, i) => (
                       <Star

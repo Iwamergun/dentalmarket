@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Dark theme backgrounds
+        // Light theme backgrounds
         background: {
           DEFAULT: 'var(--background)',
           deep: 'var(--background-deep)',
@@ -17,31 +17,35 @@ export default {
           elevated: 'var(--background-elevated)',
         },
         foreground: 'var(--foreground)',
-        // Primary - Medical Blue
+        // Primary - Dark Navy
         primary: {
-          DEFAULT: '#0A84FF',
-          dark: '#0066CC',
-          light: '#3399FF',
-          glow: 'rgba(10, 132, 255, 0.4)',
+          DEFAULT: '#0F172A',
+          dark: '#020617',
+          light: '#1E293B',
         },
-        // Accent - Dental Mint/Cyan
+        // Secondary - Blue
+        secondary: {
+          DEFAULT: '#2563EB',
+          dark: '#1D4ED8',
+          light: '#3B82F6',
+        },
+        // Accent - CTA Amber
         accent: {
-          DEFAULT: '#00D9C0',
-          dark: '#00B3A0',
-          light: '#33E6D1',
-          glow: 'rgba(0, 217, 192, 0.4)',
+          DEFAULT: '#F59E0B',
+          dark: '#D97706',
+          light: '#FBB040',
         },
         // Text colors
         text: {
-          primary: '#F0F4F8',
-          secondary: '#94A3B8',
-          muted: '#64748B',
+          primary: '#0F172A',
+          secondary: '#475569',
+          muted: '#94A3B8',
         },
         // Border colors
         border: {
-          DEFAULT: '#1E293B',
-          light: '#334155',
-          focus: '#0A84FF',
+          DEFAULT: '#E2E8F0',
+          light: '#CBD5E1',
+          focus: '#2563EB',
         },
         // Status colors
         success: '#10B981',
@@ -49,17 +53,14 @@ export default {
         error: '#EF4444',
       },
       boxShadow: {
-        'card': '0 4px 20px rgba(0, 0, 0, 0.3)',
-        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.4)',
-        'glow-primary': '0 0 20px rgba(10, 132, 255, 0.3)',
-        'glow-accent': '0 0 20px rgba(0, 217, 192, 0.3)',
-        'glow-primary-lg': '0 0 40px rgba(10, 132, 255, 0.4)',
-        'glow-accent-lg': '0 0 40px rgba(0, 217, 192, 0.4)',
+        'card': '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0 4px 6px rgba(0, 0, 0, 0.1)',
+        'subtle': '0 1px 2px rgba(0, 0, 0, 0.05)',
+        'premium': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
-        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -69,10 +70,6 @@ export default {
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        glowPulse: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(10, 132, 255, 0.3)' },
-          '50%': { boxShadow: '0 0 30px rgba(10, 132, 255, 0.5)' },
         },
       },
       transitionTimingFunction: {

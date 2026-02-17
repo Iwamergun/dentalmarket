@@ -90,7 +90,7 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <RecentOrders orders={(recentOrders as any) ?? []} />
+      <RecentOrders orders={(recentOrders as unknown[]) ?? []} />
     </div>
   )
 }

@@ -55,7 +55,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   }
 
   // Mock price function - would come from offers in real scenario
-  const getProductPrice = (product: Product) => {
+  const getProductPrice = () => {
     // This is a placeholder - actual price would come from product.offers
     return 1250 // Mock price
   }
@@ -72,7 +72,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {displayProducts.map((product) => {
-            const price = getProductPrice(product)
+            const price = getProductPrice()
             
             return (
               <div

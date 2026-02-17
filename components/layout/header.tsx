@@ -46,25 +46,25 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      {/* Top Info Bar */}
-      <div className="bg-primary text-white">
+      {/* Top Info Bar - Premium Gradient */}
+      <div className="bg-gradient-to-r from-primary via-primary-light to-secondary text-white">
         <div className="container-main">
           <div className="flex h-10 items-center justify-between text-sm">
             <div className="hidden md:flex items-center gap-6">
-              <a href="tel:+908501234567" className="flex items-center gap-1.5 hover:text-accent transition-colors">
+              <a href="tel:+908501234567" className="flex items-center gap-1.5 hover:text-accent transition-colors font-medium">
                 <Phone className="w-4 h-4" />
                 <span>+90 (850) 123 45 67</span>
               </a>
-              <a href="mailto:info@dentalmarket.com" className="flex items-center gap-1.5 hover:text-accent transition-colors">
+              <a href="mailto:info@dentalmarket.com" className="flex items-center gap-1.5 hover:text-accent transition-colors font-medium">
                 <Mail className="w-4 h-4" />
                 <span>info@dentalmarket.com</span>
               </a>
             </div>
             <div className="flex items-center gap-4 ml-auto">
-              <Link href="/hakkimizda" className="hover:text-accent transition-colors">
+              <Link href="/hakkimizda" className="hover:text-accent transition-colors font-medium">
                 Hakkımızda
               </Link>
-              <Link href="/iletisim" className="hover:text-accent transition-colors">
+              <Link href="/iletisim" className="hover:text-accent transition-colors font-medium">
                 İletişim
               </Link>
             </div>
@@ -73,28 +73,29 @@ export function Header() {
       </div>
 
       {/* Main Header */}
-      <div className="border-b border-border">
+      <div className="border-b-2 border-border shadow-md">
         <div className="container-main">
-          <div className="flex h-16 items-center justify-between gap-4">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <span className="text-white font-bold text-lg">DM</span>
+          <div className="flex h-18 items-center justify-between gap-4 py-3">
+            {/* Logo - More Vibrant */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent via-purple to-secondary flex items-center justify-center shadow-lg group-hover:shadow-glow-accent transition-all duration-300 transform group-hover:scale-105">
+                <span className="text-white font-extrabold text-xl">DM</span>
               </div>
-              <span className="hidden sm:block text-xl font-bold text-primary">
-                Dental<span className="text-secondary">Market</span>
+              <span className="hidden sm:block text-xl font-extrabold">
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Dental</span>
+                <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">Market</span>
               </span>
             </Link>
 
-            {/* Search Bar - Desktop */}
+            {/* Search Bar - Premium Design */}
             <div className="hidden md:flex flex-1 max-w-xl">
               <div className="relative w-full">
                 <input
                   type="text"
                   placeholder="Ürün, marka veya kategori ara..."
-                  className="w-full h-10 pl-4 pr-12 rounded-lg bg-background border border-border text-text-primary placeholder-text-muted focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20 transition-all duration-200"
+                  className="w-full h-12 pl-5 pr-14 rounded-xl bg-background border-2 border-border text-text-primary placeholder-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all duration-300 font-medium"
                 />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-text-muted hover:text-secondary transition-colors">
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-accent to-accent-light text-white rounded-lg hover:shadow-glow-accent transition-all duration-300 transform hover:scale-105">
                   <Search className="w-5 h-5" />
                 </button>
               </div>
@@ -105,7 +106,7 @@ export function Header() {
               {/* Mobile Search Toggle */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="md:hidden p-2 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200"
+                className="md:hidden p-2.5 rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all duration-300 transform hover:scale-105"
               >
                 <Search className="w-6 h-6" />
               </button>
@@ -115,32 +116,32 @@ export function Header() {
 
               {/* Account / Auth */}
               {loading ? (
-                <div className="w-10 h-10 rounded-lg bg-background animate-pulse" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-purple animate-pulse" />
               ) : user ? (
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 p-2 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200"
+                    className="flex items-center gap-2 p-2 rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all duration-300"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent via-purple to-secondary flex items-center justify-center shadow-lg">
+                      <span className="text-white text-sm font-bold">
                         {user.email?.charAt(0).toUpperCase() || 'U'}
                       </span>
                     </div>
                     <svg 
-                      className={`w-4 h-4 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} 
+                      className={`hidden sm:block w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white border border-border rounded-xl shadow-premium py-2 z-50 animate-fade-in">
-                      <div className="px-4 py-3 border-b border-border">
-                        <p className="text-sm font-medium text-text-primary truncate">
+                    <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-border rounded-2xl shadow-premium py-2 z-50 animate-fade-in">
+                      <div className="px-4 py-3 border-b-2 border-border">
+                        <p className="text-sm font-bold text-text-primary truncate">
                           {user.user_metadata?.full_name || 'Kullanıcı'}
                         </p>
                         <p className="text-xs text-text-muted truncate">
@@ -152,7 +153,7 @@ export function Header() {
                         <Link
                           href="/profil"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-secondary hover:bg-background transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-accent hover:bg-accent/5 transition-all duration-300 font-medium"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -162,7 +163,7 @@ export function Header() {
                         <Link
                           href="/profil/siparislerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-secondary hover:bg-background transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-accent hover:bg-accent/5 transition-all duration-300 font-medium"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -172,7 +173,7 @@ export function Header() {
                         <Link
                           href="/profil/favorilerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-secondary hover:bg-background transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-accent hover:bg-accent/5 transition-all duration-300 font-medium"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -182,7 +183,7 @@ export function Header() {
                         <Link
                           href="/profil/adreslerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-secondary hover:bg-background transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-accent hover:bg-accent/5 transition-all duration-300 font-medium"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -193,11 +194,11 @@ export function Header() {
                       </div>
 
                       {isAdmin && (
-                        <div className="border-t border-border pt-1 mt-1">
+                        <div className="border-t-2 border-border pt-1 mt-1">
                           <Link
                             href="/admin/dashboard"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-text-secondary hover:text-secondary hover:bg-background transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-purple hover:text-purple-dark hover:bg-purple/5 transition-all duration-300 font-medium"
                           >
                             <Shield className="w-5 h-5" />
                             Admin Panel
@@ -205,11 +206,11 @@ export function Header() {
                         </div>
                       )}
 
-                      <div className="border-t border-border pt-1 mt-1">
+                      <div className="border-t-2 border-border pt-1 mt-1">
                         <Link
                           href="/cikis"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-500/10 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-500/10 transition-all duration-300 font-medium"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -223,7 +224,7 @@ export function Header() {
               ) : (
                 <Link 
                   href="/giris" 
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-white font-medium hover:bg-secondary-dark transition-all duration-200"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent to-accent-light text-white font-bold hover:shadow-glow-accent transition-all duration-300 transform hover:scale-105"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -234,7 +235,7 @@ export function Header() {
 
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200 lg:hidden"
+                className="p-2.5 rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all duration-300 lg:hidden transform hover:scale-105"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -247,7 +248,7 @@ export function Header() {
               <input
                 type="text"
                 placeholder="Ürün, marka veya kategori ara..."
-                className="w-full h-10 px-4 rounded-lg bg-background border border-border text-text-primary placeholder-text-muted focus:border-secondary focus:outline-none transition-all duration-200"
+                className="w-full h-12 px-5 rounded-xl bg-background border-2 border-border text-text-primary placeholder-text-muted focus:border-accent focus:outline-none transition-all duration-300 font-medium"
                 autoFocus
               />
             </div>
@@ -257,19 +258,19 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-white animate-fade-in">
+        <div className="lg:hidden border-t-2 border-border bg-white animate-fade-in">
           <nav className="container-main py-4 space-y-2">
-            <Link href="/kategoriler" className="block px-4 py-3 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200">
+            <Link href="/kategoriler" className="block px-4 py-3 rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all duration-300 font-semibold">
               Kategoriler
             </Link>
-            <Link href="/markalar" className="block px-4 py-3 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200">
+            <Link href="/markalar" className="block px-4 py-3 rounded-xl text-text-secondary hover:text-purple hover:bg-purple/10 transition-all duration-300 font-semibold">
               Markalar
             </Link>
-            <Link href="/urunler" className="block px-4 py-3 rounded-lg text-text-secondary hover:text-secondary hover:bg-background transition-all duration-200">
+            <Link href="/urunler" className="block px-4 py-3 rounded-xl text-text-secondary hover:text-teal hover:bg-teal/10 transition-all duration-300 font-semibold">
               Tüm Ürünler
             </Link>
-            <Link href="/kampanyalar" className="block px-4 py-3 rounded-lg text-accent hover:bg-accent/5 transition-all duration-200">
-              Kampanyalar
+            <Link href="/kampanyalar" className="block px-4 py-3 rounded-xl text-accent hover:bg-accent/10 transition-all duration-300 font-bold">
+              🎉 Kampanyalar
             </Link>
           </nav>
         </div>

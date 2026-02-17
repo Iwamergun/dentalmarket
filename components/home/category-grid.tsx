@@ -13,6 +13,18 @@ const categoryIcons = {
   activity: Activity,
 }
 
+// Vibrant gradient colors for each category
+const categoryGradients = [
+  'from-accent to-accent-light',
+  'from-purple to-purple-light',
+  'from-teal to-teal-light',
+  'from-secondary to-secondary-light',
+  'from-accent to-purple',
+  'from-purple to-teal',
+  'from-teal to-secondary',
+  'from-secondary to-accent',
+]
+
 interface CategoryGridProps {
   categories: Category[]
 }
@@ -22,35 +34,47 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
   const displayCategories = categories.slice(0, 8)
 
   return (
-    <section className="py-12 md:py-16 bg-background">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-background to-background-elevated">
       <div className="container-main">
-        <div className="text-center mb-10">
-          <h2 className="section-title">Popüler Kategoriler</h2>
+        <div className="text-center mb-12">
+          <h2 className="section-title">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Popüler Kategoriler
+            </span>
+          </h2>
           <p className="section-subtitle">
-            İhtiyacınız olan her şey burada
+            İhtiyacınız olan <span className="font-bold text-accent">her şey burada</span>
           </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {displayCategories.map((category, index) => {
-            // Cycle through icons
+            // Cycle through icons and gradients
             const iconKeys = Object.keys(categoryIcons)
             const IconComponent = categoryIcons[iconKeys[index % iconKeys.length] as keyof typeof categoryIcons]
+            const gradientClass = categoryGradients[index % categoryGradients.length]
 
             return (
               <Link
                 key={category.id}
                 href={`/kategoriler/${category.slug}`}
-                className="group card-base p-6 text-center transition-all duration-200 hover:border-secondary"
+                className="group relative card-base p-6 text-center transition-all duration-300 hover:shadow-card-hover overflow-hidden"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-secondary/10 text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-200 mb-4">
-                  <IconComponent className="w-8 h-8" />
+                {/* Gradient Background on Hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                
+                {/* Icon with Gradient Background */}
+                <div className={`relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br ${gradientClass} text-white shadow-lg group-hover:scale-110 transition-transform duration-300 mb-4`}>
+                  <IconComponent className="w-10 h-10" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-semibold text-text-primary mb-1 group-hover:text-secondary transition-colors">
+                
+                {/* Category Name */}
+                <h3 className="relative font-bold text-lg text-text-primary group-hover:text-accent transition-colors mb-2">
                   {category.name}
                 </h3>
-                <p className="text-sm text-text-muted">
-                  {/* Product count would come from backend if available */}
+                
+                {/* CTA */}
+                <p className={`relative text-sm font-semibold bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
                   Keşfet →
                 </p>
               </Link>
@@ -58,14 +82,14 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
           })}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-10">
           <Link
             href="/kategoriler"
-            className="inline-flex items-center gap-2 text-secondary hover:text-secondary-dark font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-accent to-accent-light text-white font-bold rounded-xl hover:shadow-glow-accent transition-all duration-300 transform hover:scale-105"
           >
-            Tüm Kategorileri Gör
+            <span>Tüm Kategorileri Gör</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>

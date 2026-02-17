@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { Heart, ShoppingCart, Star } from 'lucide-react'
+import { Heart, ShoppingCart, Star, TrendingUp } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
 import { useWishlist } from '@/app/contexts/WishlistContext'
 import { formatPrice } from '@/lib/utils/format'
@@ -64,13 +64,23 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   return (
     <section className="py-12 md:py-16 bg-white">
       <div className="container-main">
-        <div className="text-center mb-10">
-          <h2 className="section-title">Öne Çıkan Ürünler</h2>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent/10 to-purple/10 rounded-full mb-4">
+            <TrendingUp className="w-5 h-5 text-accent" />
+            <span className="text-sm font-bold text-accent">EN ÇOK SATANLAR</span>
+          </div>
+          <h2 className="section-title">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Öne Çıkan Ürünler
+            </span>
+          </h2>
           <p className="section-subtitle">
-            En çok tercih edilen ürünler
+            En çok <span className="font-bold text-accent">tercih edilen</span> ürünler
           </p>
         </div>
 
+        {/* Product Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {displayProducts.map((product) => {
             const price = getProductPrice()
@@ -78,17 +88,22 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             return (
               <div
                 key={product.id}
-                className="group card-base overflow-hidden"
+                className="group relative card-base overflow-hidden"
               >
+                {/* Best Seller Badge */}
+                <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-gradient-to-r from-accent to-accent-light text-white text-xs font-bold rounded-full shadow-lg">
+                  ÇOK SATANLAR
+                </div>
+
                 {/* Image */}
                 <div className="relative aspect-square bg-background overflow-hidden">
                   <Link href={`/urunler/${product.slug}`}>
                     {product.primary_image ? (
                       <Image
-                        src={product.primary_image}
+                        src={product.primary_image.startsWith('/') ? product.primary_image : `/${product.primary_image}`}
                         alt={product.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-background-elevated">
@@ -97,13 +112,13 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     )}
                   </Link>
                   
-                  {/* Wishlist Button */}
+                  {/* Wishlist Button - Vibrant */}
                   <button
                     onClick={() => handleToggleWishlist(product.id)}
-                    className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
+                    className={`absolute top-3 right-3 z-10 p-2.5 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${
                       isInWishlist(product.id)
-                        ? 'bg-red-500 text-white'
-                        : 'bg-white/80 text-text-muted hover:text-red-500'
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg'
+                        : 'bg-white/90 text-text-muted hover:text-red-500 shadow-md'
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
@@ -114,18 +129,18 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                 <div className="p-4">
                   {/* Brand */}
                   {product.brand_id && (
-                    <p className="text-xs text-text-muted mb-1">Marka</p>
+                    <p className="text-xs text-text-muted font-medium mb-1">Premium Marka</p>
                   )}
 
                   {/* Title */}
                   <Link href={`/urunler/${product.slug}`}>
-                    <h3 className="font-medium text-text-primary mb-2 line-clamp-2 group-hover:text-secondary transition-colors">
+                    <h3 className="font-bold text-text-primary mb-2 line-clamp-2 group-hover:text-accent transition-colors">
                       {product.name}
                     </h3>
                   </Link>
 
                   {/* Rating - TODO: Replace with actual product rating from database */}
-                  <div className="flex items-center gap-1 mb-2">
+                  <div className="flex items-center gap-1 mb-3">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
@@ -136,29 +151,35 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                         }`}
                       />
                     ))}
-                    <span className="text-xs text-text-muted ml-1">(4.0)</span>
+                    <span className="text-xs text-text-muted ml-1 font-medium">(4.0)</span>
                   </div>
 
-                  {/* Price */}
+                  {/* Price - Premium Display */}
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-lg font-bold text-primary">
+                      <p className="text-xl font-extrabold bg-gradient-to-r from-accent to-accent-dark bg-clip-text text-transparent">
                         {formatPrice(price)}
                       </p>
+                      <p className="text-xs text-text-muted line-through">
+                        {formatPrice(price * 1.2)}
+                      </p>
+                    </div>
+                    <div className="px-2 py-1 bg-gradient-to-r from-success/10 to-success/20 rounded-full">
+                      <span className="text-xs font-bold text-success">-20%</span>
                     </div>
                   </div>
 
-                  {/* Add to Cart Button */}
+                  {/* Add to Cart Button - Premium */}
                   <button
                     onClick={() => handleAddToCart(product)}
                     disabled={loadingStates[product.id]}
-                    className="w-full py-2 bg-secondary text-white font-medium rounded-lg hover:bg-secondary-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-gradient-to-r from-accent to-accent-light text-white font-bold rounded-xl hover:shadow-glow-accent transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:scale-105"
                   >
                     {loadingStates[product.id] ? (
                       <span className="text-sm">Ekleniyor...</span>
                     ) : (
                       <>
-                        <ShoppingCart className="w-4 h-4" />
+                        <ShoppingCart className="w-5 h-5" />
                         <span className="text-sm">Sepete Ekle</span>
                       </>
                     )}
@@ -169,14 +190,15 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           })}
         </div>
 
-        <div className="text-center mt-8">
+        {/* View All Button */}
+        <div className="text-center mt-10">
           <Link
             href="/urunler"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-light transition-all duration-200"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-primary-light text-white font-bold rounded-xl hover:shadow-premium transition-all duration-300 transform hover:scale-105"
           >
-            Tüm Ürünleri Gör
+            <span>Tüm Ürünleri Gör</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>

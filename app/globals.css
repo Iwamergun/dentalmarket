@@ -3,42 +3,52 @@
 @tailwind utilities;
 
 :root {
-  /* SPARK Premium Light Theme */
-  --background: #F8FAFC;
+  /* SPARK Premium E-Commerce Theme - Amazon/eBay/StoreEnvy Inspired */
+  --background: #F7F8FA;
   --background-deep: #FFFFFF;
   --background-card: #FFFFFF;
-  --background-elevated: #F1F5F9;
+  --background-elevated: #F0F2F5;
   --foreground: #0F172A;
   
-  /* Primary - Dark Navy */
-  --primary: #0F172A;
-  --primary-dark: #020617;
-  --primary-light: #1E293B;
-  --primary-glow: rgba(15, 23, 42, 0.1);
+  /* Primary - Rich Dark Blue */
+  --primary: #131921;
+  --primary-dark: #0A0E14;
+  --primary-light: #232F3E;
+  --primary-glow: rgba(19, 25, 33, 0.1);
   
-  /* Accent - CTA Amber */
-  --accent: #F59E0B;
-  --accent-dark: #D97706;
-  --accent-light: #FBB040;
-  --accent-glow: rgba(245, 158, 11, 0.1);
+  /* Accent - Vibrant Orange (Amazon-inspired) */
+  --accent: #FF9900;
+  --accent-dark: #F57C00;
+  --accent-light: #FFB84D;
+  --accent-glow: rgba(255, 153, 0, 0.15);
   
-  /* Secondary - Blue */
-  --secondary: #2563EB;
-  --secondary-dark: #1D4ED8;
-  --secondary-light: #3B82F6;
+  /* Secondary - Electric Blue */
+  --secondary: #146EB4;
+  --secondary-dark: #0F5A8F;
+  --secondary-light: #1E88E5;
   
-  /* Success */
-  --success: #10B981;
+  /* Success - Emerald Green */
+  --success: #00C853;
+  
+  /* Purple Accent for Premium Features */
+  --purple: #9C27B0;
+  --purple-dark: #7B1FA2;
+  --purple-light: #BA68C8;
+  
+  /* Teal Accent */
+  --teal: #00ACC1;
+  --teal-dark: #00838F;
+  --teal-light: #26C6DA;
   
   /* Text */
   --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
+  --text-secondary: #565959;
+  --text-muted: #8B949E;
   
   /* Borders */
-  --border: #E2E8F0;
-  --border-light: #CBD5E1;
-  --border-focus: #2563EB;
+  --border: #D5D9D9;
+  --border-light: #E7E7E7;
+  --border-focus: #FF9900;
 }
 
 * {
@@ -79,77 +89,103 @@ body {
 }
 
 @layer components {
-  /* Card Styles */
+  /* Card Styles - Premium E-Commerce */
   .card-base {
     @apply bg-background-card border border-border rounded-xl;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 200ms ease-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .card-base:hover {
-    @apply border-border-light;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    @apply border-accent;
+    box-shadow: 0 8px 16px rgba(255, 153, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
   }
   
   .card-elevated {
     @apply bg-background-card border border-border rounded-xl;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   }
   
-  /* Button Styles */
+  /* Button Styles - Premium Glow Effects */
   .btn-glow-primary {
-    @apply bg-primary text-white font-medium rounded-lg px-6 py-3;
-    transition: all 200ms ease-out;
+    @apply bg-primary text-white font-semibold rounded-lg px-6 py-3;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(19, 25, 33, 0.2);
   }
   
   .btn-glow-primary:hover {
     @apply bg-primary-light;
-    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(19, 25, 33, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
   
   .btn-glow-accent {
-    @apply bg-accent text-white font-medium rounded-lg px-6 py-3;
-    transition: all 200ms ease-out;
+    @apply bg-accent text-white font-semibold rounded-lg px-6 py-3;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(255, 153, 0, 0.3);
   }
   
   .btn-glow-accent:hover {
     @apply bg-accent-dark;
-    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(255, 153, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
   
   .btn-outline {
-    @apply border border-border text-text-primary font-medium rounded-lg px-6 py-3 bg-transparent;
-    transition: all 200ms ease-out;
+    @apply border-2 border-border text-text-primary font-semibold rounded-lg px-6 py-3 bg-transparent;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-outline:hover {
-    @apply border-secondary text-secondary bg-secondary/5;
+    @apply border-accent text-accent bg-accent/5;
+    box-shadow: 0 2px 8px rgba(255, 153, 0, 0.15);
   }
   
-  /* Section Titles */
+  /* Section Titles - Bold & Eye-Catching */
   .section-title {
-    @apply text-2xl md:text-3xl font-bold text-text-primary;
+    @apply text-3xl md:text-4xl font-bold text-text-primary;
+    letter-spacing: -0.02em;
   }
   
   .section-subtitle {
-    @apply text-text-secondary mt-2;
+    @apply text-lg text-text-secondary mt-2;
   }
   
-  /* Badge Styles */
+  /* Badge Styles - Vibrant */
   .badge-primary {
-    @apply bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded;
+    @apply bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full;
   }
   
   .badge-accent {
-    @apply bg-accent/10 text-accent text-xs font-medium px-2 py-1 rounded;
+    @apply bg-accent/15 text-accent-dark text-xs font-semibold px-3 py-1 rounded-full;
+    box-shadow: 0 2px 4px rgba(255, 153, 0, 0.1);
+  }
+  
+  .badge-purple {
+    @apply bg-purple/10 text-purple text-xs font-semibold px-3 py-1 rounded-full;
+  }
+  
+  .badge-teal {
+    @apply bg-teal/10 text-teal text-xs font-semibold px-3 py-1 rounded-full;
   }
   
   /* Container */
   .container-main {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Premium Gradient Backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  }
+  
+  .gradient-rainbow {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 50%, var(--secondary) 100%);
   }
 }
 

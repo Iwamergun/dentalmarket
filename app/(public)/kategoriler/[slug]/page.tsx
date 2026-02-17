@@ -1,8 +1,10 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getAllCategories } from '@/lib/supabase/queries/categories'
+import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
-import { ProductImageCard } from '@/components/catalog/product-image-card'
+import { CategoryProductsClient } from '@/components/catalog/category-products-client'
 import { Category, Product } from '@/types/catalog.types'
 
 // Force dynamic rendering to ensure cookies work properly
@@ -62,19 +64,20 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   }
 
   // Ürünleri çek (basit query)
-  const { data: productsData, error: prodError } = await supabase
+  const { data: productsData } = await supabase
     .from('catalog_products')
     .select('*')
     .eq('primary_category_id', category.id)
     .eq('is_active', true)
-    .limit(20)
+    .limit(100)
 
   const products = (productsData || []) as Product[]
 
-  console.log('Category:', category.name)
-  console.log('Products count:', products.length)
-  console.log('Products error:', prodError)
-  console.log('Products data:', JSON.stringify(products, null, 2))
+  // Fetch all categories and brands for filters
+  const [allCategories, brands] = await Promise.all([
+    getAllCategories(),
+    getBrands(),
+  ])
 
   const breadcrumbItems = [
     { label: 'Ana Sayfa', href: '/' },
@@ -87,28 +90,19 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <Breadcrumbs items={breadcrumbItems} />
       
       <div className="mt-8">
-        <h1 className="text-4xl font-bold">{category.name}</h1>
+        <h1 className="text-4xl font-bold text-primary">{category.name}</h1>
         {category.description && (
-          <p className="mt-2 text-gray-600">{category.description}</p>
+          <p className="mt-2 text-text-secondary">{category.description}</p>
         )}
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold">Ürünler ({products?.length || 0})</h2>
-        
-        {products && products.length > 0 ? (
-          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => (
-              <ProductImageCard 
-                key={product.id} 
-                product={product} 
-                href={`/urunler/${product.slug}`}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="mt-4 text-gray-500">Henüz ürün bulunmamaktadır.</p>
-        )}
+        <CategoryProductsClient 
+          products={products}
+          categories={allCategories}
+          brands={brands}
+          currentCategoryId={category.id}
+        />
       </div>
     </div>
   )

@@ -2,8 +2,10 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getBrandBySlug } from '@/lib/supabase/queries/brands'
 import { getProductsByBrand } from '@/lib/supabase/queries/products'
+import { getAllCategories } from '@/lib/supabase/queries/categories'
+import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
-import { ProductGrid } from '@/components/catalog/product-grid'
+import { BrandProductsClient } from '@/components/catalog/brand-products-client'
 
 interface BrandPageProps {
   params: Promise<{ slug: string }>
@@ -34,7 +36,11 @@ export default async function BrandPage({ params }: BrandPageProps) {
   
   if (!brand) notFound()
 
-  const products = await getProductsByBrand(brand.id, 20, 0)
+  const [products, categories, brands] = await Promise.all([
+    getProductsByBrand(brand.id, 100, 0),
+    getAllCategories(),
+    getBrands(),
+  ])
 
   const breadcrumbItems = [
     { label: 'Ana Sayfa', href: '/' },
@@ -47,17 +53,19 @@ export default async function BrandPage({ params }: BrandPageProps) {
       <Breadcrumbs items={breadcrumbItems} />
       
       <div className="mt-8">
-        <h1 className="text-4xl font-bold">{brand.name}</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-4xl font-bold text-primary">{brand.name}</h1>
+        <p className="mt-2 text-text-secondary">
           {brand.name} markalı ürünleri keşfedin
         </p>
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold">Ürünler</h2>
-        <div className="mt-4">
-          <ProductGrid products={products} />
-        </div>
+        <BrandProductsClient 
+          products={products}
+          categories={categories}
+          brands={brands}
+          currentBrandId={brand.id}
+        />
       </div>
     </div>
   )

@@ -52,7 +52,6 @@ export default function SupplierProfilPage() {
     setLoading(true)
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -65,7 +64,8 @@ export default function SupplierProfilPage() {
 
       if (error) throw error
       toast.success('Profil başarıyla güncellendi')
-    } catch {
+    } catch (error) {
+      console.error('Profile update error:', error)
       toast.error('Profil güncellenirken bir hata oluştu')
     } finally {
       setLoading(false)

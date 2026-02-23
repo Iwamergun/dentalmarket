@@ -100,7 +100,8 @@ export default function YeniUrunPage() {
 
       toast.success('Ürün başarıyla eklendi')
       router.push('/supplier/urunler')
-    } catch {
+    } catch (error) {
+      console.error('Product creation error:', error)
       toast.error('Ürün eklenirken bir hata oluştu')
     } finally {
       setLoading(false)

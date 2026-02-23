@@ -133,7 +133,8 @@ export default function UrunDuzenlePage() {
 
       toast.success('Ürün başarıyla güncellendi')
       router.push('/supplier/urunler')
-    } catch {
+    } catch (error) {
+      console.error('Product update error:', error)
       toast.error('Ürün güncellenirken bir hata oluştu')
     } finally {
       setLoading(false)
@@ -154,7 +155,8 @@ export default function UrunDuzenlePage() {
 
       toast.success('Ürün başarıyla silindi')
       router.push('/supplier/urunler')
-    } catch {
+    } catch (error) {
+      console.error('Product deletion error:', error)
       toast.error('Ürün silinirken bir hata oluştu')
     } finally {
       setLoading(false)

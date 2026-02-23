@@ -12,6 +12,7 @@ ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS stock_quantity INTEGER DEF
 CREATE INDEX IF NOT EXISTS idx_catalog_products_supplier_id ON catalog_products(supplier_id);
 
 -- Supplier kendi ürünlerini yönetebilir RLS
+DROP POLICY IF EXISTS "Suppliers can manage own products" ON catalog_products;
 CREATE POLICY "Suppliers can manage own products" ON catalog_products
     FOR ALL
     USING (

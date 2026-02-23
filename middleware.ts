@@ -54,9 +54,18 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Supplier route kontrolü
+  if (pathname.startsWith('/supplier')) {
+    if (!session) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/supplier/:path*'],
 }

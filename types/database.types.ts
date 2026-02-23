@@ -173,6 +173,10 @@ export interface Database {
           canonical_url: string | null
           noindex: boolean
           is_active: boolean
+          supplier_id: string | null
+          price: number | null
+          compare_at_price: number | null
+          stock_quantity: number | null
           created_at: string
           updated_at: string
         }
@@ -193,6 +197,10 @@ export interface Database {
           canonical_url?: string | null
           noindex?: boolean
           is_active?: boolean
+          supplier_id?: string | null
+          price?: number | null
+          compare_at_price?: number | null
+          stock_quantity?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -213,6 +221,10 @@ export interface Database {
           canonical_url?: string | null
           noindex?: boolean
           is_active?: boolean
+          supplier_id?: string | null
+          price?: number | null
+          compare_at_price?: number | null
+          stock_quantity?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -305,6 +317,9 @@ export interface Database {
           company_name: string | null
           tax_number: string | null
           phone: string | null
+          store_slug: string | null
+          store_description: string | null
+          store_logo_url: string | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -315,6 +330,9 @@ export interface Database {
           company_name?: string | null
           tax_number?: string | null
           phone?: string | null
+          store_slug?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -325,6 +343,9 @@ export interface Database {
           company_name?: string | null
           tax_number?: string | null
           phone?: string | null
+          store_slug?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string

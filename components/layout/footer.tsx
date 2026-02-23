@@ -96,6 +96,11 @@ export function Footer() {
                   İade Politikası
                 </Link>
               </li>
+              <li>
+                <Link href="/sss" className="text-slate-300 hover:text-accent transition-colors">
+                  SSS
+                </Link>
+              </li>
             </ul>
           </div>
 

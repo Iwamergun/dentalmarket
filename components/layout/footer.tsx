@@ -137,10 +137,10 @@ export function Footer() {
         <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-300">
           <p>© {new Date().getFullYear()} Dental Market. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-6">
-            <Link href="/gizlilik" className="hover:text-accent transition-colors">
+            <Link href="/gizlilik-politikasi" className="hover:text-accent transition-colors">
               Gizlilik Politikası
             </Link>
-            <Link href="/kullanim-kosullari" className="hover:text-accent transition-colors">
+            <Link href="/kullanim-sartlari" className="hover:text-accent transition-colors">
               Kullanım Koşulları
             </Link>
           </div>

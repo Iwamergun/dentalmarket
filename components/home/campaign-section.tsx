@@ -7,7 +7,7 @@ const campaigns = [
     description: 'Seçili ürünlerde %20 indirim',
     badge: '%20 İNDİRİM',
     color: 'primary',
-    href: '/kampanyalar/kis',
+    href: '/kampanyalar',
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const campaigns = [
     description: 'İlk siparişinize özel avantajlar',
     badge: 'YENİ ÜYE',
     color: 'accent',
-    href: '/kampanyalar/yeni-uye',
+    href: '/kayit',
   },
   {
     id: 3,
@@ -23,7 +23,7 @@ const campaigns = [
     description: '10+ ürün alımlarında ekstra indirim',
     badge: 'TOPLU ALIM',
     color: 'primary',
-    href: '/kampanyalar/toplu-alim',
+    href: '/kampanyalar',
   },
 ]
 

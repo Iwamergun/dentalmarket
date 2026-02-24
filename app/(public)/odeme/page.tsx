@@ -290,11 +290,11 @@ export default function CheckoutPage() {
                   className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span className="text-sm text-muted-foreground">
-                  <Link href="/kosullar" className="text-primary hover:underline">
+                  <Link href="/kullanim-sartlari" className="text-primary hover:underline">
                     Satış koşullarını
                   </Link>
                   {' '}ve{' '}
-                  <Link href="/gizlilik" className="text-primary hover:underline">
+                  <Link href="/gizlilik-politikasi" className="text-primary hover:underline">
                     gizlilik politikasını
                   </Link>
                   {' '}okudum ve kabul ediyorum.

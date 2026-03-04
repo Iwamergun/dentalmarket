@@ -34,17 +34,17 @@ export default async function SupplierLayout({
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
-    redirect('/login')
+  if (!user) {
+    redirect('/giris')
   }
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single()
 
   if (!profile || profile.role !== 'supplier') {
@@ -55,7 +55,7 @@ export default async function SupplierLayout({
     <div className="flex h-screen bg-gray-100">
       <SupplierSidebar />
       <div className="flex flex-1 flex-col">
-        <SupplierHeader user={session.user} />
+        <SupplierHeader user={user} />
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
           {children}
         </main>

@@ -27,16 +27,16 @@ export async function middleware(request: NextRequest) {
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
   // Admin route kontrolü
   if (pathname.startsWith('/admin')) {
-    if (!session) {
+    if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = '/giris'
       return NextResponse.redirect(url)
     }
 
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     if (profile?.role !== 'admin') {
@@ -56,9 +56,18 @@ export async function middleware(request: NextRequest) {
 
   // Supplier route kontrolü
   if (pathname.startsWith('/supplier')) {
-    if (!session) {
+    if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = '/giris'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Dashboard route kontrolü
+  if (pathname.startsWith('/dashboard')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/giris'
       return NextResponse.redirect(url)
     }
   }
@@ -67,5 +76,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/supplier/:path*'],
+  matcher: ['/admin/:path*', '/supplier/:path*', '/dashboard/:path*'],
 }

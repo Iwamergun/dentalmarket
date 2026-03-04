@@ -19,8 +19,7 @@ export async function getProducts(limit = 20, offset = 0): Promise<Product[]> {
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Error fetching products:', error)
-    console.error('Error details:', JSON.stringify(error, null, 2))
+    console.error('Error fetching products:', error?.message)
     return []
   }
 
@@ -39,12 +38,10 @@ export async function getProductsByCategory(categoryId: string, limit = 20, offs
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Error fetching products by category:', error)
-    console.error('Error details:', JSON.stringify(error, null, 2))
+    console.error('Error fetching products by category:', error?.message)
     return []
   }
 
-  console.log('Products found:', data?.length)  // ← Debug log ekle
   return data || []
 }
 
@@ -60,7 +57,7 @@ export async function getProductsByBrand(brandId: string, limit = 20, offset = 0
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Error fetching products by brand:', error)
+    console.error('Error fetching products by brand:', error?.message)
     return []
   }
 

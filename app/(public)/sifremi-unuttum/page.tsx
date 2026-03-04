@@ -2,25 +2,42 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { toast } from 'sonner'
-import { Mail, CheckCircle } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Geçerli bir e-posta adresi giriniz'),
+})
+
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
+
 export default function SifremiUnuttumPage() {
-  const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSent, setIsSent] = useState(false)
+  const [sentEmail, setSentEmail] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  })
+
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true)
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/sifremi-sifirla`,
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/sifre-sifirla`,
       })
 
       if (error) {
@@ -28,9 +45,9 @@ export default function SifremiUnuttumPage() {
         return
       }
 
+      setSentEmail(data.email)
       setIsSent(true)
-    } catch (error) {
-      console.error('Reset password error:', error)
+    } catch {
       toast.error('Beklenmeyen bir hata oluştu')
     } finally {
       setIsLoading(false)
@@ -44,7 +61,7 @@ export default function SifremiUnuttumPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-white font-bold text-xl">DM</span>
+              <span className="text-white font-bold text-xl">DA</span>
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-text-primary mb-2">
@@ -60,7 +77,7 @@ export default function SifremiUnuttumPage() {
             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">E-posta Gönderildi!</h2>
             <p className="text-gray-600 mb-6">
-              Gelen kutunuzu kontrol edin. Şifre sıfırlama bağlantısı <strong>{email}</strong> adresine gönderildi.
+              Gelen kutunuzu kontrol edin. Şifre sıfırlama bağlantısı <strong>{sentEmail}</strong> adresine gönderildi.
             </p>
             <Link href="/giris">
               <Button className="w-full h-12 text-base font-semibold">
@@ -70,25 +87,23 @@ export default function SifremiUnuttumPage() {
           </div>
         ) : (
           <div className="bg-background-card border border-border rounded-2xl p-6 shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-text-primary">
                   E-posta Adresi
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="ornek@klinik.com"
-                    autoComplete="email"
-                    required
-                    disabled={isLoading}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="ornek@klinik.com"
+                  autoComplete="email"
+                  disabled={isLoading}
+                  {...register('email')}
+                  className={errors.email ? 'border-red-500 focus:border-red-500' : ''}
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email.message}</p>
+                )}
               </div>
 
               <Button

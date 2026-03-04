@@ -1,4 +1,5 @@
 import { HeroSection } from '@/components/home/hero-section'
+import { ProductCarousel } from '@/components/home/product-carousel'
 import { CategoryGrid } from '@/components/home/category-grid'
 import { CampaignBanner } from '@/components/home/campaign-banner'
 import { FeaturedProducts } from '@/components/home/featured-products'
@@ -23,6 +24,9 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Product Carousel */}
+      <ProductCarousel />
       
       <main>
         <div className="container mx-auto px-4 py-8">

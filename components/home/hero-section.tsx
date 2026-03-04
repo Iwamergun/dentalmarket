@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Sparkles, ShieldCheck, Truck, Award, HeartPulse } from 'lucide-react'
+import { Sparkles, HeartPulse } from 'lucide-react'
 
 export function HeroSection() {
   return (
@@ -169,41 +169,6 @@ export function HeroSection() {
                 <p className="text-[11px] text-secondary-text mt-0.5">Müşteri memnuniyeti</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Trust Indicators — 4-column grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 pt-16">
-          <div className="bg-white rounded-2xl p-5 shadow-lg border border-border hover:border-primary/30 transition-all duration-200 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-body-text text-sm mb-1">Güvenli Ödeme</h3>
-            <p className="text-xs text-secondary-text">256-bit SSL şifreleme</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-lg border border-border hover:border-secondary/30 transition-all duration-200 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
-              <Truck className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-body-text text-sm mb-1">Hızlı Teslimat</h3>
-            <p className="text-xs text-secondary-text">2-5 iş günü kargo</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-lg border border-border hover:border-accent/30 transition-all duration-200 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-accent to-warning flex items-center justify-center">
-              <Award className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-body-text text-sm mb-1">Kalite Garantisi</h3>
-            <p className="text-xs text-secondary-text">Orijinal ürün garantisi</p>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-lg border border-border hover:border-success/30 transition-all duration-200 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-success to-info flex items-center justify-center">
-              <HeartPulse className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-body-text text-sm mb-1">7/24 Destek</h3>
-            <p className="text-xs text-secondary-text">Her zaman yanınızda</p>
           </div>
         </div>
       </div>

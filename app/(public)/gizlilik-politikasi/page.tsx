@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 
 export const metadata: Metadata = {
-  title: 'Gizlilik Politikası - DentalMarket',
-  description: 'DentalMarket Gizlilik Politikası - Kişisel verilerinizin nasıl toplandığı ve kullanıldığı hakkında bilgi edinin.',
+  title: 'Gizlilik Politikası - Dent Alışveriş',
+  description: 'Dent Alışveriş Gizlilik Politikası - Kişisel verilerinizin nasıl toplandığı ve kullanıldığı hakkında bilgi edinin.',
 }
 
 export default function GizlilikPolitikasiPage() {
@@ -25,7 +25,7 @@ export default function GizlilikPolitikasiPage() {
         <section className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3">1. Gizlilik Politikası Hakkında</h2>
           <p className="text-gray-600 leading-relaxed">
-            DentalMarket olarak kişisel verilerinizin gizliliğine büyük önem vermekteyiz. Bu Gizlilik Politikası,
+            Dent Alışveriş olarak kişisel verilerinizin gizliliğine büyük önem vermekteyiz. Bu Gizlilik Politikası,
             platformumuzu kullandığınızda hangi kişisel verileri topladığımızı, bu verileri nasıl kullandığımızı
             ve koruduğumuzu açıklamaktadır. Sitemizi kullanarak bu politikayı kabul etmiş sayılırsınız.
           </p>
@@ -114,7 +114,7 @@ export default function GizlilikPolitikasiPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-3">9. İletişim</h2>
           <p className="text-gray-600 leading-relaxed">
             Gizlilik politikamıza ilişkin sorularınız veya talepleriniz için{' '}
-            <strong>gizlilik@dentalmarket.com</strong> adresine e-posta gönderebilirsiniz.
+            <strong>gizlilik@dentalisveris.com</strong> adresine e-posta gönderebilirsiniz.
           </p>
         </section>
       </div>

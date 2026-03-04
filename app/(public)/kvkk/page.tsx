@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 
 export const metadata: Metadata = {
-  title: 'KVKK Aydınlatma Metni - DentalMarket',
-  description: 'DentalMarket KVKK (Kişisel Verilerin Korunması Kanunu) Aydınlatma Metni',
+  title: 'KVKK Aydınlatma Metni - Dent Alışveriş',
+  description: 'Dent Alışveriş KVKK (Kişisel Verilerin Korunması Kanunu) Aydınlatma Metni',
 }
 
 export default function KvkkPage() {
@@ -26,7 +26,7 @@ export default function KvkkPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-3">1. Veri Sorumlusu</h2>
           <p className="text-gray-600 leading-relaxed">
             6698 sayılı Kişisel Verilerin Korunması Kanunu (&quot;KVKK&quot;) uyarınca, kişisel verileriniz;
-            veri sorumlusu sıfatıyla DentalMarket A.Ş. tarafından aşağıda açıklanan kapsamda
+            veri sorumlusu sıfatıyla Dent Alışveriş A.Ş. tarafından aşağıda açıklanan kapsamda
             işlenebilecektir.
           </p>
         </section>
@@ -84,7 +84,7 @@ export default function KvkkPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-3">6. İletişim</h2>
           <p className="text-gray-600 leading-relaxed">
             KVKK kapsamındaki haklarınızı kullanmak için{' '}
-            <strong>kvkk@dentalmarket.com</strong> adresine e-posta gönderebilir veya{' '}
+            <strong>kvkk@dentalisveris.com</strong> adresine e-posta gönderebilir veya{' '}
             İstanbul adresimize yazılı olarak başvurabilirsiniz.
           </p>
         </section>

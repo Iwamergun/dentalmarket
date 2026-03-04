@@ -1,4 +1,4 @@
-# Dental Market
+# Dent Alışveriş
 
 A modern B2B e-commerce marketplace for dental products and equipment built with Next.js 15, TypeScript, Supabase, and TailwindCSS.
 
@@ -71,7 +71,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_NAME=Dental Market
+NEXT_PUBLIC_SITE_NAME=Dent Alışveriş
 ```
 
 **Important:** Replace `your_anon_key_here` and `your_service_role_key_here` with your actual Supabase keys.
@@ -150,8 +150,8 @@ Required environment variables:
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | `https://xxx.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJ...` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | `eyJ...` |
-| `NEXT_PUBLIC_SITE_URL` | Your site URL | `https://dentalmarket.com` |
-| `NEXT_PUBLIC_SITE_NAME` | Your site name | `Dental Market` |
+| `NEXT_PUBLIC_SITE_URL` | Your site URL | `https://dentalisveris.com` |
+| `NEXT_PUBLIC_SITE_NAME` | Your site name | `Dent Alışveriş` |
 
 ## Security Notes
 
@@ -173,7 +173,7 @@ This project is proprietary software. All rights reserved.
 
 ## Support
 
-For support, email info@dentalmarket.com or open an issue in the GitHub repository.
+For support, email info@dentalisveris.com or open an issue in the GitHub repository.
 
 ## Acknowledgments
 

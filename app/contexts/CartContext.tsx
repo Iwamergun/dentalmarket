@@ -98,7 +98,7 @@ interface CartProviderProps {
 }
 
 // Local Storage Keys
-const LOCAL_CART_KEY = 'dental_market_cart'
+const LOCAL_CART_KEY = 'dentalisveris_cart'
 
 // Free shipping threshold
 const FREE_SHIPPING_THRESHOLD = 500

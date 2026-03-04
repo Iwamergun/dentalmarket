@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'İade ve Değişim Politikası - DentalMarket',
-  description: 'DentalMarket iade ve değişim koşulları, süreci ve prosedürü hakkında bilgi alın.',
+  title: 'İade ve Değişim Politikası - Dent Alışveriş',
+  description: 'Dent Alışveriş iade ve değişim koşulları, süreci ve prosedürü hakkında bilgi alın.',
 }
 
 const policies = [

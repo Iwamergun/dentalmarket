@@ -3,13 +3,13 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { FaqAccordion } from '@/components/sss/FaqAccordion'
 
 export const metadata: Metadata = {
-  title: 'Sıkça Sorulan Sorular - DentalMarket',
-  description: 'DentalMarket hakkında merak ettiğiniz her şey. Kargo, iade, ödeme ve üyelik sorularının yanıtları.',
+  title: 'Sıkça Sorulan Sorular - Dent Alışveriş',
+  description: 'Dent Alışveriş hakkında merak ettiğiniz her şey. Kargo, iade, ödeme ve üyelik sorularının yanıtları.',
 }
 
 const faqItems = [
   {
-    question: 'DentalMarket\'e nasıl üye olabilirim?',
+    question: 'Dent Alışveriş\'e nasıl üye olabilirim?',
     answer:
       'Sağ üst köşedeki "Üye Ol" butonuna tıklayarak ad, soyad, e-posta ve şifre bilgilerinizle kolayca üye olabilirsiniz. Üyelik tamamen ücretsizdir.',
   },
@@ -51,7 +51,7 @@ const faqItems = [
   {
     question: 'Tedarikçi olarak nasıl başvurabilirim?',
     answer:
-      'Tedarikçi başvurusu için info@dentalmarket.com adresine e-posta göndererek veya iletişim formumuzu doldurarak başvurabilirsiniz. Ekibimiz en kısa sürede sizinle iletişime geçecektir.',
+      'Tedarikçi başvurusu için info@dentalisveris.com adresine e-posta göndererek veya iletişim formumuzu doldurarak başvurabilirsiniz. Ekibimiz en kısa sürede sizinle iletişime geçecektir.',
   },
   {
     question: 'Toplu alım indirimi var mı?',

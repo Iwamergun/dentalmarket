@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: SaticiPageProps): Promise<Met
   const data = await getSupplierData(slug)
   if (!data) return {}
   return {
-    title: `${data.supplier.company_name} - DentalMarket`,
+    title: `${data.supplier.company_name} - Dent Alışveriş`,
     description: data.supplier.store_description ?? `${data.supplier.company_name} mağaza sayfası`,
   }
 }

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
   if (!brand) return {}
 
   return {
-    title: brand.seo_title || `${brand.name} - Dental Market`,
+    title: brand.seo_title || `${brand.name} - Dent Alışveriş`,
     description: brand.seo_description || `${brand.name} markalı diş hekimliği ürünlerini keşfedin`,
     alternates: {
       canonical: brand.canonical_url || `/markalar/${brand.slug}`,

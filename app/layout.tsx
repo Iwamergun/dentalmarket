@@ -20,7 +20,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: "Dental Market - Diş Hekimliği Ürünleri ve Ekipmanları",
+  title: "Dent Alışveriş - Diş Hekimliği Ürünleri ve Ekipmanları",
   description: "Diş hekimliği ürünleri ve ekipmanları için önde gelen B2B e-ticaret platformu",
 };
 

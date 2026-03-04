@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Kontrol Paneli - Dental Market',
-  description: 'Dental Market kontrol paneli',
+  title: 'Kontrol Paneli - Dent Alışveriş',
+  description: 'Dent Alışveriş kontrol paneli',
 }
 
 export default function DashboardPage() {

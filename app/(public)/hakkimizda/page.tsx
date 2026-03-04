@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { Users, Target, Eye, TrendingUp, Shield, Heart, Star, Clock } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Hakkımızda - DentalMarket',
-  description: 'DentalMarket hakkında bilgi edinin. Misyonumuz, vizyonumuz ve değerlerimiz.',
+  title: 'Hakkımızda - Dent Alışveriş',
+  description: 'Dent Alışveriş hakkında bilgi edinin. Misyonumuz, vizyonumuz ve değerlerimiz.',
 }
 
 const stats = [
@@ -44,7 +44,7 @@ export default function HakkimizdaPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Biz Kimiz</h2>
             <p className="text-gray-600 leading-relaxed">
-              DentalMarket, Türkiye&apos;nin önde gelen dental B2B e-ticaret platformudur. 
+              Dent Alışveriş, Türkiye&apos;nin önde gelen dental B2B e-ticaret platformudur. 
               Diş hekimleri, klinikler ve dental laboratuvarlar için kapsamlı ürün yelpazesi 
               sunan platformumuz, sektörün ihtiyaçlarını en iyi şekilde karşılamak amacıyla kurulmuştur.
               2010 yılından bu yana güvenilir bir tedarik ortağı olarak sektörde hizmet vermekteyiz.

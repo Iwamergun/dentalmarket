@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Kategoriler - Dental Market',
+  title: 'Kategoriler - Dent Alışveriş',
   description: 'Diş hekimliği ürün kategorilerini keşfedin',
 }
 

@@ -4,7 +4,7 @@ import { BrandCard } from '@/components/catalog/brand-card'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 
 export const metadata: Metadata = {
-  title: 'Markalar - Dental Market',
+  title: 'Markalar - Dent Alışveriş',
   description: 'Diş hekimliği ürün markalarını keşfedin',
 }
 

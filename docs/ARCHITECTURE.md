@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dental Market is built using modern web technologies with a focus on performance, SEO, and scalability. This document explains the architectural decisions and patterns used throughout the application.
+Dent Alışveriş is built using modern web technologies with a focus on performance, SEO, and scalability. This document explains the architectural decisions and patterns used throughout the application.
 
 ## Technology Stack
 

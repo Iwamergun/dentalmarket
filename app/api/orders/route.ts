@@ -22,7 +22,7 @@ const createOrderSchema = z.object({
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase()
   const random = Math.random().toString(36).substring(2, 6).toUpperCase()
-  return `DM-${timestamp}-${random}`
+  return `DA-${timestamp}-${random}`
 }
 
 export async function POST(request: NextRequest) {

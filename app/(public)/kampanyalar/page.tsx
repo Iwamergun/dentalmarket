@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Kampanyalar - DentalMarket',
-  description: 'DentalMarket güncel kampanyaları ve özel fırsatları',
+  title: 'Kampanyalar - Dent Alışveriş',
+  description: 'Dent Alışveriş güncel kampanyaları ve özel fırsatları',
 }
 
 const mockCampaigns = [

@@ -32,7 +32,7 @@ interface WishlistProviderProps {
 }
 
 // Local Storage Key
-const LOCAL_WISHLIST_KEY = 'dental_market_wishlist'
+const LOCAL_WISHLIST_KEY = 'dentalisveris_wishlist'
 
 // Context
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined)

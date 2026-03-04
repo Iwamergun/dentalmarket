@@ -180,9 +180,9 @@ const InvoicePDF = ({ invoice, order, items }: InvoicePDFProps) => (
       {/* 1. Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.companyName}>DentalMarket</Text>
+          <Text style={styles.companyName}>Dent Alışveriş</Text>
           <Text style={styles.companyInfo}>Ornek Mahallesi, Ornek Cd. No:123, Istanbul</Text>
-          <Text style={styles.companyInfo}>Tel: +90 (212) 123 45 67 | Email: info@dentalmarket.com</Text>
+          <Text style={styles.companyInfo}>Tel: +90 (212) 123 45 67 | Email: info@dentalisveris.com</Text>
           <Text style={styles.companyInfo}>Vergi Dairesi: Kadikoy | Vergi No: 1234567890</Text>
         </View>
         <View>
@@ -318,8 +318,8 @@ const InvoicePDF = ({ invoice, order, items }: InvoicePDFProps) => (
       {/* 6. Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Bu fatura elektronik olarak olusturulmustur.</Text>
-        <Text style={styles.footerText}>DentalMarket - Dental Malzeme ve Ekipman Tedariki</Text>
-        <Text style={styles.footerText}>www.dentalmarket.com</Text>
+        <Text style={styles.footerText}>Dent Alışveriş - Dental Malzeme ve Ekipman Tedariki</Text>
+        <Text style={styles.footerText}>www.dentalisveris.com</Text>
       </View>
     </Page>
   </Document>

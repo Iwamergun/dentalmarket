@@ -4,8 +4,8 @@ import { IletisimForm } from '@/components/iletisim/IletisimForm'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'İletişim - DentalMarket',
-  description: 'DentalMarket ile iletişime geçin. Sorularınızı yanıtlamak için buradayız.',
+  title: 'İletişim - Dent Alışveriş',
+  description: 'Dent Alışveriş ile iletişime geçin. Sorularınızı yanıtlamak için buradayız.',
 }
 
 export default function IletisimPage() {
@@ -38,7 +38,7 @@ export default function IletisimPage() {
               <Mail className="w-5 h-5 text-primary mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-gray-700">E-posta</p>
-                <p className="text-sm text-gray-600">info@dentalmarket.com</p>
+                <p className="text-sm text-gray-600">info@dentalisveris.com</p>
               </div>
             </li>
             <li className="flex items-start gap-3">

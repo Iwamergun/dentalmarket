@@ -10,7 +10,7 @@ interface OrderConfirmationPageProps {
 export async function generateMetadata({ params }: OrderConfirmationPageProps): Promise<Metadata> {
   const { orderNumber } = await params
   return {
-    title: `Sipariş Onayı - ${orderNumber} | Dental Market`,
+    title: `Sipariş Onayı - ${orderNumber} | Dent Alışveriş`,
     description: 'Siparişiniz başarıyla oluşturuldu.',
     robots: {
       index: false,
@@ -120,7 +120,7 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
         {/* Ek Bilgi */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>
-            Dental Market&apos;i tercih ettiğiniz için teşekkür ederiz!
+            Dent Alışveriş&apos;i tercih ettiğiniz için teşekkür ederiz!
           </p>
           <p className="mt-1">
             Memnuniyetiniz bizim için önemli.

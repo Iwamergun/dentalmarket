@@ -22,7 +22,7 @@ export default function SupplierSidebar() {
   return (
     <aside className="w-64 bg-gray-900 text-white">
       <div className="p-6">
-        <h1 className="text-xl font-bold">DentalMarket</h1>
+        <h1 className="text-xl font-bold">Dent Alışveriş</h1>
         <p className="text-xs text-gray-400 mt-1">Tedarikçi Paneli</p>
       </div>
       <nav className="mt-6">

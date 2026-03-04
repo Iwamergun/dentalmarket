@@ -59,9 +59,9 @@ export function Header() {
                 <Phone className="w-4 h-4" />
                 <span>+90 (850) 123 45 67</span>
               </a>
-              <a href="mailto:info@dentalmarket.com" className="flex items-center gap-1.5 hover:text-accent transition-colors">
+              <a href="mailto:info@dentalisveris.com" className="flex items-center gap-1.5 hover:text-accent transition-colors">
                 <Mail className="w-4 h-4" />
-                <span>info@dentalmarket.com</span>
+                <span>info@dentalisveris.com</span>
               </a>
             </div>
           </div>
@@ -75,11 +75,11 @@ export function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-xl">DM</span>
+                <span className="text-white font-bold text-xl">DA</span>
               </div>
               <div className="hidden sm:block">
                 <span className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                  DentalMarket
+                  Dent Alışveriş
                 </span>
               </div>
             </Link>

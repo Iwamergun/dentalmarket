@@ -10,10 +10,10 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-warning flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">DM</span>
+                <span className="text-white font-bold text-lg">DA</span>
               </div>
               <span className="text-2xl font-extrabold bg-gradient-to-r from-white to-accent bg-clip-text text-transparent">
-                DentalMarket
+                Dent Alışveriş
               </span>
             </Link>
             <p className="text-sm text-slate-300 max-w-sm mb-6">
@@ -112,7 +112,7 @@ export function Footer() {
                 <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                info@dentalmarket.com
+                info@dentalisveris.com
               </li>
               <li className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ export function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-300">
-          <p>© {new Date().getFullYear()} Dental Market. Tüm hakları saklıdır.</p>
+          <p>© {new Date().getFullYear()} Dent Alışveriş. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-6">
             <Link href="/gizlilik-politikasi" className="hover:text-accent transition-colors">
               Gizlilik Politikası

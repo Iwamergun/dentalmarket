@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { ProductsClient } from '@/components/catalog/products-client'
 
 export const metadata: Metadata = {
-  title: 'Ürünler - Dental Market',
+  title: 'Ürünler - Dent Alışveriş',
   description: 'Diş hekimliği ürünlerini keşfedin',
 }
 

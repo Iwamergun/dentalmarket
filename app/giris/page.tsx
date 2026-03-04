@@ -66,14 +66,14 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-white font-bold text-xl">DM</span>
+              <span className="text-white font-bold text-xl">DA</span>
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-text-primary mb-2">
             Hesabınıza Giriş Yapın
           </h1>
           <p className="text-text-secondary">
-            Dental Market&apos;e hoş geldiniz
+            Dent Alışveriş&apos;e hoş geldiniz
           </p>
         </div>
 

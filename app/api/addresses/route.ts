@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addressFormSchema } from '@/lib/validations/address'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 // GET: Kullanıcının tüm adreslerini getir
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`addresses:${ip}`, { limit: 20, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -24,7 +34,7 @@ export async function GET() {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Adresler getirilirken hata:', error)
+      console.error('Adresler getirilirken hata:', error.message)
       return NextResponse.json(
         { error: 'Adresler getirilirken bir hata oluştu' },
         { status: 500 }
@@ -33,7 +43,7 @@ export async function GET() {
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('Adresler API hatası:', err)
+    console.error('Adresler API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }
@@ -44,6 +54,15 @@ export async function GET() {
 // POST: Yeni adres ekle
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`addresses:${ip}`, { limit: 20, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -109,7 +128,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Adres eklenirken hata:', error)
+      console.error('Adres eklenirken hata:', error.message)
       return NextResponse.json(
         { error: 'Adres eklenirken bir hata oluştu' },
         { status: 500 }
@@ -118,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data }, { status: 201 })
   } catch (err) {
-    console.error('Adres ekleme API hatası:', err)
+    console.error('Adres ekleme API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }

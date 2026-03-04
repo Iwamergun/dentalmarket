@@ -3,9 +3,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import React from 'react'
 import { renderToStream } from '@react-pdf/renderer'
 import InvoicePDF from '@/components/InvoicePDF'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`invoices:${ip}`, { limit: 3, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const supabase = await createClient()
 
     // Body'den order_id al
@@ -19,8 +29,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Fatura olusturuluyor, order_id:', order_id)
-
     // Sipariş bilgilerini çek
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order, error: orderError } = await (supabase as any)
@@ -30,14 +38,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (orderError || !order) {
-      console.log('Order fetch error:', orderError)
       return NextResponse.json(
         { error: 'Siparis bulunamadi', details: orderError?.message },
         { status: 404 }
       )
     }
-
-    console.log('Order fetched:', order.order_number)
 
     // Sipariş kalemlerini çek (catalog_products ile birlikte)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,20 +59,16 @@ export async function POST(request: NextRequest) {
       .eq('order_id', order_id)
 
     if (itemsError) {
-      console.log('Order items fetch error:', itemsError)
       return NextResponse.json(
         { error: 'Siparis kalemleri alinamadi', details: itemsError.message },
         { status: 500 }
       )
     }
 
-    console.log('Order items fetched:', orderItems?.length || 0)
-
     // Fatura numarası oluştur
     const { data: invoiceNumberData, error: invoiceNumberError } = await supabase.rpc('generate_invoice_number')
 
     if (invoiceNumberError) {
-      console.log('Invoice number generation error:', invoiceNumberError)
       return NextResponse.json(
         { error: 'Fatura numarasi olusturulamadi', details: invoiceNumberError.message },
         { status: 500 }
@@ -75,7 +76,6 @@ export async function POST(request: NextRequest) {
     }
 
     const invoice_number = invoiceNumberData as string
-    console.log('Generated invoice number:', invoice_number)
 
     // Müşteri adını billing_type'a göre belirle
     const customer_name =
@@ -109,18 +109,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (invoiceError || !invoice) {
-      console.log('Invoice insert error:', invoiceError)
       return NextResponse.json(
         { error: 'Fatura kaydı olusturulamadi', details: invoiceError?.message },
         { status: 500 }
       )
     }
 
-    console.log('Invoice created:', invoice.id)
-
     // PDF oluştur
-    console.log('PDF olusturuluyor...')
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pdfStream = await renderToStream(
       React.createElement(InvoicePDF, {
@@ -138,8 +133,6 @@ export async function POST(request: NextRequest) {
     }
     const pdfBuffer = Buffer.concat(chunks)
 
-    console.log('PDF olusturuldu, boyut:', pdfBuffer.length, 'bytes')
-
     // Supabase Storage'a yükle
     const fileName = `invoices/${invoice.invoice_number}.pdf`
 
@@ -151,14 +144,11 @@ export async function POST(request: NextRequest) {
       })
 
     if (uploadError) {
-      console.log('PDF upload error:', uploadError)
       return NextResponse.json(
         { error: 'PDF yuklenemedi', details: uploadError.message },
         { status: 500 }
       )
     }
-
-    console.log('PDF yuklendi:', fileName)
 
     // Public URL al
     const { data: urlData } = supabase.storage
@@ -166,8 +156,6 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(fileName)
 
     const pdfUrl = urlData.publicUrl
-
-    console.log('PDF URL:', pdfUrl)
 
     // invoices kaydını güncelle
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -180,11 +168,8 @@ export async function POST(request: NextRequest) {
       .eq('id', invoice.id)
 
     if (updateError) {
-      console.log('Invoice update error:', updateError)
       // PDF oluşturuldu ama kayıt güncellenemedi - kritik değil
     }
-
-    console.log('Fatura basariyla olusturuldu:', invoice.invoice_number)
 
     // Response döndür
     return NextResponse.json({
@@ -196,7 +181,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.log('Invoice generate error:', error)
+    console.error('Invoice generation error:', error instanceof Error ? error.message : error)
     return NextResponse.json(
       { error: 'Fatura olusturulurken bir hata olustu' },
       { status: 500 }

@@ -28,7 +28,7 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Adres getirilirken hata:', error)
+      console.error('Adres getirilirken hata:', error.message)
       return NextResponse.json(
         { error: 'Adres bulunamadı' },
         { status: 404 }
@@ -37,7 +37,7 @@ export async function GET(
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('Adres detay API hatası:', err)
+    console.error('Adres detay API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }
@@ -126,7 +126,7 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Adres güncellenirken hata:', error)
+      console.error('Adres güncellenirken hata:', error.message)
       return NextResponse.json(
         { error: 'Adres güncellenirken bir hata oluştu' },
         { status: 500 }
@@ -135,7 +135,7 @@ export async function PUT(
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('Adres güncelleme API hatası:', err)
+    console.error('Adres güncelleme API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }
@@ -192,7 +192,7 @@ export async function DELETE(
       .eq('user_id', user.id)
 
     if (error) {
-      console.error('Adres silinirken hata:', error)
+      console.error('Adres silinirken hata:', error.message)
       return NextResponse.json(
         { error: 'Adres silinirken bir hata oluştu' },
         { status: 500 }
@@ -201,7 +201,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Adres başarıyla silindi' })
   } catch (err) {
-    console.error('Adres silme API hatası:', err)
+    console.error('Adres silme API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }

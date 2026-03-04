@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 // Guest sepet item şeması
 const guestCartItemSchema = z.object({
@@ -24,6 +25,15 @@ const syncCartSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`cart-sync:${ip}`, { limit: 10, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const supabase = await createClient()
     
     // Kullanıcı kimlik doğrulaması
@@ -79,7 +89,6 @@ export async function POST(request: Request) {
         .single()
 
       if (createError || !newCart) {
-        console.error('Cart creation error:', createError)
         return NextResponse.json(
           { error: 'Sepet oluşturulamadı' },
           { status: 500 }
@@ -152,7 +161,7 @@ export async function POST(request: Request) {
     })
 
   } catch (error) {
-    console.error('Cart Sync API Error:', error)
+    console.error('Cart Sync API Error:', error instanceof Error ? error.message : error)
     return NextResponse.json(
       { error: 'Sepet senkronizasyonunda bir hata oluştu' },
       { status: 500 }

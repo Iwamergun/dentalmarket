@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`admin-orders:${ip}`, { limit: 30, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { success: false, error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     // 1. Supabase client oluştur
     const supabase = await createClient()
 

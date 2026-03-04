@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 // Tek ürün stok kontrolü şeması
 const singleItemSchema = z.object({
@@ -45,6 +46,15 @@ interface InventoryCheckResult {
  */
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`inventory:${ip}`, { limit: 30, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const supabase = await createClient()
     
     const body = await request.json()
@@ -195,6 +205,15 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   try {
+    const ip = getClientIp(request)
+    const limiter = rateLimit(`inventory:${ip}`, { limit: 30, windowMs: 60_000 })
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika bekleyin.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const productId = searchParams.get('product_id')
     const variantId = searchParams.get('variant_id')

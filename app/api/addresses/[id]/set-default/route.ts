@@ -52,7 +52,7 @@ export async function POST(
       .single()
 
     if (error) {
-      console.error('Varsayılan adres güncellenirken hata:', error)
+      console.error('Varsayılan adres güncellenirken hata:', error.message)
       return NextResponse.json(
         { error: 'Varsayılan adres güncellenirken bir hata oluştu' },
         { status: 500 }
@@ -61,7 +61,7 @@ export async function POST(
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('Varsayılan adres API hatası:', err)
+    console.error('Varsayılan adres API hatası:', err instanceof Error ? err.message : String(err))
     return NextResponse.json(
       { error: 'Beklenmeyen bir hata oluştu' },
       { status: 500 }

@@ -7,6 +7,30 @@ export async function GET(
 ) {
   try {
     const supabase = await createClient()
+
+    // Auth kontrolü
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Oturum açmanız gerekiyor' },
+        { status: 401 }
+      )
+    }
+
+    // Admin rol kontrolü
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json(
+        { success: false, error: 'Bu işlem için yetkiniz yok' },
+        { status: 403 }
+      )
+    }
+
     const { id } = await params
 
     console.log('=== ORDER DETAIL API START ===')

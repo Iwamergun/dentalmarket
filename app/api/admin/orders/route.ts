@@ -3,9 +3,35 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
+    // 1. Supabase client oluştur
+    const supabase = await createClient()
+
+    // Auth kontrolü
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Oturum açmanız gerekiyor' },
+        { status: 401 }
+      )
+    }
+
+    // Admin rol kontrolü
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json(
+        { success: false, error: 'Bu işlem için yetkiniz yok' },
+        { status: 403 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
 
-    // 1. Query params al ve parse et
+    // 2. Query params al ve parse et
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const offset = (page - 1) * limit
@@ -14,9 +40,6 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
-
-    // 2. Supabase client oluştur
-    const supabase = await createClient()
 
     // 3. Query builder
     let query = supabase

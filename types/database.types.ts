@@ -31,6 +31,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       cart_items: {
         Row: {
@@ -63,6 +64,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       brands: {
         Row: {
@@ -101,6 +103,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       categories: {
         Row: {
@@ -154,6 +157,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       catalog_products: {
         Row: {
@@ -228,6 +232,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       catalog_product_categories: {
         Row: {
@@ -245,6 +250,7 @@ export interface Database {
           category_id?: string
           is_primary?: boolean
         }
+        Relationships: []
       }
       catalog_product_images: {
         Row: {
@@ -274,6 +280,7 @@ export interface Database {
           is_primary?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       catalog_product_variants: {
         Row: {
@@ -309,6 +316,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -350,6 +358,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       offers: {
         Row: {
@@ -400,6 +409,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       media_assets: {
         Row: {
@@ -441,6 +451,7 @@ export interface Database {
           bytes?: number | null
           created_at?: string
         }
+        Relationships: []
       }
       orders: {
         Row: {
@@ -488,6 +499,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       order_items: {
         Row: {
@@ -520,6 +532,7 @@ export interface Database {
           total_price?: number
           created_at?: string
         }
+        Relationships: []
       }
       addresses: {
         Row: {
@@ -573,6 +586,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       wishlist: {
         Row: {
@@ -593,6 +607,7 @@ export interface Database {
           product_id?: string
           created_at?: string
         }
+        Relationships: []
       }
       product_reviews: {
         Row: {
@@ -628,6 +643,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
     }
     Views: {

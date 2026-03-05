@@ -20,6 +20,8 @@ interface CarouselProduct {
 }
 
 const PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='224' height='224' viewBox='0 0 224 224'%3E%3Crect width='224' height='224' fill='%23f3f4f6'/%3E%3Ctext x='112' y='112' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EGörsel Yok%3C/text%3E%3C/svg%3E"
+const SCROLL_STEP = 300
+const AUTO_SCROLL_INTERVAL = 3000
 
 function SkeletonCard() {
   return (
@@ -98,6 +100,28 @@ export function ProductCarousel() {
   const [title, setTitle] = useState('Popüler Ürünler')
   const [loading, setLoading] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const startAutoScroll = () => {
+    if (autoScrollRef.current) clearInterval(autoScrollRef.current)
+    autoScrollRef.current = setInterval(() => {
+      const el = scrollRef.current
+      if (!el) return
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: 'smooth' })
+      } else {
+        el.scrollBy({ left: SCROLL_STEP, behavior: 'smooth' })
+      }
+    }, AUTO_SCROLL_INTERVAL)
+  }
+
+  const stopAutoScroll = () => {
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current)
+      autoScrollRef.current = null
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController()
@@ -118,15 +142,23 @@ export function ProductCarousel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
+  useEffect(() => {
+    if (!loading && products.length > 0) {
+      startAutoScroll()
+    }
+    return () => stopAutoScroll()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, products.length])
+
   const scrollLeft = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' })
+      scrollRef.current.scrollBy({ left: -SCROLL_STEP, behavior: 'smooth' })
     }
   }
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' })
+      scrollRef.current.scrollBy({ left: SCROLL_STEP, behavior: 'smooth' })
     }
   }
 
@@ -170,6 +202,8 @@ export function ProductCarousel() {
         <div className="container mx-auto px-4">
           <div
             ref={scrollRef}
+            onMouseEnter={stopAutoScroll}
+            onMouseLeave={startAutoScroll}
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory"
           >
             {products.map((product) => (

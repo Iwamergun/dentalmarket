@@ -26,7 +26,7 @@ export default async function HomePage() {
       <HeroSection />
 
       {/* Product Carousel */}
-      <ProductCarousel />
+      <ProductCarousel fallbackProducts={products} />
       
       <main>
         <div className="container mx-auto px-4 py-8">

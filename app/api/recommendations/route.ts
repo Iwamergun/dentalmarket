@@ -10,6 +10,16 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
+    type ProductRaw = {
+      id: string
+      name: string
+      slug: string
+      primary_image: string | null
+      brand_id: string | null
+      default_offer_id: string | null
+      brands: { name: string } | null
+    }
+
     type ProductRow = {
       id: string
       name: string
@@ -19,6 +29,38 @@ export async function GET(request: NextRequest) {
       compare_at_price: number | null
       brand_id: string | null
       brands: { name: string } | null
+    }
+
+    const PRODUCT_SELECT = 'id, name, slug, primary_image, brand_id, default_offer_id, brands(name)'
+
+    async function attachPrices(rows: ProductRaw[]): Promise<ProductRow[]> {
+      const offerIds = rows
+        .map((p) => p.default_offer_id)
+        .filter((id): id is string => id !== null)
+
+      const priceMap: Record<string, number> = {}
+      if (offerIds.length > 0) {
+        const { data: offers } = await supabase
+          .from('offers')
+          .select('id, price')
+          .in('id', offerIds)
+        if (offers) {
+          for (const o of offers) {
+            priceMap[o.id] = o.price
+          }
+        }
+      }
+
+      return rows.map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        primary_image: p.primary_image,
+        brand_id: p.brand_id,
+        brands: p.brands,
+        price: p.default_offer_id != null ? (priceMap[p.default_offer_id] ?? null) : null,
+        compare_at_price: null,
+      }))
     }
 
     let products: ProductRow[] = []
@@ -67,14 +109,14 @@ export async function GET(request: NextRequest) {
       if (categoryIds.length > 0) {
         const { data } = await supabase
           .from('catalog_products')
-          .select('id, name, slug, primary_image, price, compare_at_price, brand_id, brands(name)')
+          .select(PRODUCT_SELECT)
           .in('primary_category_id', categoryIds)
           .eq('is_active', true)
           .order('created_at', { ascending: false })
           .limit(limit)
 
         if (data && data.length > 0) {
-          products = data as unknown as ProductRow[]
+          products = await attachPrices(data as unknown as ProductRaw[])
           personalized = true
         }
       }
@@ -84,12 +126,12 @@ export async function GET(request: NextRequest) {
     if (products.length === 0) {
       const { data } = await supabase
         .from('catalog_products')
-        .select('id, name, slug, primary_image, price, compare_at_price, brand_id, brands(name)')
+        .select(PRODUCT_SELECT)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(limit)
 
-      products = (data ?? []) as unknown as ProductRow[]
+      products = await attachPrices((data ?? []) as unknown as ProductRaw[])
     }
 
     const title = personalized ? 'Size Özel Öneriler' : 'Popüler Ürünler'

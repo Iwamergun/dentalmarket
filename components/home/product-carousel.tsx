@@ -23,6 +23,10 @@ interface ProductCarouselProps {
   fallbackProducts?: Product[]
 }
 
+function isValidPrice(value: number | null | undefined): value is number {
+  return value !== null && value !== undefined && !isNaN(value)
+}
+
 function SkeletonCard() {
   return (
     <div className="w-56 flex-shrink-0 rounded-2xl border border-border bg-white shadow-lg overflow-hidden animate-pulse">
@@ -38,10 +42,15 @@ function SkeletonCard() {
 }
 
 function ProductCard({ product }: { product: CarouselProduct }) {
-  const imageUrl = getImageUrl(product.primary_image)
+  const rawImageUrl = getImageUrl(product.primary_image)
+  const imageUrl =
+    rawImageUrl === '/placeholder-product.jpg' || !product.primary_image
+      ? 'https://placehold.co/400x400/f0f0ff/6366f1?text=Ürün+Görseli'
+      : rawImageUrl
+
   const hasDiscount =
-    product.compare_at_price !== null &&
-    product.price !== null &&
+    isValidPrice(product.compare_at_price) &&
+    isValidPrice(product.price) &&
     product.compare_at_price > product.price
 
   return (
@@ -68,14 +77,18 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           {product.name}
         </h3>
         <div className="flex items-center gap-2 pt-1">
-          {product.price !== null && (
+          {isValidPrice(product.price) ? (
             <span className="text-sm font-extrabold text-primary">
               {formatPrice(product.price)}
             </span>
+          ) : (
+            <span className="text-xs text-secondary-text italic">
+              Fiyat için iletişime geçin
+            </span>
           )}
-          {hasDiscount && product.compare_at_price !== null && (
+          {hasDiscount && (
             <span className="text-xs text-secondary-text line-through">
-              {formatPrice(product.compare_at_price)}
+              {formatPrice(product.compare_at_price as number)}
             </span>
           )}
         </div>
@@ -147,7 +160,7 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
         </div>
       ) : (
         <div
-          className="overflow-hidden"
+          className="container mx-auto px-4 overflow-hidden"
           onMouseEnter={() => {
             if (trackRef.current) trackRef.current.style.animationPlayState = 'paused'
           }}

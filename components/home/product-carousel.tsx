@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
+import type { Product } from '@/types/catalog.types'
 
 interface CarouselProduct {
   id: string
@@ -16,6 +17,10 @@ interface CarouselProduct {
   compare_at_price: number | null
   brand_id: string | null
   brands: { name: string } | null
+}
+
+interface ProductCarouselProps {
+  fallbackProducts?: Product[]
 }
 
 function SkeletonCard() {
@@ -79,7 +84,20 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   )
 }
 
-export function ProductCarousel() {
+function toCarouselProduct(product: Product): CarouselProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    primary_image: product.primary_image,
+    price: product.price,
+    compare_at_price: product.compare_at_price,
+    brand_id: product.brand_id,
+    brands: null,
+  }
+}
+
+export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps) {
   const { user } = useAuth()
   const [products, setProducts] = useState<CarouselProduct[]>([])
   const [title, setTitle] = useState('Popüler Ürünler')
@@ -91,13 +109,16 @@ export function ProductCarousel() {
     fetch('/api/recommendations?limit=16', { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => {
-        if (data.products) {
+        if (data.products && data.products.length > 0) {
           setProducts(data.products)
           setTitle(data.title ?? 'Popüler Ürünler')
+        } else {
+          setProducts(fallbackProducts.map(toCarouselProduct))
         }
       })
       .catch((err) => {
         if (err?.name !== 'AbortError') console.error('Carousel fetch error:', err)
+        setProducts(fallbackProducts.map(toCarouselProduct))
       })
       .finally(() => setLoading(false))
     return () => controller.abort()
@@ -120,7 +141,11 @@ export function ProductCarousel() {
             <SkeletonCard key={i} />
           ))}
         </div>
-      ) : products.length === 0 ? null : (
+      ) : products.length === 0 ? (
+        <div className="container mx-auto px-4 text-center py-8">
+          <p className="text-secondary-text">Yakında yeni ürünler eklenecektir</p>
+        </div>
+      ) : (
         <div
           className="overflow-hidden"
           onMouseEnter={() => {

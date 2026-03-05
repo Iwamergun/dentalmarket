@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
-import type { Product } from '@/types/catalog.types'
 
 interface CarouselProduct {
   id: string
@@ -19,9 +19,7 @@ interface CarouselProduct {
   brands: { name: string } | null
 }
 
-interface ProductCarouselProps {
-  fallbackProducts?: Product[]
-}
+const PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='224' height='224' viewBox='0 0 224 224'%3E%3Crect width='224' height='224' fill='%23f3f4f6'/%3E%3Ctext x='112' y='112' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EGörsel Yok%3C/text%3E%3C/svg%3E"
 
 function SkeletonCard() {
   return (
@@ -38,24 +36,30 @@ function SkeletonCard() {
 }
 
 function ProductCard({ product }: { product: CarouselProduct }) {
-  const imageUrl = getImageUrl(product.primary_image)
+  const [imgSrc, setImgSrc] = useState(getImageUrl(product.primary_image))
   const hasDiscount =
     product.compare_at_price !== null &&
     product.price !== null &&
+    !isNaN(product.compare_at_price) &&
+    !isNaN(product.price) &&
     product.compare_at_price > product.price
+
+  const validPrice =
+    product.price !== null && !isNaN(product.price) && product.price > 0
 
   return (
     <Link
       href={`/urunler/${product.slug}`}
-      className="w-56 flex-shrink-0 rounded-2xl border border-border bg-white shadow-lg overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 group"
+      className="w-56 flex-shrink-0 snap-start rounded-2xl border border-border bg-white shadow-lg overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 group"
     >
       <div className="aspect-square relative overflow-hidden bg-background">
         <Image
-          src={imageUrl}
+          src={imgSrc}
           alt={product.name}
           fill
           sizes="224px"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={() => setImgSrc(PLACEHOLDER_SVG)}
         />
       </div>
       <div className="p-4 space-y-1">
@@ -68,9 +72,13 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           {product.name}
         </h3>
         <div className="flex items-center gap-2 pt-1">
-          {product.price !== null && (
+          {validPrice ? (
             <span className="text-sm font-extrabold text-primary">
-              {formatPrice(product.price)}
+              {formatPrice(product.price!)}
+            </span>
+          ) : (
+            <span className="text-xs text-secondary-text italic">
+              Fiyat için iletişime geçin
             </span>
           )}
           {hasDiscount && product.compare_at_price !== null && (
@@ -84,25 +92,12 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   )
 }
 
-function toCarouselProduct(product: Product): CarouselProduct {
-  return {
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    primary_image: product.primary_image,
-    price: product.price,
-    compare_at_price: product.compare_at_price,
-    brand_id: product.brand_id,
-    brands: null,
-  }
-}
-
-export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps) {
+export function ProductCarousel() {
   const { user } = useAuth()
   const [products, setProducts] = useState<CarouselProduct[]>([])
   const [title, setTitle] = useState('Popüler Ürünler')
   const [loading, setLoading] = useState(true)
-  const trackRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -112,13 +107,10 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
         if (data.products && data.products.length > 0) {
           setProducts(data.products)
           setTitle(data.title ?? 'Popüler Ürünler')
-        } else {
-          setProducts(fallbackProducts.map(toCarouselProduct))
         }
       })
       .catch((err) => {
         if (err?.name !== 'AbortError') console.error('Carousel fetch error:', err)
-        setProducts(fallbackProducts.map(toCarouselProduct))
       })
       .finally(() => setLoading(false))
     return () => controller.abort()
@@ -126,13 +118,42 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
-  // Duplicate the list so the marquee loops seamlessly
-  const displayProducts = products.length > 0 ? [...products, ...products] : []
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' })
+    }
+  }
 
   return (
     <section className="py-10 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-extrabold text-foreground mb-6">{title}</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>
+          {products.length > 0 && (
+            <div className="flex gap-2">
+              <button
+                onClick={scrollLeft}
+                className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-colors shadow-sm"
+                aria-label="Sola kaydır"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={scrollRight}
+                className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-colors shadow-sm"
+                aria-label="Sağa kaydır"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -146,24 +167,13 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
           <p className="text-secondary-text">Yakında yeni ürünler eklenecektir</p>
         </div>
       ) : (
-        <div
-          className="overflow-hidden"
-          onMouseEnter={() => {
-            if (trackRef.current) trackRef.current.style.animationPlayState = 'paused'
-          }}
-          onMouseLeave={() => {
-            if (trackRef.current) trackRef.current.style.animationPlayState = 'running'
-          }}
-        >
+        <div className="container mx-auto px-4">
           <div
-            ref={trackRef}
-            className="flex gap-4 w-max"
-            style={{
-              animation: `carousel-scroll ${products.length * 3}s linear infinite`,
-            }}
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory"
           >
-            {displayProducts.map((product, idx) => (
-              <ProductCard key={`${product.id}-${idx}`} product={product} />
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

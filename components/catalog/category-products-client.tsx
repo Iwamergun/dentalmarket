@@ -8,10 +8,11 @@ import { ProductImageCard } from '@/components/catalog/product-image-card'
 import { SortSelect } from '@/components/catalog/sort-select'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import type { Category, Brand, Product } from '@/types/catalog.types'
+import type { Category, Brand } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface CategoryProductsClientProps {
-  products: Product[]
+  products: BestOfferProduct[]
   categories: Category[]
   brands: Brand[]
   currentCategoryId: string

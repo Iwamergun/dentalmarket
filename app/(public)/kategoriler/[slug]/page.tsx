@@ -5,7 +5,8 @@ import { getAllCategories } from '@/lib/supabase/queries/categories'
 import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { CategoryProductsClient } from '@/components/catalog/category-products-client'
-import { Category, Product } from '@/types/catalog.types'
+import { Category } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 // Force dynamic rendering to ensure cookies work properly
 export const dynamic = 'force-dynamic'
@@ -63,15 +64,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound()
   }
 
-  // Ürünleri çek (basit query)
+  // Ürünleri çek (v_product_best_offer view kullan)
   const { data: productsData } = await supabase
-    .from('catalog_products')
+    .from('v_product_best_offer' as 'catalog_products')
     .select('*')
     .eq('primary_category_id', category.id)
     .eq('is_active', true)
+    .order('min_price', { ascending: true, nullsFirst: false })
     .limit(100)
 
-  const products = (productsData || []) as Product[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const products = (productsData || []) as any as BestOfferProduct[]
 
   // Fetch all categories and brands for filters
   const [allCategories, brands] = await Promise.all([

@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getProductBySlug, getProductsByCategory } from '@/lib/supabase/queries/products'
+import { getProductBySlug, getProductsByCategoryWithOffers, getProductOffers } from '@/lib/supabase/queries/products'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { ProductDetailClient } from '@/components/product'
 import { RelatedProducts } from '@/components/product'
@@ -56,10 +56,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound()
 
   // Benzer ürünleri çek (aynı kategoriden)
-  let relatedProducts: Awaited<ReturnType<typeof getProductsByCategory>> = []
+  let relatedProducts: Awaited<ReturnType<typeof getProductsByCategoryWithOffers>> = []
   if (product.primary_category_id) {
-    relatedProducts = await getProductsByCategory(product.primary_category_id, 5)
+    relatedProducts = await getProductsByCategoryWithOffers(product.primary_category_id, 5)
   }
+
+  // Satıcı tekliflerini çek
+  const offers = await getProductOffers(product.id)
 
   // Breadcrumb öğeleri
   const breadcrumbItems = [
@@ -91,17 +94,30 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   // Fiyat ve stok bilgisi varsa offers ekle
   if (product.price) {
-    productSchema.offers = {
-      '@type': 'Offer',
-      price: product.price,
-      priceCurrency: 'TRY',
-      availability: product.stock_quantity !== null && product.stock_quantity > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      seller: {
-        '@type': 'Organization',
-        name: siteConfig.name,
-      },
+    if (product.offer_count && product.offer_count > 1 && product.price_min && product.price_max) {
+      productSchema.offers = {
+        '@type': 'AggregateOffer',
+        lowPrice: product.price_min,
+        highPrice: product.price_max,
+        priceCurrency: 'TRY',
+        offerCount: product.offer_count,
+        availability: product.stock_quantity !== null && product.stock_quantity > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+      }
+    } else {
+      productSchema.offers = {
+        '@type': 'Offer',
+        price: product.price,
+        priceCurrency: 'TRY',
+        availability: product.stock_quantity !== null && product.stock_quantity > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        seller: {
+          '@type': 'Organization',
+          name: siteConfig.name,
+        },
+      }
     }
   }
 
@@ -118,7 +134,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       
       {/* Ürün Detay - Client Component */}
       <div className="mt-8">
-        <ProductDetailClient product={product} />
+        <ProductDetailClient product={product} offers={offers} />
       </div>
 
       {/* Sekmeler: Açıklama, Özellikler, Kargo */}

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils/cn'
 interface AddToCartButtonProps {
   productId: string
   variantId?: string | null
+  offerId?: string
   quantity?: number
   productName?: string
   className?: string
@@ -22,6 +23,7 @@ interface AddToCartButtonProps {
 export function AddToCartButton({
   productId,
   variantId,
+  offerId,
   quantity = 1,
   productName,
   className,
@@ -40,7 +42,7 @@ export function AddToCartButton({
     setLoading(true)
 
     try {
-      await addToCart(productId, variantId, quantity)
+      await addToCart(productId, variantId, quantity, offerId)
       
       setSuccess(true)
       toast.success(

@@ -12,6 +12,8 @@ import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
 import { toast } from 'sonner'
 import type { ProductWithRelations } from '@/types/catalog.types'
+import type { ProductOffer } from '@/lib/supabase/queries/products'
+import { SupplierOffersSection } from './SupplierOffersSection'
 
 interface ProductDetailClientProps {
   product: ProductWithRelations & {
@@ -19,10 +21,14 @@ interface ProductDetailClientProps {
     compare_at_price?: number | null
     stock_quantity?: number | null
     images?: string[] | null
+    offer_count?: number
+    price_min?: number | null
+    price_max?: number | null
   }
+  offers?: ProductOffer[]
 }
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, offers = [] }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
@@ -60,10 +66,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     }
   }
 
+  // Find best offer for quick add-to-cart and supplier name
+  const defaultOffer = offers.length > 0 ? offers[0] : undefined
+  const bestOfferId = defaultOffer?.offer_id
+
   const handleAddToCart = async () => {
     setIsAdding(true)
     try {
-      await addToCart(product.id, null, quantity)
+      await addToCart(product.id, null, quantity, bestOfferId)
       setIsAdded(true)
       toast.success(`${quantity} adet "${product.name}" sepete eklendi`)
       setTimeout(() => {
@@ -189,22 +199,35 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         {/* Fiyat */}
         <div className="py-4 border-y border-border/50">
           {product.price ? (
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-primary">
-                {formatPrice(product.price)}
-              </span>
-              {product.compare_at_price && product.compare_at_price > product.price && (
-                <span className="text-xl text-muted-foreground line-through">
-                  {formatPrice(product.compare_at_price)}
+            <>
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl font-bold text-primary">
+                  {formatPrice(product.price)}
                 </span>
-              )}
-            </div>
+                {product.price_min != null && product.price_max != null && product.price_min !== product.price_max && (
+                  <span className="text-lg text-muted-foreground">
+                    – {formatPrice(product.price_max)}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm text-muted-foreground">KDV Dahil</p>
+              </div>
+              {(product.offer_count ?? 0) > 1 ? (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {product.offer_count} satıcıdan en ucuz fiyat
+                </p>
+              ) : defaultOffer?.supplier_name ? (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Satıcı: {defaultOffer.supplier_name}
+                </p>
+              ) : null}
+            </>
           ) : (
             <span className="text-2xl font-semibold text-muted-foreground">
               Fiyat için iletişime geçin
             </span>
           )}
-          <p className="text-sm text-muted-foreground mt-1">KDV Dahil</p>
         </div>
 
         {/* Stok Durumu Badge */}
@@ -318,6 +341,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </div>
           </div>
         </div>
+
+        {/* Satıcı Teklifleri */}
+        {offers.length > 0 && (
+          <SupplierOffersSection
+            offers={offers}
+            productId={product.id}
+            productName={product.name}
+          />
+        )}
       </div>
     </div>
   )

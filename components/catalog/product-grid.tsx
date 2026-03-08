@@ -1,8 +1,8 @@
 import { ProductCard } from './product-card'
-import type { ProductWithRelations } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface ProductGridProps {
-  products: ProductWithRelations[]
+  products: BestOfferProduct[]
 }
 
 export function ProductGrid({ products }: ProductGridProps) {

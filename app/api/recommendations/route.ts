@@ -10,16 +10,6 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    type ProductRaw = {
-      id: string
-      name: string
-      slug: string
-      primary_image: string | null
-      brand_id: string | null
-      default_offer_id: string | null
-      brands: { name: string } | null
-    }
-
     type ProductRow = {
       id: string
       name: string
@@ -28,38 +18,28 @@ export async function GET(request: NextRequest) {
       price: number | null
       compare_at_price: number | null
       brand_id: string | null
-      brands: { name: string } | null
+      brand_name: string | null
+      offer_count: number
+      price_min: number | null
+      price_max: number | null
     }
 
-    const PRODUCT_SELECT = 'id, name, slug, primary_image, brand_id, default_offer_id, brands(name)'
+    const VIEW_TABLE = 'v_product_best_offer' as 'catalog_products'
+    const VIEW_SELECT = 'id, name, slug, primary_image, brand_id, brand_name, min_price, offer_count, price_min, price_max'
 
-    async function attachPrices(rows: ProductRaw[]): Promise<ProductRow[]> {
-      const offerIds = rows
-        .map((p) => p.default_offer_id)
-        .filter((id): id is string => id !== null)
-
-      const priceMap: Record<string, number> = {}
-      if (offerIds.length > 0) {
-        const { data: offers } = await supabase
-          .from('offers')
-          .select('id, price')
-          .in('id', offerIds)
-        if (offers) {
-          for (const o of offers) {
-            priceMap[o.id] = o.price
-          }
-        }
-      }
-
-      return rows.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        primary_image: p.primary_image,
-        brand_id: p.brand_id,
-        brands: p.brands,
-        price: p.default_offer_id != null ? (priceMap[p.default_offer_id] ?? null) : null,
+    function mapRows(rows: Record<string, unknown>[]): ProductRow[] {
+      return rows.map((r) => ({
+        id: r.id as string,
+        name: r.name as string,
+        slug: r.slug as string,
+        primary_image: (r.primary_image as string | null) ?? null,
+        price: r.min_price != null ? Number(r.min_price) : null,
         compare_at_price: null,
+        brand_id: (r.brand_id as string | null) ?? null,
+        brand_name: (r.brand_name as string | null) ?? null,
+        offer_count: Number(r.offer_count ?? 0),
+        price_min: r.price_min != null ? Number(r.price_min) : null,
+        price_max: r.price_max != null ? Number(r.price_max) : null,
       }))
     }
 
@@ -108,15 +88,16 @@ export async function GET(request: NextRequest) {
 
       if (categoryIds.length > 0) {
         const { data } = await supabase
-          .from('catalog_products')
-          .select(PRODUCT_SELECT)
+          .from(VIEW_TABLE)
+          .select(VIEW_SELECT)
           .in('primary_category_id', categoryIds)
           .eq('is_active', true)
-          .order('created_at', { ascending: false })
+          .order('min_price', { ascending: true, nullsFirst: false })
           .limit(limit)
 
         if (data && data.length > 0) {
-          products = await attachPrices(data as unknown as ProductRaw[])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          products = mapRows(data as any)
           personalized = true
         }
       }
@@ -125,13 +106,14 @@ export async function GET(request: NextRequest) {
     // Fallback: newest active products
     if (products.length === 0) {
       const { data } = await supabase
-        .from('catalog_products')
-        .select(PRODUCT_SELECT)
+        .from(VIEW_TABLE)
+        .select(VIEW_SELECT)
         .eq('is_active', true)
-        .order('created_at', { ascending: false })
+        .order('min_price', { ascending: true, nullsFirst: false })
         .limit(limit)
 
-      products = await attachPrices((data ?? []) as unknown as ProductRaw[])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      products = mapRows((data ?? []) as any)
     }
 
     const title = personalized ? 'Size Özel Öneriler' : 'Popüler Ürünler'

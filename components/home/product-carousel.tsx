@@ -16,7 +16,11 @@ interface CarouselProduct {
   price: number | null
   compare_at_price: number | null
   brand_id: string | null
-  brands: { name: string } | null
+  brand_name?: string | null
+  brands?: { name: string } | null
+  offer_count?: number
+  price_min?: number | null
+  price_max?: number | null
 }
 
 const PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='224' height='224' viewBox='0 0 224 224'%3E%3Crect width='224' height='224' fill='%23f3f4f6'/%3E%3Ctext x='112' y='112' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EGörsel Yok%3C/text%3E%3C/svg%3E"
@@ -49,6 +53,10 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   const validPrice =
     product.price !== null && !isNaN(product.price) && product.price > 0
 
+  const brandName = product.brand_name || product.brands?.name
+  const hasMultipleOffers = (product.offer_count ?? 0) > 1
+  const showRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
+
   return (
     <Link
       href={`/urunler/${product.slug}`}
@@ -63,11 +71,16 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           onError={() => setImgSrc(PLACEHOLDER_SVG)}
         />
+        {hasMultipleOffers && (
+          <span className="absolute top-2 right-2 bg-primary/90 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+            {product.offer_count} satıcı
+          </span>
+        )}
       </div>
       <div className="p-4 space-y-1">
-        {product.brands?.name && (
+        {brandName && (
           <p className="text-[11px] text-secondary-text font-medium uppercase tracking-wide truncate">
-            {product.brands.name}
+            {brandName}
           </p>
         )}
         <h3 className="text-sm font-bold text-body-text line-clamp-2 leading-snug">
@@ -75,9 +88,15 @@ function ProductCard({ product }: { product: CarouselProduct }) {
         </h3>
         <div className="flex items-center gap-2 pt-1">
           {validPrice ? (
-            <span className="text-sm font-extrabold text-primary">
-              {formatPrice(product.price!)}
-            </span>
+            showRange ? (
+              <span className="text-sm font-extrabold text-primary">
+                {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
+              </span>
+            ) : (
+              <span className="text-sm font-extrabold text-primary">
+                {formatPrice(product.price!)}
+              </span>
+            )
           ) : (
             <span className="text-xs text-secondary-text italic">
               Fiyat için iletişime geçin
@@ -89,6 +108,11 @@ function ProductCard({ product }: { product: CarouselProduct }) {
             </span>
           )}
         </div>
+        {hasMultipleOffers && (
+          <p className="text-[11px] text-secondary-text">
+            {product.offer_count} satıcıdan
+          </p>
+        )}
       </div>
     </Link>
   )

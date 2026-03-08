@@ -7,7 +7,7 @@ import { BrandLogos } from '@/components/home/brand-logos'
 import { TrustSection } from '@/components/home/trust-section'
 import { FilterSidebar } from '@/components/catalog/filter-sidebar'
 import { getRootCategories } from '@/lib/supabase/queries/categories'
-import { getProducts } from '@/lib/supabase/queries/products'
+import { getProductsWithOffers } from '@/lib/supabase/queries/products'
 import { getBrands } from '@/lib/supabase/queries/brands'
 
 const FEATURED_PRODUCTS_COUNT = 8
@@ -16,7 +16,7 @@ export default async function HomePage() {
   // Fetch data from Supabase
   const [categories, products, brands] = await Promise.all([
     getRootCategories(),
-    getProducts(FEATURED_PRODUCTS_COUNT, 0),
+    getProductsWithOffers(FEATURED_PRODUCTS_COUNT, 0),
     getBrands(),
   ])
 

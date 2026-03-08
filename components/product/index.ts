@@ -1,3 +1,5 @@
 export { ProductDetailClient } from './ProductDetailClient'
 export { RelatedProducts } from './RelatedProducts'
 export { ProductTabsClient } from './ProductTabsClient'
+export { SupplierOfferCard } from './SupplierOfferCard'
+export { SupplierOffersSection } from './SupplierOffersSection'

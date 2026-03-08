@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { getProducts } from '@/lib/supabase/queries/products'
+import { getProductsWithOffers } from '@/lib/supabase/queries/products'
 import { getAllCategories } from '@/lib/supabase/queries/categories'
 import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage() {
   const [products, categories, brands] = await Promise.all([
-    getProducts(100, 0),
+    getProductsWithOffers(100, 0),
     getAllCategories(),
     getBrands(),
   ])

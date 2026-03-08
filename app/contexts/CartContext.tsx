@@ -84,7 +84,7 @@ interface CartContextType {
   discount_amount: number
   loading: boolean
   error: string | null
-  addToCart: (productId: string, variantId?: string | null, quantity?: number) => Promise<void>
+  addToCart: (productId: string, variantId?: string | null, quantity?: number, offerId?: string) => Promise<void>
   removeFromCart: (itemId: string) => Promise<void>
   updateQuantity: (itemId: string, quantity: number) => Promise<void>
   clearCart: () => Promise<void>
@@ -547,43 +547,63 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, [supabase, getLocalCart, getOrCreateCart, clearLocalCart])
 
-  // Add to cart with variant + stock support
+  // Add to cart with variant + stock support + specific offer
   const addToCart = useCallback(async (
     productId: string,
     variantId?: string | null,
-    quantity: number = 1
+    quantity: number = 1,
+    offerId?: string
   ) => {
     try {
       setError(null)
-      console.log('➕ addToCart started:', { productId, variantId, quantity, userId: user?.id })
+      console.log('➕ addToCart started:', { productId, variantId, quantity, offerId, userId: user?.id })
 
-      // Get offer (variant-aware)
+      // Get offer (variant-aware, specific offerId if given)
       console.log('💰 Fetching product offer price...')
-      let offerQuery = supabase
-        .from('offers')
-        .select('id, price, currency, stock_quantity, is_active')
-        .eq('product_id', productId)
-        .eq('is_active', true)
+      let offer: { id: string; price: string | number; currency: string; stock_quantity: number | null; is_active: boolean } | null = null
 
-      if (variantId) {
-        offerQuery = offerQuery.eq('variant_id', variantId)
+      if (offerId) {
+        // Fetch specific offer by id
+        const { data: offerRaw, error: offerError } = await supabase
+          .from('offers')
+          .select('id, price, currency, stock_quantity, is_active')
+          .eq('id', offerId)
+          .eq('is_active', true)
+          .maybeSingle()
+
+        if (offerError) {
+          console.error('❌ Offer fetch error:', offerError)
+          throw new Error('Fiyat bilgisi alınamadı')
+        }
+        offer = offerRaw as typeof offer
       } else {
-        offerQuery = offerQuery.is('variant_id', null)
+        // Fallback: cheapest active offer for product
+        let offerQuery = supabase
+          .from('offers')
+          .select('id, price, currency, stock_quantity, is_active')
+          .eq('product_id', productId)
+          .eq('is_active', true)
+
+        if (variantId) {
+          offerQuery = offerQuery.eq('variant_id', variantId)
+        } else {
+          offerQuery = offerQuery.is('variant_id', null)
+        }
+
+        const { data: offerRaw, error: offerError } = await offerQuery
+          .order('is_default', { ascending: false })
+          .order('price', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+
+        if (offerError) {
+          console.error('❌ Offer fetch error:', offerError)
+          throw new Error('Fiyat bilgisi alınamadı')
+        }
+        offer = offerRaw as typeof offer
       }
 
-      const { data: offerRaw, error: offerError } = await offerQuery
-        .order('is_default', { ascending: false })
-        .order('price', { ascending: true })
-        .limit(1)
-        .maybeSingle()
-
-      const offer = offerRaw as { id: string; price: string | number; currency: string; stock_quantity: number | null; is_active: boolean } | null
-      console.log('💰 Offer result:', { offer, offerError })
-
-      if (offerError) {
-        console.error('❌ Offer fetch error:', offerError)
-        throw new Error('Fiyat bilgisi alınamadı')
-      }
+      console.log('💰 Offer result:', { offer })
 
       if (!offer || !offer.price) {
         console.error('❌ No active offer found for product')
@@ -663,6 +683,7 @@ export function CartProvider({ children }: CartProviderProps) {
             .update({
               quantity: newQuantity,
               price,
+              offer_id: offer.id ?? null,
               updated_at: new Date().toISOString(),
             })
             .eq('id', existingItem.id)
@@ -681,6 +702,7 @@ export function CartProvider({ children }: CartProviderProps) {
               variant_id: variantId ?? null,
               quantity,
               price,
+              offer_id: offer.id,
             })
             .select()
 

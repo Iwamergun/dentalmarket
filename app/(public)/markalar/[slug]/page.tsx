@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getBrandBySlug } from '@/lib/supabase/queries/brands'
-import { getProductsByBrand } from '@/lib/supabase/queries/products'
+import { getProductsByBrandWithOffers } from '@/lib/supabase/queries/products'
 import { getAllCategories } from '@/lib/supabase/queries/categories'
 import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
@@ -37,7 +37,7 @@ export default async function BrandPage({ params }: BrandPageProps) {
   if (!brand) notFound()
 
   const [products, categories, brands] = await Promise.all([
-    getProductsByBrand(brand.id, 100, 0),
+    getProductsByBrandWithOffers(brand.id, 100, 0),
     getAllCategories(),
     getBrands(),
   ])

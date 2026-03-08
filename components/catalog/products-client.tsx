@@ -8,10 +8,11 @@ import { ProductGrid } from '@/components/catalog/product-grid'
 import { SortSelect } from '@/components/catalog/sort-select'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import type { Category, Brand, ProductWithRelations } from '@/types/catalog.types'
+import type { Category, Brand } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface ProductsClientProps {
-  products: ProductWithRelations[]
+  products: BestOfferProduct[]
   categories: Category[]
   brands: Brand[]
 }

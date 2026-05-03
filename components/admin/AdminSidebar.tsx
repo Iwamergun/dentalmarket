@@ -11,12 +11,14 @@ import {
   Tag,
   BarChart3,
   Settings,
+  Warehouse,
 } from 'lucide-react'
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Siparişler', icon: ShoppingCart },
   { href: '/admin/products', label: 'Ürünler', icon: Package },
+  { href: '/admin/stock', label: 'Stok Yönetimi', icon: Warehouse },
   { href: '/admin/customers', label: 'Müşteriler', icon: Users },
   { href: '/admin/categories', label: 'Kategoriler', icon: FolderTree },
   { href: '/admin/brands', label: 'Markalar', icon: Tag },

@@ -340,6 +340,11 @@ Production requires:
 
 ## Future Enhancements
 
+### Implemented Features
+
+1. **Admin Stock Management** (`/admin/stock`) — view and update `stock_quantity` for every
+   active offer. See [Stock Management](#stock-management) below.
+
 ### Planned Features
 
 1. **Search** - Full-text search with filters
@@ -438,6 +443,30 @@ Production requires:
 - [Supabase Documentation](https://supabase.com/docs)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
+
+## Stock Management
+
+The stock management panel lives at **`/admin/stock`** and is protected by the same admin-only
+guard used across the whole admin area (role check in `app/admin/layout.tsx`).
+
+### How it works
+
+| Layer | File | Role |
+|-------|------|------|
+| Page (server component) | `app/admin/stock/page.tsx` | Fetches all active offers + product info from Supabase; computes low-stock summary |
+| Interactive table (client component) | `components/admin/StockTable.tsx` | Renders rows with editable quantity inputs; calls the API route on save |
+| API route | `app/api/admin/stock/route.ts` | `PATCH /api/admin/stock` — verifies admin session server-side, then updates `offers.stock_quantity` |
+
+### Data model
+
+Stock is stored in the **`offers`** table (`stock_quantity` column).  Each product can have one
+active offer; the panel shows all active offers sorted by stock quantity ascending so low-stock
+items appear first.
+
+### Low-stock indicator
+
+Rows where `stock_quantity < 10` are highlighted with a warning icon.  The summary cards at the
+top of the page show counts for "low stock" and "zero stock" items at a glance.
 
 ## Contact
 

@@ -54,8 +54,15 @@ export async function PATCH(
     const { status, tracking_number, shipping_provider, shipped_at } = body
 
     // Build update payload — only include defined fields
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatePayload: Record<string, any> = { updated_at: new Date().toISOString() }
+    interface OrderUpdatePayload {
+      updated_at: string
+      status?: string
+      tracking_number?: string | null
+      shipping_provider?: string | null
+      shipped_at?: string | null
+    }
+
+    const updatePayload: OrderUpdatePayload = { updated_at: new Date().toISOString() }
 
     if (status !== undefined) {
       if (!VALID_ORDER_STATUSES.includes(status)) {

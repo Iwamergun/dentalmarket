@@ -81,9 +81,17 @@ export default async function AdminReportsPage() {
 
   // Date boundaries
   const now = new Date()
-  const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0)
-  const weekStart = new Date(now); weekStart.setDate(now.getDate() - 7); weekStart.setHours(0, 0, 0, 0)
-  const monthStart = new Date(now); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+
+  const todayStart = new Date(now)
+  todayStart.setHours(0, 0, 0, 0)
+
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() - 7)
+  weekStart.setHours(0, 0, 0, 0)
+
+  const monthStart = new Date(now)
+  monthStart.setDate(1)
+  monthStart.setHours(0, 0, 0, 0)
 
   const [
     { data: allOrders },
@@ -130,15 +138,21 @@ export default async function AdminReportsPage() {
   const deliveredOrders = statusCount('delivered')
 
   // ── Top products ─────────────────────────────────────────────────────────
+  interface TopItemRow {
+    product_id: string
+    quantity: number
+    total_price: string | number
+    catalog_products: { name: string; sku: string } | null
+  }
+
   const productMap = new Map<
     string,
     { name: string; sku: string; quantity: number; revenue: number }
   >()
 
-  ;(topItemsData ?? []).forEach((item) => {
+  ;(topItemsData as unknown as TopItemRow[] ?? []).forEach((item) => {
     const pid = item.product_id
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const product = (item as any).catalog_products as { name: string; sku: string } | null
+    const product = item.catalog_products
     const name = product?.name ?? pid
     const sku = product?.sku ?? '-'
     const existing = productMap.get(pid)

@@ -6,6 +6,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent";
 
 const outfit = Outfit({ 
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
           <CartProvider>
             <WishlistProvider>
               {children}
+              <CookieConsentBanner />
               <Toaster 
                 position="bottom-right" 
                 richColors 

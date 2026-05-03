@@ -2,7 +2,8 @@
 
 import Script from 'next/script'
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { getConsentStatus } from './cookie-consent'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
@@ -20,13 +21,26 @@ function pageview(url: string) {
 
 export function GoogleAnalytics() {
   const pathname = usePathname()
+  const [consentGiven, setConsentGiven] = useState(false)
 
   useEffect(() => {
-    if (!GA_MEASUREMENT_ID) return
-    pageview(pathname)
-  }, [pathname])
+    // Check consent that may have been stored in a previous session
+    if (getConsentStatus() === 'accepted') {
+      setConsentGiven(true)
+    }
 
-  if (!GA_MEASUREMENT_ID) return null
+    // Listen for the consent event fired by CookieConsentBanner
+    const handleConsent = () => setConsentGiven(true)
+    window.addEventListener('cookie-consent-accepted', handleConsent)
+    return () => window.removeEventListener('cookie-consent-accepted', handleConsent)
+  }, [])
+
+  useEffect(() => {
+    if (!GA_MEASUREMENT_ID || !consentGiven) return
+    pageview(pathname)
+  }, [pathname, consentGiven])
+
+  if (!GA_MEASUREMENT_ID || !consentGiven) return null
 
   return (
     <>

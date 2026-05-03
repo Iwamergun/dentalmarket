@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
+import { siteConfig } from '@/lib/constants/site-config'
 
 let _transporter: Transporter | null = null
 
@@ -44,7 +45,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   await transport.sendMail({
     from:
       process.env.SMTP_FROM ??
-      `"Dent Alışveriş" <noreply@dentalisveris.com>`,
+      `"${siteConfig.name}" <${siteConfig.contact.email}>`,
     to: options.to,
     subject: options.subject,
     html: options.html,

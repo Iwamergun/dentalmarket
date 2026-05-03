@@ -255,6 +255,19 @@ export async function POST(request: NextRequest) {
 
       const invoiceData = buildInvoiceData(rawOrder, invNumber)
 
+      // Fetch product names for the invoice (best-effort; falls back to product_id prefix)
+      const productIds = [...new Set(orderItemsData.map((i) => i.product_id))]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: products } = await (supabase as any)
+        .from('catalog_products')
+        .select('id, name, sku')
+        .in('id', productIds)
+      const productMap: Record<string, { name: string; sku: string | null }> = {}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const p of (products ?? []) as any[]) {
+        productMap[p.id] = { name: p.name, sku: p.sku }
+      }
+
       const mappedItems = mapOrderItems(
         orderItemsData.map((i) => ({
           product_id: i.product_id,
@@ -262,6 +275,9 @@ export async function POST(request: NextRequest) {
           quantity: i.quantity,
           unit_price: i.unit_price,
           total_price: i.total_price,
+          catalog_products: productMap[i.product_id]
+            ? { id: i.product_id, ...productMap[i.product_id] }
+            : null,
         })) as RawOrderItem[]
       )
 

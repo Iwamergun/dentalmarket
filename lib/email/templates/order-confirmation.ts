@@ -207,7 +207,7 @@ export function buildOrderConfirmationEmail(data: OrderConfirmationData): {
     `Siparişiniz başarıyla alındı.`,
     ``,
     `Sipariş No: ${data.orderNumber}`,
-    data.invoiceNumber ? `Fatura No : ${data.invoiceNumber}` : '',
+    data.invoiceNumber ? `Fatura No: ${data.invoiceNumber}` : '',
     `Ödeme    : ${paymentLabel}`,
     ``,
     `Ürünler:`,

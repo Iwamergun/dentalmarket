@@ -64,7 +64,7 @@ export function CookieConsentBanner() {
             >
               KVKK Aydınlatma Metni
             </a>
-            &apos;ni inceleyebilirsiniz.
+'ni inceleyebilirsiniz.
           </p>
         </div>
         <div className="flex shrink-0 gap-2">

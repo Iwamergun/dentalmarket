@@ -55,6 +55,9 @@ async function getSupplierData(slug: string) {
       },
     }
   )
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // 1. Supplier'ı bul
   const { data: supplierRaw } = await (supabase
@@ -80,7 +83,7 @@ async function getSupplierData(slug: string) {
     .order('price', { ascending: true }) as any)
 
   if (!offersRaw || offersRaw.length === 0) {
-    return { supplier, offers: [] as SupplierOffer[] }
+    return { supplier, offers: [] as SupplierOffer[], isAuthenticated: Boolean(user) }
   }
 
   // 3. Ürün bilgilerini AYRI çek (RLS join sorunu yok)
@@ -124,7 +127,7 @@ async function getSupplierData(slug: string) {
       }
     })
 
-  return { supplier, offers }
+  return { supplier, offers, isAuthenticated: Boolean(user) }
 }
 
 export async function generateMetadata({ params }: SaticiPageProps): Promise<Metadata> {
@@ -143,7 +146,7 @@ export default async function SaticiPage({ params }: SaticiPageProps) {
 
   if (!data) notFound()
 
-  const { supplier, offers } = data
+  const { supplier, offers, isAuthenticated } = data
 
   const breadcrumbItems = [
     { label: 'Ana Sayfa', href: '/' },
@@ -246,14 +249,22 @@ export default async function SaticiPage({ params }: SaticiPageProps) {
 
                 {/* Fiyat ve Stok */}
                 <div className="mt-auto pt-3">
-                  <p className="text-lg font-bold text-blue-600">
-                    ₺{offer.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
-                  </p>
+                  {isAuthenticated ? (
+                    <p className="text-lg font-bold text-blue-600">
+                      ₺{offer.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                    </p>
+                  ) : (
+                    <p className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+                      Fiyat için giriş yapın
+                    </p>
+                  )}
                   <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Truck className="w-3 h-3" />
-                      {offer.shipping_cost === 0 ? 'Ücretsiz kargo' : `₺${offer.shipping_cost} kargo`}
-                    </span>
+                    {isAuthenticated && (
+                      <span className="flex items-center gap-1">
+                        <Truck className="w-3 h-3" />
+                        {offer.shipping_cost === 0 ? 'Ücretsiz kargo' : `₺${offer.shipping_cost} kargo`}
+                      </span>
+                    )}
                     <span>Stok: {offer.stock_quantity}</span>
                   </div>
                 </div>

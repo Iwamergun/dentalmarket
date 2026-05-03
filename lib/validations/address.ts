@@ -38,7 +38,8 @@ export const addressFormSchema = z.object({
     .default(false),
 })
 
-export type AddressFormData = z.infer<typeof addressFormSchema>
+export type AddressFormInput = z.input<typeof addressFormSchema>
+export type AddressFormData = z.output<typeof addressFormSchema>
 
 // API'den dönen adres tipi (DB sütun isimleri)
 export interface Address {

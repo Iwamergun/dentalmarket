@@ -3,8 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { formatPrice } from '@/lib/utils/format'
+import { useAuth } from '@/app/contexts/AuthContext'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 // Cloudflare R2 base URL - environment variable'dan al veya default kullan
@@ -17,7 +19,9 @@ interface ProductImageCardProps {
 
 export function ProductImageCard({ product, href }: ProductImageCardProps) {
   const [imageError, setImageError] = useState(false)
-  
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
+
   const hasImage = product.primary_image && !imageError
   const imageUrl = hasImage ? `${R2_BASE_URL}/${product.primary_image}` : null
   const hasMultipleOffers = product.offer_count > 1
@@ -67,7 +71,20 @@ export function ProductImageCard({ product, href }: ProductImageCardProps) {
         )}
         {/* Price */}
         <div className="mt-2">
-          {product.min_price != null ? (
+          {authLoading ? (
+            <div className="h-6 w-24 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/giris') }}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Fiyat için giriş yapın
+            </button>
+          ) : product.min_price != null ? (
             showRange ? (
               <span className="text-base font-bold text-primary">
                 {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}

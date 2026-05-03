@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 import { Shield, Phone, Mail, Menu, X, Search, Heart, Sparkles } from 'lucide-react'
 
 export function Header() {
@@ -22,14 +23,24 @@ export function Header() {
         setIsAdmin(false)
         return
       }
+
+      const authMetadata = getAuthMetadata(user)
+
       const supabase = createClient()
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
-      setIsAdmin(profile?.role === 'admin')
+
+      if (error && error.code !== 'PGRST116') {
+        setIsAdmin(hasAdminAccess(undefined, authMetadata))
+        return
+      }
+
+      setIsAdmin(hasAdminAccess(profile?.role, authMetadata))
     }
+
     checkAdmin()
   }, [user])
 

@@ -106,7 +106,7 @@ export default function CheckoutPage() {
 
       // Başarı mesajı
       toast.success('Siparişiniz başarıyla oluşturuldu!', {
-        description: data.message,
+        description: `Sipariş numaranız: ${data.order.orderNumber}. ${data.message}`,
       })
 
       // Sipariş onay sayfasına yönlendir

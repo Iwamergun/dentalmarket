@@ -19,7 +19,6 @@ import {
   Check
 } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
-import { createClient } from '@/lib/supabase/client'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -143,7 +142,6 @@ export default function SiparisDetayPage({
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [orderNumber, setOrderNumber] = useState<string>('')
-  const supabase = createClient()
 
   useEffect(() => {
     params.then(p => setOrderNumber(p.orderNumber))
@@ -156,67 +154,19 @@ export default function SiparisDetayPage({
     setError(null)
 
     try {
-      // Sipariş bilgisini al
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: orderData, error: orderError } = await (supabase as any)
-        .from('orders')
-        .select('*')
-        .eq('order_number', orderNumber)
-        .eq('user_id', user.id)
-        .single()
+      const response = await fetch(`/api/orders/my/${orderNumber}`, {
+        credentials: 'include',
+      })
 
-      if (orderError) {
-        if (orderError.code === 'PGRST116') {
-          setError('Sipariş bulunamadı veya bu siparişe erişim yetkiniz yok.')
-        } else if (orderError.message?.includes('does not exist')) {
-          setError('Sipariş sistemi henüz kurulmamış.')
-        } else {
-          throw orderError
-        }
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'Sipariş detayları yüklenirken bir hata oluştu.')
         return
       }
 
-      setOrder(orderData)
-
-      // Sipariş kalemlerini al
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: itemsData, error: itemsError } = await (supabase as any)
-        .from('order_items')
-        .select(`
-          id,
-          product_id,
-          variant_id,
-          quantity,
-          unit_price,
-          total_price
-        `)
-        .eq('order_id', orderData.id)
-
-      if (itemsError && !itemsError.message?.includes('does not exist')) {
-        console.error('Order items error:', itemsError)
-      }
-
-      // Ürün bilgilerini al
-      if (itemsData && itemsData.length > 0) {
-        const productIds = itemsData.map((item: OrderItem) => item.product_id)
-        const { data: productsData } = await supabase
-          .from('catalog_products')
-          .select('id, name, slug, primary_image')
-          .in('id', productIds)
-
-        const productsMap = new Map(
-          (productsData || []).map((p: { id: string; name: string; slug: string; primary_image: string | null }) => [p.id, p])
-        )
-
-        const itemsWithProducts = itemsData.map((item: OrderItem) => ({
-          ...item,
-          product: productsMap.get(item.product_id) || null
-        }))
-
-        setOrderItems(itemsWithProducts)
-      } else {
-        setOrderItems([])
-      }
+      setOrder(data.order)
+      setOrderItems(data.orderItems || [])
     } catch (err) {
       console.error('Sipariş detayları yüklenirken hata:', err)
       setError('Sipariş detayları yüklenirken bir hata oluştu.')

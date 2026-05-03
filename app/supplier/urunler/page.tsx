@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Plus } from 'lucide-react'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
@@ -96,10 +97,13 @@ export default async function SupplierTekliflerimPage() {
                   return (
                     <tr key={offer.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <img
+                        <Image
                           src={getImageUrl(product?.primary_image ?? null)}
                           alt={product?.name ?? ''}
+                          width={40}
+                          height={40}
                           className="w-10 h-10 rounded object-cover bg-gray-100"
+                          unoptimized
                         />
                       </td>
                       <td className="px-6 py-4">

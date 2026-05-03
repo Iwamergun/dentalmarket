@@ -6,7 +6,6 @@ import { ProductDetailClient } from '@/components/product'
 import { RelatedProducts } from '@/components/product'
 import { ProductReviews } from '@/components/reviews'
 import { getImageUrl } from '@/lib/utils/imageHelper'
-import { formatPrice } from '@/lib/utils/format'
 import { siteConfig } from '@/lib/constants/site-config'
 
 interface ProductPageProps {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
@@ -167,10 +168,13 @@ export default function YeniTeklifPage() {
 
           {selectedProduct ? (
             <div className="flex items-center gap-4 p-4 border border-primary/30 bg-primary/5 rounded-lg">
-              <img
+              <Image
                 src={getImageUrl(selectedProduct.primary_image)}
                 alt={selectedProduct.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded object-cover bg-gray-100"
+                unoptimized
               />
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{selectedProduct.name}</p>
@@ -209,7 +213,7 @@ export default function YeniTeklifPage() {
                       className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-50 text-left"
                     >
                       {p.primary_image ? (
-                        <img src={getImageUrl(p.primary_image)} alt="" className="w-10 h-10 rounded object-cover bg-gray-100" />
+                        <Image src={getImageUrl(p.primary_image)} alt="" width={40} height={40} className="w-10 h-10 rounded object-cover bg-gray-100" unoptimized />
                       ) : (
                         <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
                           <Package className="w-5 h-5 text-gray-300" />

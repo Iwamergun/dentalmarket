@@ -2,6 +2,13 @@ import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
 
+type SupplierOrderSummary = {
+  id: string
+  order_number: string
+  status: string
+  created_at: string
+}
+
 export default async function SupplierSiparislerPage() {
   const cookieStore = await cookies()
 
@@ -70,6 +77,23 @@ export default async function SupplierSiparislerPage() {
     cancelled: 'bg-red-100 text-red-800',
   }
 
+  const getOrderSummary = (rawOrder: unknown): SupplierOrderSummary | null => {
+    if (!rawOrder || typeof rawOrder !== 'object') {
+      return null
+    }
+
+    if ('id' in rawOrder && 'order_number' in rawOrder && 'status' in rawOrder && 'created_at' in rawOrder) {
+      return {
+        id: String(rawOrder.id),
+        order_number: String(rawOrder.order_number),
+        status: String(rawOrder.status),
+        created_at: String(rawOrder.created_at),
+      }
+    }
+
+    return null
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Siparişler</h1>
@@ -97,12 +121,7 @@ export default async function SupplierSiparislerPage() {
                 </tr>
               ) : (
                 (orderItems ?? []).map((item) => {
-                  const order = item.orders as {
-                    id: string
-                    order_number: string
-                    status: string
-                    created_at: string
-                  } | null
+                  const order = getOrderSummary(item.orders)
                   if (!order) return null
                   return (
                     <tr key={item.id} className="hover:bg-gray-50">

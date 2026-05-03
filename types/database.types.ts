@@ -9,6 +9,12 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      [key: string]: {
+        Row: Record<string, unknown>
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
+        Relationships: []
+      }
       cart: {
         Row: {
           id: string
@@ -650,7 +656,10 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      [key: string]: {
+        Args: Record<string, unknown>
+        Returns: unknown
+      }
     }
     Enums: {
       [_ in never]: never

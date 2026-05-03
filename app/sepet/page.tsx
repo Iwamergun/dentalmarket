@@ -8,6 +8,7 @@ import {
   Loader2, TrendingDown, TrendingUp, AlertTriangle, XCircle,
   Tag, Truck, X
 } from 'lucide-react'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { useCart, CartItem } from '@/app/contexts/CartContext'
 import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils/format'
@@ -18,6 +19,7 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: {
   onUpdateQuantity: (itemId: string, quantity: number) => Promise<void>
   onRemove: (itemId: string) => Promise<void>
 }) {
+  const { user, loading: authLoading } = useAuth()
   const [updating, setUpdating] = useState(false)
   const [removing, setRemoving] = useState(false)
 
@@ -119,7 +121,7 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: {
             )}
 
             {/* Price change warning */}
-            {item.product?.price_changed && item.product?.current_price != null && (
+            {user && item.product?.price_changed && item.product?.current_price != null && (
               <div className={`text-sm mt-1.5 flex items-center gap-1 rounded-md px-2 py-1 w-fit ${
                 item.product.current_price < item.price
                   ? 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-950'
@@ -142,13 +144,21 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: {
 
           {/* Price (Desktop) */}
           <div className="hidden sm:block text-right flex-shrink-0">
-            <p className={`font-semibold ${isOutOfStock ? 'text-text-muted line-through' : 'text-primary'}`}>
-              {formatPrice(itemTotal)}
-            </p>
-            {item.quantity > 1 && (
-              <p className="text-xs text-text-muted">
-                {formatPrice(item.price)} / adet
-              </p>
+            {authLoading ? (
+              <div className="h-6 w-20 animate-pulse rounded bg-muted" />
+            ) : !user ? (
+              <span className="text-xs font-semibold text-primary">Fiyat için giriş yapın</span>
+            ) : (
+              <>
+                <p className={`font-semibold ${isOutOfStock ? 'text-text-muted line-through' : 'text-primary'}`}>
+                  {formatPrice(itemTotal)}
+                </p>
+                {item.quantity > 1 && (
+                  <p className="text-xs text-text-muted">
+                    {formatPrice(item.price)} / adet
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -194,9 +204,15 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: {
 
           {/* Price (Mobile) */}
           <div className="sm:hidden text-right">
-            <p className={`font-semibold ${isOutOfStock ? 'text-text-muted line-through' : 'text-primary'}`}>
-              {formatPrice(itemTotal)}
-            </p>
+            {authLoading ? (
+              <div className="h-6 w-20 animate-pulse rounded bg-muted" />
+            ) : !user ? (
+              <span className="text-xs font-semibold text-primary">Giriş yapın</span>
+            ) : (
+              <p className={`font-semibold ${isOutOfStock ? 'text-text-muted line-through' : 'text-primary'}`}>
+                {formatPrice(itemTotal)}
+              </p>
+            )}
           </div>
 
           {/* Remove Button */}
@@ -339,6 +355,7 @@ function CartSummary({
   onApplyDiscount: (code: string) => Promise<boolean>
   onRemoveDiscount: () => void
 }) {
+  const { user, loading: authLoading } = useAuth()
   return (
     <div className="bg-background-card rounded-xl border border-border p-6 sticky top-24">
       <h2 className="text-lg font-bold text-text-primary mb-4">
@@ -348,7 +365,13 @@ function CartSummary({
       <div className="space-y-3 pb-4 border-b border-border">
         <div className="flex justify-between text-text-secondary">
           <span>Ürünler ({itemCount})</span>
-          <span>{formatPrice(subtotal)}</span>
+          {authLoading ? (
+            <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <span className="text-xs font-semibold text-primary">Fiyat için giriş yapın</span>
+          ) : (
+            <span>{formatPrice(subtotal)}</span>
+          )}
         </div>
 
         {/* Shipping */}
@@ -357,7 +380,11 @@ function CartSummary({
             <Truck className="w-4 h-4" />
             Kargo
           </span>
-          {shipping_cost === 0 ? (
+          {authLoading ? (
+            <div className="h-5 w-16 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <span className="text-xs font-semibold text-primary">Giriş yapın</span>
+          ) : shipping_cost === 0 ? (
             <span className="text-green-600 font-medium">Ücretsiz</span>
           ) : (
             <span>{formatPrice(shipping_cost)}</span>
@@ -365,7 +392,7 @@ function CartSummary({
         </div>
 
         {/* Free shipping progress bar */}
-        {shipping_cost > 0 && (
+        {user && shipping_cost > 0 && (
           <div className="mt-1">
             <div className="flex justify-between text-xs text-text-muted mb-1">
               <span>Ücretsiz kargoya {formatPrice(500 - subtotal)} kaldı</span>
@@ -380,7 +407,7 @@ function CartSummary({
           </div>
         )}
 
-        {shipping_cost === 0 && (
+        {user && shipping_cost === 0 && (
           <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
             <Truck className="w-3.5 h-3.5" />
             500 ₺ üzeri siparişlerde kargo ücretsiz!
@@ -388,7 +415,7 @@ function CartSummary({
         )}
 
         {/* Discount */}
-        {discount_amount > 0 && (
+        {user && discount_amount > 0 && (
           <div className="flex justify-between text-green-600 dark:text-green-400">
             <span>İndirim</span>
             <span>-{formatPrice(discount_amount)}</span>
@@ -407,7 +434,13 @@ function CartSummary({
 
       <div className="flex justify-between items-center py-4 border-b border-border">
         <span className="text-lg font-bold text-text-primary">Toplam</span>
-        <span className="text-xl font-bold text-primary">{formatPrice(finalTotal)}</span>
+        {authLoading ? (
+          <div className="h-7 w-24 animate-pulse rounded bg-muted" />
+        ) : !user ? (
+          <span className="text-sm font-semibold text-primary">Fiyat için giriş yapın</span>
+        ) : (
+          <span className="text-xl font-bold text-primary">{formatPrice(finalTotal)}</span>
+        )}
       </div>
 
       {/* Out of stock warning */}

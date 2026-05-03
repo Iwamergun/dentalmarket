@@ -3,10 +3,12 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface CarouselProduct {
   id: string
@@ -21,6 +23,27 @@ interface CarouselProduct {
   offer_count?: number
   price_min?: number | null
   price_max?: number | null
+}
+
+interface ProductCarouselProps {
+  fallbackProducts?: BestOfferProduct[]
+}
+
+function mapFallbackProducts(fallbackProducts: BestOfferProduct[]): CarouselProduct[] {
+  return fallbackProducts.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    primary_image: product.primary_image,
+    price: product.price_min ?? null,
+    compare_at_price: null,
+    brand_id: product.brand_id,
+    brand_name: product.brand_name ?? null,
+    brands: null,
+    offer_count: product.offer_count,
+    price_min: product.price_min,
+    price_max: product.price_max,
+  }))
 }
 
 const PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='224' height='224' viewBox='0 0 224 224'%3E%3Crect width='224' height='224' fill='%23f3f4f6'/%3E%3Ctext x='112' y='112' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EGörsel Yok%3C/text%3E%3C/svg%3E"
@@ -42,6 +65,8 @@ function SkeletonCard() {
 }
 
 function ProductCard({ product }: { product: CarouselProduct }) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [imgSrc, setImgSrc] = useState(getImageUrl(product.primary_image))
   const hasDiscount =
     product.compare_at_price !== null &&
@@ -87,24 +112,43 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           {product.name}
         </h3>
         <div className="flex items-center gap-2 pt-1">
-          {validPrice ? (
-            showRange ? (
-              <span className="text-sm font-extrabold text-primary">
-                {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
-              </span>
-            ) : (
-              <span className="text-sm font-extrabold text-primary">
-                {formatPrice(product.price!)}
-              </span>
-            )
+          {authLoading ? (
+            <div className="h-5 w-24 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                router.push('/giris')
+              }}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Fiyat için giriş yapın
+            </button>
+          ) : validPrice ? (
+            <>
+              {showRange ? (
+                <span className="text-sm font-extrabold text-primary">
+                  {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
+                </span>
+              ) : (
+                <span className="text-sm font-extrabold text-primary">
+                  {formatPrice(product.price!)}
+                </span>
+              )}
+              {hasDiscount && product.compare_at_price !== null && (
+                <span className="text-xs text-secondary-text line-through">
+                  {formatPrice(product.compare_at_price)}
+                </span>
+              )}
+            </>
           ) : (
             <span className="text-xs text-secondary-text italic">
               Fiyat için iletişime geçin
-            </span>
-          )}
-          {hasDiscount && product.compare_at_price !== null && (
-            <span className="text-xs text-secondary-text line-through">
-              {formatPrice(product.compare_at_price)}
             </span>
           )}
         </div>
@@ -118,11 +162,11 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   )
 }
 
-export function ProductCarousel() {
+export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps) {
   const { user } = useAuth()
-  const [products, setProducts] = useState<CarouselProduct[]>([])
+  const [products, setProducts] = useState<CarouselProduct[]>(() => mapFallbackProducts(fallbackProducts))
   const [title, setTitle] = useState('Popüler Ürünler')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(fallbackProducts.length === 0)
   const scrollRef = useRef<HTMLDivElement>(null)
   const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 

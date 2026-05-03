@@ -3,19 +3,23 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Heart, ShoppingCart, Star } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { useWishlist } from '@/app/contexts/WishlistContext'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { toast } from 'sonner'
-import type { Product } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface FeaturedProductsProps {
-  products: Product[]
+  products: BestOfferProduct[]
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const { addToCart } = useCart()
   const { items: wishlistItems, addToWishlist, removeFromWishlist } = useWishlist()
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
@@ -23,7 +27,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   // Use first 8 products (changed to 6 for better 3-column grid)
   const displayProducts = products.slice(0, 6)
 
-  const handleAddToCart = async (product: Product) => {
+  const handleAddToCart = async (product: BestOfferProduct) => {
     setLoadingStates(prev => ({ ...prev, [product.id]: true }))
     try {
       await addToCart(product.id, null, 1)
@@ -155,14 +159,31 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
 
                   {/* Price */}
                   <div className="mb-4">
-                    {discount > 0 && (
-                      <p className="text-sm text-secondary-text line-through mb-1">
-                        {formatPrice(price)}
-                      </p>
+                    {authLoading ? (
+                      <div className="h-8 w-32 animate-pulse rounded bg-muted" />
+                    ) : !user ? (
+                      <button
+                        type="button"
+                        onClick={() => router.push('/giris')}
+                        className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+                      >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Fiyat için giriş yapın
+                      </button>
+                    ) : (
+                      <>
+                        {discount > 0 && (
+                          <p className="text-sm text-secondary-text line-through mb-1">
+                            {formatPrice(price)}
+                          </p>
+                        )}
+                        <p className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                          {formatPrice(discountedPrice)}
+                        </p>
+                      </>
                     )}
-                    <p className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                      {formatPrice(discountedPrice)}
-                    </p>
                   </div>
 
                   {/* Stock Info */}

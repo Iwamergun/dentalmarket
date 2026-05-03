@@ -23,6 +23,9 @@ export interface BestOfferProduct {
   offer_count: number
   price_min: number | null
   price_max: number | null
+  category_ids?: string[]
+  rating_avg?: number | null
+  review_count?: number
 }
 
 export interface ProductOffer {
@@ -128,12 +131,27 @@ async function enrichWithOfferStats(products: BestOfferProduct[]): Promise<BestO
   const supabase = await createClient()
   const productIds = products.map(p => p.id)
 
-  const { data: offerStats } = await supabase
-    .from('offers')
-    .select('product_id, price, supplier_id')
-    .in('product_id', productIds)
-    .eq('is_active', true)
-    .gt('stock_quantity', 0)
+  const [offerStatsResult, categoryRelationsResult, reviewStatsResult] = await Promise.all([
+    supabase
+      .from('offers')
+      .select('product_id, price, supplier_id')
+      .in('product_id', productIds)
+      .eq('is_active', true)
+      .gt('stock_quantity', 0),
+    supabase
+      .from('catalog_product_categories')
+      .select('product_id, category_id')
+      .in('product_id', productIds),
+    supabase
+      .from('product_reviews')
+      .select('product_id, rating')
+      .in('product_id', productIds)
+      .eq('is_approved', true),
+  ])
+
+  const offerStats = offerStatsResult.data
+  const categoryRelations = categoryRelationsResult.data
+  const reviewStats = reviewStatsResult.data
 
   const offerMap = new Map<string, { count: number; minPrice: number; maxPrice: number }>()
   offerStats?.forEach(o => {
@@ -148,15 +166,40 @@ async function enrichWithOfferStats(products: BestOfferProduct[]): Promise<BestO
     }
   })
 
+  const categoryMap = new Map<string, Set<string>>()
+  categoryRelations?.forEach((relation) => {
+    const existing = categoryMap.get(relation.product_id) ?? new Set<string>()
+    existing.add(relation.category_id)
+    categoryMap.set(relation.product_id, existing)
+  })
+
+  const reviewMap = new Map<string, { total: number; count: number }>()
+  reviewStats?.forEach((review) => {
+    const existing = reviewMap.get(review.product_id) ?? { total: 0, count: 0 }
+    existing.total += Number(review.rating)
+    existing.count += 1
+    reviewMap.set(review.product_id, existing)
+  })
+
   return products.map(p => {
     const stats = offerMap.get(p.id)
-    if (!stats) return p
+    const relatedCategoryIds = new Set(categoryMap.get(p.id) ?? [])
+
+    if (p.primary_category_id) {
+      relatedCategoryIds.add(p.primary_category_id)
+    }
+
+    const reviews = reviewMap.get(p.id)
+
     return {
       ...p,
-      offer_count: stats.count,
-      min_price: stats.minPrice,
-      price_min: stats.minPrice,
-      price_max: stats.maxPrice,
+      offer_count: stats?.count ?? p.offer_count,
+      min_price: stats?.minPrice ?? p.min_price,
+      price_min: stats?.minPrice ?? p.price_min,
+      price_max: stats?.maxPrice ?? p.price_max,
+      category_ids: Array.from(relatedCategoryIds),
+      rating_avg: reviews ? reviews.total / reviews.count : null,
+      review_count: reviews?.count ?? 0,
     }
   })
 }
@@ -169,6 +212,52 @@ export async function getProductsWithOffers(limit = 20, offset = 0): Promise<Bes
 export async function getProductsByCategoryWithOffers(categoryId: string, limit = 20, offset = 0): Promise<BestOfferProduct[]> {
   const products = await getProductsByCategory(categoryId, limit, offset)
   return enrichWithOfferStats(products)
+}
+
+export async function getProductsByCategoryIdsWithOffers(categoryIds: string[], limit = 20, offset = 0): Promise<BestOfferProduct[]> {
+  if (categoryIds.length === 0) {
+    return []
+  }
+
+  const supabase = await createClient()
+
+  const [relationResult, primaryResult] = await Promise.all([
+    supabase
+      .from('catalog_product_categories')
+      .select('product_id')
+      .in('category_id', categoryIds),
+    supabase
+      .from('v_product_best_offer' as 'catalog_products')
+      .select('id')
+      .in('primary_category_id', categoryIds)
+      .eq('is_active', true),
+  ])
+
+  const productIds = Array.from(
+    new Set([
+      ...(relationResult.data?.map((relation) => relation.product_id) ?? []),
+      ...(primaryResult.data?.map((product) => product.id) ?? []),
+    ])
+  )
+
+  if (productIds.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('v_product_best_offer' as 'catalog_products')
+    .select('*')
+    .in('id', productIds)
+    .eq('is_active', true)
+    .order('min_price', { ascending: true, nullsFirst: false })
+    .range(offset, offset + limit - 1)
+
+  if (error) {
+    console.error('Error fetching products by category ids:', error?.message)
+    return []
+  }
+
+  return enrichWithOfferStats((data || []) as unknown as BestOfferProduct[])
 }
 
 export async function getProductsByBrandWithOffers(brandId: string, limit = 20, offset = 0): Promise<BestOfferProduct[]> {

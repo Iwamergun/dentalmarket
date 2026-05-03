@@ -29,8 +29,7 @@ interface CategoryGridProps {
 }
 
 export function CategoryGrid({ categories }: CategoryGridProps) {
-  // Use first 8 categories
-  const displayCategories = categories.slice(0, 8)
+  const displayCategories = categories.slice(0, 4)
 
   return (
     <section className="py-12 md:py-16 bg-background">
@@ -42,7 +41,7 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
           {displayCategories.map((category, index) => {
             // Cycle through icons and gradients
             const iconKeys = Object.keys(categoryIcons)

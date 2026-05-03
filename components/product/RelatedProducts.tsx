@@ -2,10 +2,12 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
 import { Badge } from '@/components/ui/badge'
 import { AddToCartButton } from '@/components/cart'
+import { useAuth } from '@/app/contexts/AuthContext'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface RelatedProductsProps {
@@ -14,6 +16,8 @@ interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ products, currentProductId }: RelatedProductsProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   // Mevcut ürünü listeden çıkar
   const filteredProducts = products.filter(p => p.id !== currentProductId).slice(0, 4)
   
@@ -56,8 +60,27 @@ export function RelatedProducts({ products, currentProductId }: RelatedProductsP
                   <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
-                  {product.min_price != null && (
+                  {authLoading ? (
+                    <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+                  ) : !user ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        router.push('/giris')
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Fiyat için giriş yapın
+                    </button>
+                  ) : product.min_price != null ? (
                     <p className="text-sm font-bold text-primary">{formatPrice(product.min_price)}</p>
+                  ) : (
+                    <p className="text-xs italic text-muted-foreground">Fiyat bilgisi yok</p>
                   )}
                   
                   <div onClick={(e) => e.preventDefault()}>

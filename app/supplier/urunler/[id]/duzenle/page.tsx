@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter, useParams } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
 import { getImageUrl } from '@/lib/utils/imageHelper'
-import { formatPrice } from '@/lib/utils/format'
 
 const PAYMENT_OPTIONS = [
   { value: 'havale', label: 'Havale/EFT' },
@@ -21,6 +21,21 @@ type ProductInfo = {
   sku: string | null
   primary_image: string | null
   short_description: string | null
+}
+
+type SupplierOfferFormRecord = {
+  id: string
+  product_id: string
+  price: number | null
+  vat_rate: number | null
+  stock_quantity: number | null
+  min_order_quantity: number | null
+  lead_time_days: number | null
+  shipping_cost: number | null
+  free_shipping_threshold: number | null
+  payment_options: string[] | null
+  notes: string | null
+  is_active: boolean | null
 }
 
 export default function TeklifDuzenlePage() {
@@ -55,14 +70,16 @@ export default function TeklifDuzenlePage() {
       if (!user) { router.push('/giris'); return }
 
       // Fetch the offer (id param is now the offer id)
-      const { data: offer } = await supabase
-        .from('offers')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: offer } = await (supabase.from('offers') as any)
         .select('id, product_id, price, vat_rate, stock_quantity, min_order_quantity, lead_time_days, shipping_cost, free_shipping_threshold, payment_options, notes, is_active')
         .eq('id', offerId)
         .eq('supplier_id', user.id)
         .maybeSingle()
 
-      if (!offer) {
+      const typedOffer = offer as SupplierOfferFormRecord | null
+
+      if (!typedOffer) {
         toast.error('Teklif bulunamadı veya yetkiniz yok')
         router.push('/supplier/urunler')
         return
@@ -72,22 +89,22 @@ export default function TeklifDuzenlePage() {
       const { data: prod } = await supabase
         .from('catalog_products')
         .select('name, sku, primary_image, short_description')
-        .eq('id', offer.product_id)
+        .eq('id', typedOffer.product_id)
         .single()
 
       setProduct(prod ?? null)
 
       setForm({
-        price: String(offer.price ?? ''),
-        vat_rate: String(offer.vat_rate ?? 20),
-        stock_quantity: String(offer.stock_quantity ?? ''),
-        min_order_quantity: String(offer.min_order_quantity ?? 1),
-        lead_time_days: String(offer.lead_time_days ?? ''),
-        shipping_cost: String(offer.shipping_cost ?? ''),
-        free_shipping_threshold: String(offer.free_shipping_threshold ?? ''),
-        payment_options: (offer.payment_options as string[]) ?? [],
-        notes: offer.notes ?? '',
-        is_active: offer.is_active ?? true,
+        price: String(typedOffer.price ?? ''),
+        vat_rate: String(typedOffer.vat_rate ?? 20),
+        stock_quantity: String(typedOffer.stock_quantity ?? ''),
+        min_order_quantity: String(typedOffer.min_order_quantity ?? 1),
+        lead_time_days: String(typedOffer.lead_time_days ?? ''),
+        shipping_cost: String(typedOffer.shipping_cost ?? ''),
+        free_shipping_threshold: String(typedOffer.free_shipping_threshold ?? ''),
+        payment_options: typedOffer.payment_options ?? [],
+        notes: typedOffer.notes ?? '',
+        is_active: typedOffer.is_active ?? true,
       })
       setInitialLoading(false)
     }
@@ -118,8 +135,8 @@ export default function TeklifDuzenlePage() {
 
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('offers')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from('offers') as any)
         .update({
           price: parseFloat(form.price),
           vat_rate: parseInt(form.vat_rate) || 20,
@@ -181,10 +198,13 @@ export default function TeklifDuzenlePage() {
       {/* Readonly Product Info */}
       {product && (
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-6 flex items-center gap-4">
-          <img
+          <Image
             src={getImageUrl(product.primary_image)}
             alt={product.name}
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-lg object-cover bg-white border"
+            unoptimized
           />
           <div>
             <h2 className="font-semibold text-gray-900">{product.name}</h2>

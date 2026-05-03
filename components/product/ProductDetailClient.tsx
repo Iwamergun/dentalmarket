@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ShoppingCart, Minus, Plus, Check, Loader2, Package, Truck, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { WishlistButton } from '@/components/WishlistButton'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { useCart } from '@/app/contexts/CartContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
@@ -29,6 +31,8 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product, offers = [] }: ProductDetailClientProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
@@ -198,7 +202,20 @@ export function ProductDetailClient({ product, offers = [] }: ProductDetailClien
 
         {/* Fiyat */}
         <div className="py-4 border-y border-border/50">
-          {product.price ? (
+          {authLoading ? (
+            <div className="h-10 w-40 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <button
+              type="button"
+              onClick={() => router.push('/giris')}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Fiyat için giriş yapın
+            </button>
+          ) : product.price ? (
             <>
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-primary">

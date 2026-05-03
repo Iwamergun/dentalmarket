@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Package, Eye, Truck, CheckCircle, Clock, XCircle, Loader2, ShoppingBag, RefreshCw } from 'lucide-react'
+import { Package, Eye, Truck, CheckCircle, Clock, XCircle, ShoppingBag, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
-import { createClient } from '@/lib/supabase/client'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
@@ -45,7 +44,6 @@ export default function SiparislerimPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
   const fetchOrders = async () => {
     if (!user) {
@@ -57,46 +55,17 @@ export default function SiparislerimPage() {
     setError(null)
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error: fetchError } = await (supabase as any)
-        .from('orders')
-        .select(`
-          id,
-          order_number,
-          status,
-          payment_status,
-          payment_method,
-          subtotal,
-          shipping_cost,
-          total,
-          created_at,
-          updated_at
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/orders/my', {
+        credentials: 'include',
+      })
 
-      if (fetchError) {
-        // Tablo yoksa boş liste göster
-        if (fetchError.message?.includes('does not exist')) {
-          setOrders([])
-        } else {
-          throw fetchError
-        }
-      } else {
-        // Her sipariş için ürün sayısını al
-        const ordersWithCount = await Promise.all(
-          (data || []).map(async (order: Order) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { count } = await (supabase as any)
-              .from('order_items')
-              .select('*', { count: 'exact', head: true })
-              .eq('order_id', order.id)
-            
-            return { ...order, items_count: count || 0 }
-          })
-        )
-        setOrders(ordersWithCount)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Siparişler yüklenirken bir hata oluştu.')
       }
+
+      setOrders(data.orders || [])
     } catch (err) {
       console.error('Siparişler yüklenirken hata:', err)
       setError('Siparişler yüklenirken bir hata oluştu.')

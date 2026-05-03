@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { cn } from '@/lib/utils/cn'
 
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc'
 
@@ -31,7 +32,10 @@ export function SortSelect({ className }: SortSelectProps) {
     <select 
       value={currentSort}
       onChange={handleSortChange}
-      className="rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+      className={cn(
+        'rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20',
+        className
+      )}
     >
       <option value="newest">En Yeni</option>
       <option value="price-asc">Fiyat: Düşükten Yükseğe</option>

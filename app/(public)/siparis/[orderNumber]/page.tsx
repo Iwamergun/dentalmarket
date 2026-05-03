@@ -39,6 +39,9 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
           <p className="text-muted-foreground">
             Siparişiniz başarıyla oluşturuldu ve işleme alındı.
           </p>
+          <p className="mt-3 text-sm font-medium text-primary">
+            Sipariş numaranız: <span className="font-mono">{orderNumber}</span>
+          </p>
         </div>
 
         {/* Sipariş Bilgileri Kartı */}
@@ -103,7 +106,7 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
 
         {/* Aksiyonlar */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/hesabim/siparislerim" className="flex-1">
+          <Link href="/profil/siparislerim" className="flex-1">
             <Button className="w-full">
               <Package className="w-4 h-4 mr-2" />
               Siparişlerimi Görüntüle

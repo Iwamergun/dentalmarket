@@ -152,6 +152,7 @@ Required environment variables:
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | `eyJ...` |
 | `NEXT_PUBLIC_SITE_URL` | Your site URL | `https://dentalisveris.com` |
 | `NEXT_PUBLIC_SITE_NAME` | Your site name | `Dent Alışveriş` |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 Measurement ID (optional) | `G-XXXXXXXXXX` |
 
 ## Security Notes
 

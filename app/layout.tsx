@@ -5,6 +5,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { Toaster } from "sonner";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 
 const outfit = Outfit({ 
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={`${outfit.variable} ${dmSans.variable} antialiased`}>
+        <GoogleAnalytics />
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>

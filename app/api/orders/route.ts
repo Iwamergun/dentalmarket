@@ -3,6 +3,16 @@ import { createClient } from '@/lib/supabase/server'
 import { checkoutSchema } from '@/lib/validations/checkout'
 import { z } from 'zod'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import {
+  generateInvoiceNumber,
+  buildInvoiceData,
+  mapOrderItems,
+  generateInvoicePdf,
+  type RawOrder,
+  type RawOrderItem,
+} from '@/lib/invoice/generate-invoice-pdf'
+import { sendEmail, isEmailConfigured } from '@/lib/email/mailer'
+import { buildOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation'
 
 // Sipariş oluşturma request şeması
 const createOrderSchema = z.object({
@@ -215,6 +225,121 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // -----------------------------------------------------------------------
+    // Fatura oluştur ve onay e-postası gönder (hata olursa sipariş etkilenmez)
+    // -----------------------------------------------------------------------
+    let invoiceNumber: string | null = null
+    try {
+      const invNumber = generateInvoiceNumber()
+      invoiceNumber = invNumber
+
+      const rawOrder: RawOrder = {
+        id: orderId,
+        order_number: orderNumber,
+        subtotal,
+        shipping_cost: shipping,
+        total,
+        shipping_address: {
+          first_name: address.firstName,
+          last_name: address.lastName,
+          phone: address.phone,
+          email: address.email,
+          address: address.address,
+          city: address.city,
+          district: address.district,
+          postal_code: address.postalCode,
+          notes: address.notes ?? null,
+        },
+        notes: address.notes ?? null,
+      }
+
+      const invoiceData = buildInvoiceData(rawOrder, invNumber)
+
+      const mappedItems = mapOrderItems(
+        orderItemsData.map((i) => ({
+          product_id: i.product_id,
+          variant_id: i.variant_id,
+          quantity: i.quantity,
+          unit_price: i.unit_price,
+          total_price: i.total_price,
+        })) as RawOrderItem[]
+      )
+
+      // Generate PDF
+      const pdfBuffer = await generateInvoicePdf(
+        invoiceData,
+        { order_number: orderNumber, billing_type: 'individual' },
+        mappedItems
+      )
+
+      // Persist invoice record (optional – skipped if table does not exist)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any)
+        .from('invoices')
+        .insert({
+          order_id: orderId,
+          invoice_number: invoiceData.invoice_number,
+          invoice_date: invoiceData.invoice_date,
+          customer_name: invoiceData.customer_name,
+          customer_tax_office: invoiceData.customer_tax_office,
+          customer_tax_number: invoiceData.customer_tax_number,
+          customer_address: invoiceData.customer_address,
+          customer_city: invoiceData.customer_city,
+          customer_phone: invoiceData.customer_phone,
+          customer_email: invoiceData.customer_email,
+          subtotal: invoiceData.subtotal,
+          discount_amount: invoiceData.discount_amount,
+          shipping_cost: invoiceData.shipping_cost,
+          tax_amount: invoiceData.tax_amount,
+          total_amount: invoiceData.total_amount,
+          notes: rawOrder.notes ?? null,
+        })
+
+      // Send confirmation email with PDF attachment
+      if (isEmailConfigured() && address.email) {
+        const emailPayload = buildOrderConfirmationEmail({
+          orderNumber,
+          customerName: `${address.firstName} ${address.lastName}`,
+          paymentMethod,
+          subtotal,
+          shippingCost: shipping,
+          total,
+          items: mappedItems.map((mi) => ({
+            product_name: mi.product_name,
+            product_sku: mi.product_sku,
+            variant_name: mi.variant_name,
+            quantity: mi.quantity,
+            unit_price: mi.unit_price,
+            total: mi.total,
+          })),
+          notes: address.notes ?? null,
+          invoiceNumber: invNumber,
+        })
+
+        await sendEmail({
+          to: address.email,
+          subject: `Sipariş Onayı – ${orderNumber} | Dent Alışveriş`,
+          html: emailPayload.html,
+          text: emailPayload.text,
+          attachments: [
+            {
+              filename: `fatura-${invNumber}.pdf`,
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            },
+          ],
+        })
+      }
+    } catch (invoiceEmailError) {
+      // Invoice / email errors must not fail the order creation
+      console.error(
+        'Invoice/email error (non-fatal):',
+        invoiceEmailError instanceof Error
+          ? invoiceEmailError.message
+          : invoiceEmailError
+      )
+    }
+
     // Başarılı yanıt
     return NextResponse.json({
       success: true,
@@ -224,6 +349,7 @@ export async function POST(request: NextRequest) {
         status: order.status,
         total: order.total,
         paymentMethod: order.payment_method,
+        invoiceNumber,
       },
       message: getOrderMessage(paymentMethod),
     })

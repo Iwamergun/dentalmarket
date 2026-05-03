@@ -6,6 +6,13 @@ import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import dynamic from "next/dynamic";
+
+// Imported with ssr:false so it never runs during SSR and does not affect SEO
+const PushNotificationProvider = dynamic(
+  () => import("@/components/push/PushNotificationProvider"),
+  { ssr: false }
+)
 
 const outfit = Outfit({ 
   subsets: ["latin"],
@@ -37,6 +44,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
+              <PushNotificationProvider />
               {children}
               <Toaster 
                 position="bottom-right" 

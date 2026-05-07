@@ -13,15 +13,15 @@ const categoryIcons = {
   activity: Activity,
 }
 
-const gradients = [
-  'from-primary to-secondary',
-  'from-secondary to-accent',
-  'from-accent to-warning',
-  'from-primary to-accent',
-  'from-secondary to-primary',
-  'from-accent to-secondary',
-  'from-warning to-accent',
-  'from-primary to-warning',
+const tones = [
+  'bg-primary',
+  'bg-secondary',
+  'bg-accent',
+  'bg-primary',
+  'bg-secondary',
+  'bg-accent',
+  'bg-warning',
+  'bg-primary',
 ]
 
 interface CategoryGridProps {
@@ -43,10 +43,10 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
 
         <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
           {displayCategories.map((category, index) => {
-            // Cycle through icons and gradients
+            // Cycle through icons and tones
             const iconKeys = Object.keys(categoryIcons)
             const IconComponent = categoryIcons[iconKeys[index % iconKeys.length] as keyof typeof categoryIcons]
-            const gradientClass = gradients[index % gradients.length]
+            const toneClass = tones[index % tones.length]
 
             return (
               <Link
@@ -54,7 +54,7 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
                 href={`/kategoriler/${category.slug}`}
                 className="group bg-white border-2 border-border rounded-2xl p-6 text-center hover:shadow-2xl hover:border-primary/40 transition-all duration-300"
               >
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientClass} text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl ${toneClass} text-white shadow-lg transition-transform duration-300 group-hover:scale-110`}>
                   <IconComponent className="w-8 h-8" />
                 </div>
                 <h3 className="font-bold text-body-text mb-1 group-hover:text-primary transition-colors">

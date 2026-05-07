@@ -89,7 +89,7 @@ export function CategoryBar() {
 
   if (isLoading) {
     return (
-      <nav className="hidden lg:block bg-gradient-to-r from-primary/5 to-secondary/5 border-b-2 border-primary/10">
+      <nav className="hidden border-b-2 border-primary/10 bg-muted lg:block">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-1 h-12">
             {[...Array(7)].map((_, i) => (
@@ -105,7 +105,7 @@ export function CategoryBar() {
     /* position:relative + z-40 → stacking context above <main> so dropdown renders on top */
     <nav
       ref={navRef}
-      className="relative z-40 hidden overflow-x-clip lg:block bg-gradient-to-r from-primary/5 to-secondary/5 border-b-2 border-primary/10"
+      className="relative z-40 hidden overflow-x-clip border-b-2 border-primary/10 bg-muted shadow-[inset_0_-1px_0_rgba(84,48,165,0.04)] lg:block"
     >
       <div className="container mx-auto px-4">
         <div className="flex w-full items-center gap-2 py-1">

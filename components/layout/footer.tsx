@@ -2,17 +2,17 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-primary via-secondary to-primary text-slate-300">
+    <footer className="bg-primary text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-warning flex items-center justify-center shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent shadow-lg">
                 <span className="text-white font-bold text-lg">DA</span>
               </div>
-              <span className="text-2xl font-extrabold bg-gradient-to-r from-white to-accent bg-clip-text text-transparent">
+              <span className="text-2xl font-extrabold text-white">
                 Dent Alışveriş
               </span>
             </Link>

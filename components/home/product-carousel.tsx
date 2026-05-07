@@ -231,7 +231,7 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
   }
 
   return (
-    <section className="py-10 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
+    <section className="bg-muted py-10 shadow-[inset_0_1px_0_rgba(84,48,165,0.04)]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>

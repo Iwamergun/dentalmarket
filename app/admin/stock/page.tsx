@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import StockTable from '@/components/admin/StockTable'
 import { AlertTriangle } from 'lucide-react'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 const LOW_STOCK_THRESHOLD = 10
 
@@ -17,7 +18,7 @@ export default async function AdminStockPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'admin') redirect('/')
+  if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) redirect('/')
 
   // Fetch all active offers joined with product info
   const { data: offers } = await supabase

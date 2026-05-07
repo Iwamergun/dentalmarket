@@ -20,7 +20,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/login')
+    router.push('/giris')
     router.refresh()
   }
 

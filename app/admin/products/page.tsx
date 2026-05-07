@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Plus } from 'lucide-react'
 import { getImageUrl } from '@/lib/utils/imageHelper'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 export default async function AdminProductsPage() {
   const supabase = await createClient()
@@ -17,7 +18,7 @@ export default async function AdminProductsPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'admin') redirect('/')
+  if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) redirect('/')
 
   // Fetch products with brand and category names
   const { data: products } = await supabase

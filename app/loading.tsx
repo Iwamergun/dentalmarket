@@ -3,10 +3,10 @@ export default function Loading() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       {/* Brand Logo */}
       <div className="mb-8 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-md">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-md">
           <span className="text-sm font-bold text-white">DA</span>
         </div>
-        <span className="text-lg font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+        <span className="text-lg font-extrabold text-primary">
           Dent Alışveriş
         </span>
       </div>

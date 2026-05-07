@@ -81,7 +81,8 @@ export function AddToCartButton({
       className={cn(
         'gap-2 transition-all duration-300',
         fullWidth && 'w-full',
-        success && 'bg-green-600 hover:bg-green-600',
+        variant === 'default' && !success && 'h-12 rounded-xl bg-accent text-white shadow-md hover:bg-accent/90 hover:shadow-lg',
+        success && 'h-12 rounded-xl bg-success text-white shadow-md hover:bg-success',
         className
       )}
     >

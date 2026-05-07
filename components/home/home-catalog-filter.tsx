@@ -48,7 +48,7 @@ export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps
 
       <aside className="hidden lg:block">
         <div className="sticky top-[132px] space-y-4">
-          <div className="rounded-[32px] border border-primary/10 bg-[linear-gradient(145deg,rgba(11,63,110,0.08),rgba(255,255,255,0.98))] p-6 shadow-card">
+          <div className="rounded-[32px] border border-primary/10 bg-white p-6 shadow-card">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Hizli Katalog</p>
             <h2 className="mt-2 text-2xl font-bold text-primary">Dogru urune daha hizli ulasin</h2>
             <p className="mt-3 text-sm leading-6 text-text-secondary">

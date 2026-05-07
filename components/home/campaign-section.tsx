@@ -53,8 +53,8 @@ export function CampaignSection() {
               href={campaign.href}
               className={`group relative overflow-hidden rounded-xl p-6 transition-all duration-200 hover:-translate-y-1 ${
                 campaign.color === 'primary' 
-                  ? 'bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 hover:border-primary/50 hover:shadow-glow-primary'
-                  : 'bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 hover:border-accent/50 hover:shadow-glow-accent'
+                  ? 'border border-primary/30 bg-primary/10 hover:border-primary/50 hover:shadow-lg'
+                  : 'border border-accent/30 bg-accent/10 hover:border-accent/50 hover:shadow-lg'
               }`}
             >
               {/* Badge */}

@@ -10,7 +10,7 @@ export function BrandLogos({ brands }: BrandLogosProps) {
   const displayBrands = brands.slice(0, 12)
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 border-y-2 border-primary/10">
+    <section className="border-y-2 border-primary/10 bg-muted py-12 md:py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-extrabold text-body-text mb-3">Güvenilir Markalar</h2>
@@ -30,7 +30,7 @@ export function BrandLogos({ brands }: BrandLogosProps) {
                 {brand.name}
               </span>
               {/* Gradient underline on hover */}
-              <span className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary to-secondary rounded-full group-hover:w-full transition-all duration-300" />
+              <span className="absolute bottom-0 left-0 h-1 w-0 rounded-full bg-primary group-hover:w-full transition-all duration-300" />
             </Link>
           ))}
         </div>

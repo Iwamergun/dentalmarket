@@ -3,9 +3,7 @@ import { Sparkles, HeartPulse } from 'lucide-react'
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
-      {/* Radial gradient overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-secondary/10 via-transparent to-transparent" />
+    <section className="relative overflow-hidden bg-muted shadow-[inset_0_-30px_60px_rgba(84,48,165,0.05)]">
 
       <div className="container mx-auto px-4 relative py-16 md:py-24">
         {/* Two-column layout */}
@@ -13,7 +11,7 @@ export function HeroSection() {
           {/* Left — Text content */}
           <div className="space-y-8 text-center lg:text-left">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-accent to-warning text-white border-0 rounded-full shadow-lg animate-fade-in">
+            <div className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-white shadow-[0_10px_24px_rgba(230,115,0,0.22)] animate-fade-in">
               <Sparkles className="w-5 h-5" />
               <span className="font-bold text-sm" role="img" aria-label="Kutlama">🎉</span>
               <span className="font-bold text-sm">Yeni Ürünler Geldi - Özel Fırsatlar!</span>
@@ -21,7 +19,7 @@ export function HeroSection() {
 
             {/* Main Title */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
-              <span className="bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
+              <span className="text-foreground">
                 Diş Hekimleri İçin
                 <br />
                 Premium B2B Platform
@@ -38,13 +36,13 @@ export function HeroSection() {
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
               <Link
                 href="/urunler"
-                className="px-8 py-4 bg-gradient-to-r from-primary via-secondary to-primary text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105"
+                className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-white font-bold shadow-[0_12px_28px_rgba(84,48,165,0.2)] transition-all duration-200 hover:bg-primary/90 hover:shadow-[0_16px_32px_rgba(84,48,165,0.24)]"
               >
                 Ürünleri Keşfet
               </Link>
               <Link
                 href="/kategoriler"
-                className="px-8 py-4 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
+                className="inline-flex h-12 items-center justify-center rounded-xl border-2 border-primary/15 bg-white px-8 text-primary font-bold transition-all duration-200 hover:border-primary hover:bg-primary/5"
               >
                 Kategoriler
               </Link>
@@ -122,7 +120,7 @@ export function HeroSection() {
               </svg>
 
               {/* Heart pulse icon overlay */}
-              <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-br from-destructive to-accent rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute -top-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-destructive shadow-lg">
                 <HeartPulse className="w-5 h-5 text-white" />
               </div>
             </div>
@@ -133,7 +131,7 @@ export function HeroSection() {
               className="absolute top-4 -left-4 bg-white/90 backdrop-blur-md border border-border/50 rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 animate-float z-20"
               style={{ animationDelay: '0s' }}
             >
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-success to-primary flex items-center justify-center flex-shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success shadow-sm">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
               <div>
@@ -147,7 +145,7 @@ export function HeroSection() {
               className="absolute -bottom-2 -left-8 bg-white/90 backdrop-blur-md border border-border/50 rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 animate-float z-20"
               style={{ animationDelay: '0.5s' }}
             >
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" /></svg>
               </div>
               <div>
@@ -161,7 +159,7 @@ export function HeroSection() {
               className="absolute top-1/2 -right-12 -translate-y-1/2 bg-white/90 backdrop-blur-md border border-border/50 rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 animate-float z-20"
               style={{ animationDelay: '1s' }}
             >
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-warning to-accent flex items-center justify-center flex-shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warning shadow-sm">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
               </div>
               <div>

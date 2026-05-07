@@ -60,7 +60,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+    <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
       {/* Image */}
       <Link href={`/urunler/${product.slug}`} className="block">
         <div className="relative aspect-square bg-gray-100">
@@ -134,7 +134,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
           {isInStock ? (
             <Button
               size="sm"
-              className="w-full gap-1.5"
+              className="h-12 w-full gap-1.5 rounded-xl bg-accent text-white shadow-md hover:bg-accent/90 hover:shadow-lg"
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
             >

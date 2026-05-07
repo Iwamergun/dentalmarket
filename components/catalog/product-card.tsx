@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
 
   return (
-    <Card className="h-full flex flex-col transition-shadow hover:shadow-md relative group overflow-hidden">
+    <Card className="relative flex h-full min-h-[420px] flex-col overflow-hidden transition-shadow hover:shadow-md group">
       {/* Wishlist Button */}
       <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <WishlistButton 
@@ -43,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       )}
       
-      <Link href={`/urunler/${product.slug}`} className="flex-1 flex flex-col">
+      <Link href={`/urunler/${product.slug}`} className="flex flex-1 flex-col">
         {/* Ürün Görseli */}
         <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center">
           {product.primary_image ? (
@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
       </Link>
 
-      <CardFooter className="pt-0 pb-4 px-4">
+      <CardFooter className="mt-auto flex items-center px-4 pb-4 pt-0">
         <AddToCartButton 
           productId={product.id}
           productName={product.name}

@@ -89,7 +89,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             return (
               <div
                 key={product.id}
-                className="group bg-gradient-to-br from-white to-muted/30 border-2 border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:border-primary/40 transition-all duration-300"
+                className="group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border-2 border-border bg-white transition-all duration-300 hover:border-primary/40 hover:shadow-2xl"
               >
                 {/* Image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
@@ -110,7 +110,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   
                   {/* Discount Badge */}
                   {discount > 0 && (
-                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r from-destructive to-destructive/80 text-white text-xs font-bold rounded-lg border-2 border-white shadow-lg">
+                    <div className="absolute top-3 left-3 rounded-lg border-2 border-white bg-destructive px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                       %{discount} İndirim
                     </div>
                   )}
@@ -129,7 +129,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                 </div>
 
                 {/* Content */}
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   {/* Brand */}
                   {product.brand_id && (
                     <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em] mb-2">PREMIUM BRAND</p>
@@ -179,7 +179,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                             {formatPrice(price)}
                           </p>
                         )}
-                        <p className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                        <p className="text-2xl font-extrabold text-primary">
                           {formatPrice(discountedPrice)}
                         </p>
                       </>
@@ -200,20 +200,22 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   </div>
 
                   {/* Add to Cart Button */}
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    disabled={loadingStates[product.id]}
-                    className="w-full bg-gradient-to-r from-accent via-warning to-accent hover:from-warning hover:via-accent hover:to-warning text-white font-bold rounded-xl h-12 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {loadingStates[product.id] ? (
-                      <span>Ekleniyor...</span>
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-5 h-5" />
-                        <span>Sepete Ekle</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="mt-auto pt-4">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      disabled={loadingStates[product.id]}
+                      className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-white font-bold shadow-md transition-all duration-200 hover:bg-accent/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loadingStates[product.id] ? (
+                        <span>Ekleniyor...</span>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-5 h-5" />
+                          <span>Sepete Ekle</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )
@@ -223,7 +225,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         <div className="text-center mt-10">
           <Link
             href="/urunler"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-8 text-white font-bold shadow-xl transition-all duration-200 hover:bg-primary/90 hover:shadow-2xl"
           >
             Tüm Ürünleri Gör
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

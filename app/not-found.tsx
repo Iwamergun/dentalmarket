@@ -13,10 +13,10 @@ export default function NotFound() {
 
       {/* Brand Logo */}
       <div className="mb-8 flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-md">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-md">
           <span className="text-lg font-bold text-white">DA</span>
         </div>
-        <span className="text-xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+        <span className="text-xl font-extrabold text-primary">
           Dent Alışveriş
         </span>
       </div>
@@ -41,7 +41,7 @@ export default function NotFound() {
         </div>
 
         {/* 404 */}
-        <p className="mb-2 text-7xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <p className="mb-2 text-7xl font-extrabold text-primary">
           404
         </p>
         <h1 className="mb-2 text-2xl font-bold text-text-primary">

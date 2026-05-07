@@ -29,5 +29,11 @@ describe('admin mock sections', () => {
       expect(section.apiTodo).toContain('TODO:')
       expect(section.apiTodo).toContain('/api/admin/')
     })
+
+    expect(customersSection.apiTodo).toContain('/api/admin/customers')
+    expect(categoriesSection.apiTodo).toContain('/api/admin/categories')
+    expect(brandsSection.apiTodo).toContain('/api/admin/brands')
+    expect(reportsSection.apiTodo).toContain('/api/admin/reports')
+    expect(settingsSection.apiTodo).toContain('/api/admin/settings')
   })
 })

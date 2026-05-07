@@ -25,6 +25,7 @@ dentalmarket/
 │   │   └── markalar/            # Brands
 │   ├── (dashboard)/             # Authenticated routes
 │   │   └── dashboard/
+│   ├── admin/                   # Admin dashboard routes (/admin/*)
 │   ├── sitemap.ts               # Dynamic sitemap generation
 │   └── robots.ts                # Robots.txt generation
 ├── components/
@@ -83,6 +84,13 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Admin Dashboard
+
+- Admin panel root: `/admin` (redirects to `/admin/dashboard`)
+- Protected via middleware + role token checks (`hasAdminAccess`)
+- Yeni eklenen admin sayfaları (`/admin/customers`, `/admin/categories`, `/admin/brands`, `/admin/reports`, `/admin/settings`) geçici mock veri ile çalışır.
+- Gerçek backend entegrasyonu için `lib/admin/mock-data.ts` içindeki TODO notlarını takip edin.
 
 ## Available Scripts
 

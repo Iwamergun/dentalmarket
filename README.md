@@ -89,8 +89,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 - Admin panel root: `/admin` (redirects to `/admin/dashboard`)
 - Protected via middleware + role token checks (`hasAdminAccess`)
-- Yeni eklenen admin sayfaları (`/admin/customers`, `/admin/categories`, `/admin/brands`, `/admin/reports`, `/admin/settings`) geçici mock veri ile çalışır.
-- Gerçek backend entegrasyonu için `lib/admin/mock-data.ts` içindeki TODO notlarını takip edin.
+- Newly added admin pages (`/admin/customers`, `/admin/categories`, `/admin/brands`, `/admin/reports`, `/admin/settings`) currently run with temporary mock data.
+- For real backend integration, follow the TODO notes in `lib/admin/mock-data.ts`.
 
 ## Available Scripts
 

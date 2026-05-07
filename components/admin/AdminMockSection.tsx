@@ -35,7 +35,7 @@ export default function AdminMockSection({ section }: AdminMockSectionProps) {
               {section.rows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50">
                   {row.values.map((value, index) => (
-                    <td key={`${row.id}-${index}`} className="px-6 py-4 text-gray-700">
+                    <td key={`${row.id}-${section.columns[index] ?? index}`} className="px-6 py-4 text-gray-700">
                       {value}
                     </td>
                   ))}

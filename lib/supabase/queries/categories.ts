@@ -72,3 +72,30 @@ export async function getRootCategories(): Promise<Category[]> {
 
   return (data || []) as Category[]
 }
+
+export function getCategoryDescendantIds(categories: Category[], rootCategoryId: string): string[] {
+  const childrenByParentId = new Map<string, Category[]>()
+
+  categories.forEach((category) => {
+    if (!category.parent_id) return
+
+    const siblings = childrenByParentId.get(category.parent_id) ?? []
+    siblings.push(category)
+    childrenByParentId.set(category.parent_id, siblings)
+  })
+
+  const collectedIds: string[] = []
+  const pendingIds = [rootCategoryId]
+
+  while (pendingIds.length > 0) {
+    const categoryId = pendingIds.shift()
+    if (!categoryId || collectedIds.includes(categoryId)) continue
+
+    collectedIds.push(categoryId)
+
+    const children = childrenByParentId.get(categoryId) ?? []
+    children.forEach((child) => pendingIds.push(child.id))
+  }
+
+  return collectedIds
+}

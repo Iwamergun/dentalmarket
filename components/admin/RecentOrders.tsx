@@ -3,17 +3,17 @@
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 
-interface Order {
+export interface RecentOrder {
   id: string
   order_number: string
-  total: string
+  total: string | number | null
   status: string
   created_at: string
   profiles?: { company_name: string | null }
 }
 
 interface RecentOrdersProps {
-  orders: Order[]
+  orders: RecentOrder[]
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -59,7 +59,7 @@ export default function RecentOrders({ orders }: RecentOrdersProps) {
                     {order.profiles?.company_name ?? '-'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {parseFloat(order.total).toLocaleString('tr-TR')} ₺
+                      {Number(order.total ?? 0).toLocaleString('tr-TR')} ₺
                   </td>
                   <td className="px-6 py-4">
                     <span

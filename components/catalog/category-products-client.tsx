@@ -2,12 +2,14 @@
 
 import * as React from 'react'
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Filter } from 'lucide-react'
 import { FilterSidebar } from '@/components/catalog/filter-sidebar'
 import { ProductImageCard } from '@/components/catalog/product-image-card'
 import { SortSelect } from '@/components/catalog/sort-select'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { filterAndSortProducts, parseCatalogFilters } from '@/lib/catalog/filtering'
 import type { Category, Brand } from '@/types/catalog.types'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
@@ -25,6 +27,12 @@ export function CategoryProductsClient({
   currentCategoryId 
 }: CategoryProductsClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const searchParams = useSearchParams()
+
+  const filteredProducts = React.useMemo(() => {
+    const filters = parseCatalogFilters(searchParams)
+    return filterAndSortProducts(products, filters)
+  }, [products, searchParams])
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
@@ -69,7 +77,7 @@ export function CategoryProductsClient({
 
           {/* Results Count */}
           <div className="text-sm text-text-secondary">
-            <span className="font-semibold text-primary">{products.length}</span> ürün bulundu
+            <span className="font-semibold text-primary">{filteredProducts.length}</span> ürün bulundu
           </div>
 
           {/* Sorting */}
@@ -79,9 +87,9 @@ export function CategoryProductsClient({
         </div>
 
         {/* Product Grid */}
-        {products && products.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <ProductImageCard 
                 key={product.id} 
                 product={product} 

@@ -10,6 +10,13 @@ import {
   type RawOrder,
 } from '@/lib/invoice/generate-invoice-pdf'
 
+type InvoiceNumberRpcClient = {
+  rpc: (fn: 'generate_invoice_number') => Promise<{
+    data: string | null
+    error: { message: string } | null
+  }>
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request)
@@ -70,8 +77,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate invoice number
-    const invoiceNumber = generateInvoiceNumber()
+  // Prefer the DB-backed sequence, but keep the code-based generator as fallback.
+  const rpcClient = supabase as unknown as InvoiceNumberRpcClient
+  const { data: invoiceNumberData, error: invoiceNumberError } = await rpcClient.rpc('generate_invoice_number')
+  const invoiceNumber = invoiceNumberError || !invoiceNumberData
+    ? generateInvoiceNumber()
+    : invoiceNumberData
 
     // Build structured invoice data from the actual orders schema
     const invoiceData = buildInvoiceData(order as RawOrder, invoiceNumber)

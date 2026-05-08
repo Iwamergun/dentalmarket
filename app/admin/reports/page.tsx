@@ -10,6 +10,7 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react'
+import { requireAdminAccess } from '@/lib/auth/require-admin'
 
 export const metadata = { title: 'Raporlar | Admin' }
 
@@ -56,6 +57,8 @@ function MetricCard({
 
 // ─── Page ─────────────────────────────────────────────────────────────────
 export default async function AdminReportsPage() {
+  await requireAdminAccess()
+
   const cookieStore = await cookies()
 
   const supabase = createServerClient<Database>(

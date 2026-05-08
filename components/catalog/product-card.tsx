@@ -8,6 +8,8 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { WishlistButton } from '@/components/WishlistButton'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/contexts/AuthContext'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface ProductCardProps {
@@ -15,12 +17,14 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const hasMultipleOffers = product.offer_count > 1
   const hasPrice = product.min_price != null && product.min_price > 0
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
 
   return (
-    <Card className="h-full flex flex-col transition-shadow hover:shadow-md relative group overflow-hidden">
+    <Card className="relative flex h-full min-h-[420px] flex-col overflow-hidden transition-shadow hover:shadow-md group">
       {/* Wishlist Button */}
       <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <WishlistButton 
@@ -39,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       )}
       
-      <Link href={`/urunler/${product.slug}`} className="flex-1 flex flex-col">
+      <Link href={`/urunler/${product.slug}`} className="flex flex-1 flex-col">
         {/* Ürün Görseli */}
         <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center">
           {product.primary_image ? (
@@ -72,7 +76,20 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardContent className="pb-2 pt-0 flex-1">
           {/* Fiyat */}
           <div className="mt-2">
-            {hasPrice ? (
+            {authLoading ? (
+              <div className="h-6 w-24 animate-pulse rounded bg-muted" />
+            ) : !user ? (
+              <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/giris') }}
+                className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Fiyat için giriş yapın
+              </button>
+            ) : hasPrice ? (
               isRange ? (
                 <div>
                   <span className="text-lg font-bold text-blue-600">
@@ -86,7 +103,7 @@ export function ProductCard({ product }: ProductCardProps) {
               )
             ) : (
               <span className="text-sm text-muted-foreground italic">
-                Fiyat için iletişime geçin
+                Fiyat bilgisi yok
               </span>
             )}
           </div>
@@ -101,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
       </Link>
 
-      <CardFooter className="pt-0 pb-4 px-4">
+      <CardFooter className="mt-auto flex items-center px-4 pb-4 pt-0">
         <AddToCartButton 
           productId={product.id}
           productName={product.name}

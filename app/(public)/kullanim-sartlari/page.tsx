@@ -25,8 +25,8 @@ export default function KullanimSartlariPage() {
         <section className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3">1. Genel Hükümler</h2>
           <p className="text-gray-600 leading-relaxed">
-            Bu Kullanım Koşulları, Dent Alışveriş platformunu ("Platform") kullanan tüm ziyaretçi ve
-            üyeler ("Kullanıcı") için geçerlidir. Platformu kullanmaya devam etmekle bu koşulları
+            Bu Kullanım Koşulları, Dent Alışveriş platformunu (&quot;Platform&quot;) kullanan tüm ziyaretçi ve
+            üyeler (&quot;Kullanıcı&quot;) için geçerlidir. Platformu kullanmaya devam etmekle bu koşulları
             okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan etmiş olursunuz. Platform; diş kliniği
             ekipmanları, sarf malzemeleri ve ilgili ürünlerin alım-satımına aracılık eden elektronik
             ticaret hizmetini sunar.

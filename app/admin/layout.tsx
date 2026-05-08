@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 export default async function AdminLayout({
   children,
@@ -47,7 +48,7 @@ export default async function AdminLayout({
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'admin') {
+  if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
     redirect('/')
   }
 

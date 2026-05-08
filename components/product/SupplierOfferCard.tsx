@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ShoppingCart, Loader2, Check, Truck, Star, Clock, Package, Store } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCart } from '@/app/contexts/CartContext'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { toast } from 'sonner'
@@ -27,6 +30,8 @@ interface SupplierOfferCardProps {
 }
 
 export function SupplierOfferCard({ offer, productId, productName, isBest }: SupplierOfferCardProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
   const { addToCart } = useCart()
@@ -59,7 +64,7 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
         {/* Supplier logo / avatar */}
         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
           {offer.supplier_logo ? (
-            <img src={getImageUrl(offer.supplier_logo)} alt={offer.supplier_name ?? ''} className="w-full h-full object-cover" />
+            <Image src={getImageUrl(offer.supplier_logo)} alt={offer.supplier_name ?? ''} width={48} height={48} className="w-full h-full object-cover" unoptimized />
           ) : (
             <Package className="w-6 h-6 text-muted-foreground" />
           )}
@@ -88,7 +93,7 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
                 {offer.lead_time_days === 0 ? 'Aynı gün' : `${offer.lead_time_days} iş günü`}
               </span>
             )}
-            {offer.shipping_cost != null && (
+            {user && offer.shipping_cost != null && (
               <span className="flex items-center gap-1">
                 <Truck className="w-3.5 h-3.5" />
                 {offer.shipping_cost === 0 ? 'Ücretsiz kargo' : `Kargo: ${formatPrice(offer.shipping_cost)}`}
@@ -118,7 +123,22 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
 
         {/* Price + CTA */}
         <div className="flex flex-col items-end gap-2 flex-shrink-0">
-          <span className="text-xl font-bold text-primary">{formatPrice(offer.price)}</span>
+          {authLoading ? (
+            <div className="h-7 w-24 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <button
+              type="button"
+              onClick={() => router.push('/giris')}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Fiyat için giriş yapın
+            </button>
+          ) : (
+            <span className="text-xl font-bold text-primary">{formatPrice(offer.price)}</span>
+          )}
 
           {!isInStock ? (
             <Badge variant="danger" className="text-xs">Stokta Yok</Badge>

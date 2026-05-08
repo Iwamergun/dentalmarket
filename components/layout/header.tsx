@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 import { Shield, Phone, Mail, Menu, X, Search, Heart, Sparkles } from 'lucide-react'
 
 export function Header() {
@@ -22,14 +23,24 @@ export function Header() {
         setIsAdmin(false)
         return
       }
+
+      const authMetadata = getAuthMetadata(user)
+
       const supabase = createClient()
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
-      setIsAdmin(profile?.role === 'admin')
+
+      if (error && error.code !== 'PGRST116') {
+        setIsAdmin(hasAdminAccess(undefined, authMetadata))
+        return
+      }
+
+      setIsAdmin(hasAdminAccess(profile?.role, authMetadata))
     }
+
     checkAdmin()
   }, [user])
 
@@ -46,8 +57,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 shadow-lg">
-      {/* Top Bar - Gradient */}
-      <div className="bg-gradient-to-r from-gradient-start to-gradient-end text-white">
+      {/* Top Bar */}
+      <div className="bg-primary text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
         <div className="container mx-auto px-4">
           <div className="flex h-10 items-center justify-between text-sm">
             <div className="hidden md:flex items-center gap-2">
@@ -74,11 +85,11 @@ export function Header() {
           <div className="flex h-20 items-center justify-between gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-md">
                 <span className="text-white font-bold text-xl">DA</span>
               </div>
               <div className="hidden sm:block">
-                <span className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                <span className="text-2xl font-extrabold text-primary">
                   Dent Alışveriş
                 </span>
               </div>
@@ -92,7 +103,7 @@ export function Header() {
                   placeholder="Ürün, marka veya kategori ara..."
                   className="w-full h-12 pl-5 pr-14 rounded-xl border-2 border-border text-body-text placeholder-secondary-text focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 shadow-sm"
                 />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg transition-all duration-200">
+                <button className="absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center rounded-lg bg-primary px-4 text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-lg">
                   <Search className="w-5 h-5" />
                 </button>
               </div>
@@ -125,7 +136,7 @@ export function Header() {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 p-2 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center shadow-md">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary shadow-md">
                       <span className="text-white text-sm font-semibold">
                         {user.email?.charAt(0).toUpperCase() || 'U'}
                       </span>
@@ -226,7 +237,7 @@ export function Header() {
               ) : (
                 <Link 
                   href="/giris" 
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold hover:shadow-xl transition-all duration-200"
+                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-white font-bold shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-xl"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />

@@ -4,7 +4,28 @@ import { createContext, useContext, useEffect, useState, useCallback, ReactNode,
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthContext'
 import { toast } from 'sonner'
-import type { ProductWithRelations } from '@/types/catalog.types'
+
+interface WishlistProduct {
+  id: string
+  name: string
+  slug: string
+  short_description?: string | null
+  primary_image?: string | null
+  sku?: string | null
+  is_active?: boolean
+  brand_id?: string | null
+  primary_category_id?: string | null
+  brand?: {
+    id?: string
+    name?: string
+    slug?: string
+  } | null
+  category?: {
+    id?: string
+    name?: string
+    slug?: string
+  } | null
+}
 
 // Types
 export interface WishlistItem {
@@ -12,7 +33,7 @@ export interface WishlistItem {
   user_id: string
   product_id: string
   created_at: string
-  product?: ProductWithRelations
+  product?: WishlistProduct
 }
 
 interface WishlistContextType {
@@ -239,12 +260,27 @@ export function WishlistProvider({ children }: WishlistProviderProps) {
             const mockItems: WishlistItem[] = localProductIds.map((productId, index) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const product = products?.find((p: any) => p.id === productId)
+
+              const normalizedProduct: WishlistProduct | undefined = product
+                ? {
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    short_description: product.short_description,
+                    primary_image: product.primary_image,
+                    sku: product.sku,
+                    is_active: product.is_active,
+                    brand_id: product.brand_id,
+                    primary_category_id: product.primary_category_id,
+                  }
+                : undefined
+
               return {
                 id: `local-${index}`,
                 user_id: 'guest',
                 product_id: productId,
                 created_at: new Date().toISOString(),
-                product: product || undefined,
+                product: normalizedProduct,
               }
             })
             setItems(mockItems)

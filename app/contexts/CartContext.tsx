@@ -73,6 +73,14 @@ interface LocalCartItem {
   variant?: CartVariant | null
 }
 
+type CartOffer = {
+  id: string
+  price: string | number
+  currency: string
+  stock_quantity: number | null
+  is_active: boolean
+}
+
 interface CartContextType {
   items: CartItem[]
   itemCount: number
@@ -361,6 +369,14 @@ export function CartProvider({ children }: CartProviderProps) {
           .select('product_id, variant_id, quantity, reserved_quantity, low_stock_threshold')
           .in('product_id', productIds)
 
+        const typedInventoryData = (inventoryData ?? []) as Array<{
+          product_id: string
+          variant_id: string | null
+          quantity: number
+          reserved_quantity: number | null
+          low_stock_threshold: number | null
+        }>
+
         console.log('📊 Inventory data:', inventoryData)
 
         // Build offer map (variant_id || product_id as key)
@@ -388,13 +404,7 @@ export function CartProvider({ children }: CartProviderProps) {
           reserved_quantity: number
           low_stock_threshold: number
         }>()
-        inventoryData?.forEach((inv: {
-          product_id: string
-          variant_id: string | null
-          quantity: number
-          reserved_quantity: number | null
-          low_stock_threshold: number | null
-        }) => {
+        typedInventoryData.forEach((inv) => {
           const key = inv.variant_id || inv.product_id
           inventoryMap.set(key, {
             quantity: inv.quantity,
@@ -560,7 +570,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
       // Get offer (variant-aware, specific offerId if given)
       console.log('💰 Fetching product offer price...')
-      let offer: { id: string; price: string | number; currency: string; stock_quantity: number | null; is_active: boolean } | null = null
+      let offer: CartOffer | null = null
 
       if (offerId) {
         // Fetch specific offer by id
@@ -575,7 +585,7 @@ export function CartProvider({ children }: CartProviderProps) {
           console.error('❌ Offer fetch error:', offerError)
           throw new Error('Fiyat bilgisi alınamadı')
         }
-        offer = offerRaw as typeof offer
+        offer = offerRaw as CartOffer | null
       } else {
         // Fallback: cheapest active offer for product
         let offerQuery = supabase
@@ -600,7 +610,7 @@ export function CartProvider({ children }: CartProviderProps) {
           console.error('❌ Offer fetch error:', offerError)
           throw new Error('Fiyat bilgisi alınamadı')
         }
-        offer = offerRaw as typeof offer
+        offer = offerRaw as CartOffer | null
       }
 
       console.log('💰 Offer result:', { offer })
@@ -609,6 +619,8 @@ export function CartProvider({ children }: CartProviderProps) {
         console.error('❌ No active offer found for product')
         throw new Error('Ürün için aktif fiyat bulunamadı')
       }
+
+      const resolvedOffer = offer
 
       // Stock check from inventory
       console.log('📊 Checking inventory...')
@@ -628,7 +640,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
       const availableStock = inventory
         ? inventory.quantity - (inventory.reserved_quantity || 0)
-        : offer.stock_quantity ?? 999
+        : resolvedOffer.stock_quantity ?? 999
 
       console.log('📊 Available stock:', availableStock)
 
@@ -641,8 +653,8 @@ export function CartProvider({ children }: CartProviderProps) {
         throw new Error(`Sadece ${availableStock} adet mevcut`)
       }
 
-      const price = typeof offer.price === 'string' ? parseFloat(offer.price) : Number(offer.price)
-      console.log('✅ Using offer price:', price, offer.currency || 'TL')
+      const price = typeof resolvedOffer.price === 'string' ? parseFloat(resolvedOffer.price) : Number(resolvedOffer.price)
+      console.log('✅ Using offer price:', price, resolvedOffer.currency || 'TL')
 
       if (user) {
         // Logged-in user: use Supabase
@@ -683,7 +695,7 @@ export function CartProvider({ children }: CartProviderProps) {
             .update({
               quantity: newQuantity,
               price,
-              offer_id: offer.id ?? null,
+              offer_id: resolvedOffer.id ?? null,
               updated_at: new Date().toISOString(),
             })
             .eq('id', existingItem.id)

@@ -6,6 +6,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent";
 import dynamic from "next/dynamic";
 
 // Imported with ssr:false so it never runs during SSR and does not affect SEO
@@ -46,6 +47,7 @@ export default function RootLayout({
             <WishlistProvider>
               <PushNotificationProvider />
               {children}
+              <CookieConsentBanner />
               <Toaster 
                 position="bottom-right" 
                 richColors 

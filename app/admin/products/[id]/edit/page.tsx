@@ -6,6 +6,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
 import ImageUploader from '@/components/admin/ImageUploader'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 function slugify(text: string) {
   return text
@@ -65,7 +66,7 @@ export default function AdminEditProductPage() {
         .eq('id', user.id)
         .single()
 
-      if (!profile || profile.role !== 'admin') {
+      if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
         router.push('/')
         return
       }

@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
 import StatsCard from '@/components/admin/StatsCard'
 import RecentOrders from '@/components/admin/RecentOrders'
+import type { RecentOrder } from '@/components/admin/RecentOrders'
 
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies()
@@ -28,22 +29,16 @@ export default async function AdminDashboardPage() {
     }
   )
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const todayISO = today.toISOString()
-
   const [
     { count: ordersCount },
     { count: productsCount },
     { count: customersCount },
-    { count: todayOrders },
     { data: allOrders },
     { data: recentOrders },
   ] = await Promise.all([
     supabase.from('orders').select('*', { count: 'exact', head: true }),
     supabase.from('catalog_products').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'clinic'),
-    supabase.from('orders').select('*', { count: 'exact', head: true }).gte('created_at', todayISO),
     supabase.from('orders').select('total'),
     supabase
       .from('orders')
@@ -53,11 +48,30 @@ export default async function AdminDashboardPage() {
   ])
 
   const totalRevenue = (allOrders ?? []).reduce(
-    (sum, order) => sum + parseFloat(order.total as string),
+    (sum, order) => sum + Number(order.total ?? 0),
     0
   )
 
-  const formattedRevenue = totalRevenue.toLocaleString('tr-TR') + ' ₺'
+  const normalizedRecentOrders: RecentOrder[] = (recentOrders ?? []).map((order) => {
+    const rawProfile: unknown = order.profiles
+
+    return {
+      id: order.id,
+      order_number: order.order_number,
+      total: order.total,
+      status: order.status,
+      created_at: order.created_at,
+      profiles:
+        rawProfile &&
+        typeof rawProfile === 'object' &&
+        'company_name' in rawProfile
+          ? {
+              company_name:
+                typeof rawProfile.company_name === 'string' ? rawProfile.company_name : null,
+            }
+          : undefined,
+    }
+  })
 
   return (
     <div>
@@ -90,7 +104,7 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <RecentOrders orders={(recentOrders as unknown[]) ?? []} />
+      <RecentOrders orders={normalizedRecentOrders} />
     </div>
   )
 }

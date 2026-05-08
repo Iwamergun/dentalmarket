@@ -57,16 +57,47 @@ export default async function SupplierDashboardPage() {
         .limit(5)
     : { data: [] }
 
+  type SupplierDashboardOrder = {
+    id: string
+    status: string
+    total: number
+    created_at: string
+    order_number: string
+  }
+
+  const getOrderDetails = (rawOrder: unknown): SupplierDashboardOrder | null => {
+    if (!rawOrder || typeof rawOrder !== 'object') {
+      return null
+    }
+
+    if (
+      'id' in rawOrder &&
+      'status' in rawOrder &&
+      'created_at' in rawOrder &&
+      'order_number' in rawOrder
+    ) {
+      return {
+        id: String(rawOrder.id),
+        status: String(rawOrder.status),
+        total: Number('total' in rawOrder ? rawOrder.total : 0),
+        created_at: String(rawOrder.created_at),
+        order_number: String(rawOrder.order_number),
+      }
+    }
+
+    return null
+  }
+
   const activeOrders = new Set(
     (supplierOrderItems ?? []).filter((item) => {
-      const order = item.orders as { status: string } | null
+      const order = getOrderDetails(item.orders)
       return order && !['delivered', 'cancelled'].includes(order.status)
     }).map((item) => item.order_id)
   ).size
 
   const pendingOrders = new Set(
     (supplierOrderItems ?? []).filter((item) => {
-      const order = item.orders as { status: string } | null
+      const order = getOrderDetails(item.orders)
       return order && order.status === 'pending'
     }).map((item) => item.order_id)
   ).size
@@ -143,13 +174,7 @@ export default async function SupplierDashboardPage() {
                 </tr>
               ) : (
                 (recentOrderItems ?? []).map((item, index) => {
-                  const order = item.orders as {
-                    id: string
-                    status: string
-                    total: number
-                    created_at: string
-                    order_number: string
-                  } | null
+                  const order = getOrderDetails(item.orders)
                   if (!order) return null
                   return (
                     <tr key={`${order.id}-${index}`} className="hover:bg-gray-50">

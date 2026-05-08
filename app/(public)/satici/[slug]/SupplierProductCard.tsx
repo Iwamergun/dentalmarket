@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ShoppingCart, Loader2, Check, Truck, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { useCart } from '@/app/contexts/CartContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
@@ -32,6 +34,8 @@ interface SupplierProductCardProps {
 }
 
 export function SupplierProductCard({ offer }: SupplierProductCardProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
   const { addToCart } = useCart()
@@ -56,7 +60,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+    <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
       {/* Image */}
       <Link href={`/urunler/${product.slug}`} className="block">
         <div className="relative aspect-square bg-gray-100">
@@ -87,7 +91,24 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
         )}
 
         {/* Price */}
-        <p className="mt-2 text-lg font-bold text-primary">{formatPrice(offer.price)}</p>
+        <div className="mt-2">
+          {authLoading ? (
+            <div className="h-7 w-24 animate-pulse rounded bg-muted" />
+          ) : !user ? (
+            <button
+              type="button"
+              onClick={() => router.push('/giris')}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Fiyat için giriş yapın
+            </button>
+          ) : (
+            <p className="text-lg font-bold text-primary">{formatPrice(offer.price)}</p>
+          )}
+        </div>
 
         {/* Meta */}
         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[11px] text-gray-500">
@@ -100,7 +121,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
               {offer.lead_time_days === 0 ? 'Aynı gün' : `${offer.lead_time_days} gün`}
             </span>
           )}
-          {offer.shipping_cost != null && (
+          {user && offer.shipping_cost != null && (
             <span className="flex items-center gap-0.5">
               <Truck className="w-3 h-3" />
               {offer.shipping_cost === 0 ? 'Ücretsiz' : formatPrice(offer.shipping_cost)}
@@ -113,7 +134,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
           {isInStock ? (
             <Button
               size="sm"
-              className="w-full gap-1.5"
+              className="h-12 w-full gap-1.5 rounded-xl bg-accent text-white shadow-md hover:bg-accent/90 hover:shadow-lg"
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
             >

@@ -5,7 +5,7 @@ import { CampaignBanner } from '@/components/home/campaign-banner'
 import { FeaturedProducts } from '@/components/home/featured-products'
 import { BrandLogos } from '@/components/home/brand-logos'
 import { TrustSection } from '@/components/home/trust-section'
-import { FilterSidebar } from '@/components/catalog/filter-sidebar'
+import { HomeCatalogFilter } from '@/components/home/home-catalog-filter'
 import { getRootCategories } from '@/lib/supabase/queries/categories'
 import { getProductsWithOffers } from '@/lib/supabase/queries/products'
 import { getBrands } from '@/lib/supabase/queries/brands'
@@ -31,12 +31,7 @@ export default async function HomePage() {
       <main>
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* FilterSidebar */}
-            <FilterSidebar 
-              categories={categories}
-              brands={brands}
-              className="w-full lg:w-80 flex-shrink-0"
-            />
+            <HomeCatalogFilter categories={categories} brands={brands} />
             
             {/* Main Content */}
             <div className="flex-1 space-y-16">

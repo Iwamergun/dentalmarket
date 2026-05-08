@@ -3,19 +3,23 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Heart, ShoppingCart, Star } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { useWishlist } from '@/app/contexts/WishlistContext'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { toast } from 'sonner'
-import type { Product } from '@/types/catalog.types'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface FeaturedProductsProps {
-  products: Product[]
+  products: BestOfferProduct[]
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
+  const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const { addToCart } = useCart()
   const { items: wishlistItems, addToWishlist, removeFromWishlist } = useWishlist()
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({})
@@ -23,7 +27,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   // Use first 8 products (changed to 6 for better 3-column grid)
   const displayProducts = products.slice(0, 6)
 
-  const handleAddToCart = async (product: Product) => {
+  const handleAddToCart = async (product: BestOfferProduct) => {
     setLoadingStates(prev => ({ ...prev, [product.id]: true }))
     try {
       await addToCart(product.id, null, 1)
@@ -85,7 +89,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             return (
               <div
                 key={product.id}
-                className="group bg-gradient-to-br from-white to-muted/30 border-2 border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:border-primary/40 transition-all duration-300"
+                className="group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border-2 border-border bg-white transition-all duration-300 hover:border-primary/40 hover:shadow-2xl"
               >
                 {/* Image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
@@ -106,7 +110,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   
                   {/* Discount Badge */}
                   {discount > 0 && (
-                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-gradient-to-r from-destructive to-destructive/80 text-white text-xs font-bold rounded-lg border-2 border-white shadow-lg">
+                    <div className="absolute top-3 left-3 rounded-lg border-2 border-white bg-destructive px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                       %{discount} İndirim
                     </div>
                   )}
@@ -125,7 +129,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                 </div>
 
                 {/* Content */}
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   {/* Brand */}
                   {product.brand_id && (
                     <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em] mb-2">PREMIUM BRAND</p>
@@ -155,14 +159,31 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
 
                   {/* Price */}
                   <div className="mb-4">
-                    {discount > 0 && (
-                      <p className="text-sm text-secondary-text line-through mb-1">
-                        {formatPrice(price)}
-                      </p>
+                    {authLoading ? (
+                      <div className="h-8 w-32 animate-pulse rounded bg-muted" />
+                    ) : !user ? (
+                      <button
+                        type="button"
+                        onClick={() => router.push('/giris')}
+                        className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+                      >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Fiyat için giriş yapın
+                      </button>
+                    ) : (
+                      <>
+                        {discount > 0 && (
+                          <p className="text-sm text-secondary-text line-through mb-1">
+                            {formatPrice(price)}
+                          </p>
+                        )}
+                        <p className="text-2xl font-extrabold text-primary">
+                          {formatPrice(discountedPrice)}
+                        </p>
+                      </>
                     )}
-                    <p className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                      {formatPrice(discountedPrice)}
-                    </p>
                   </div>
 
                   {/* Stock Info */}
@@ -179,20 +200,22 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   </div>
 
                   {/* Add to Cart Button */}
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    disabled={loadingStates[product.id]}
-                    className="w-full bg-gradient-to-r from-accent via-warning to-accent hover:from-warning hover:via-accent hover:to-warning text-white font-bold rounded-xl h-12 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {loadingStates[product.id] ? (
-                      <span>Ekleniyor...</span>
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-5 h-5" />
-                        <span>Sepete Ekle</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="mt-auto pt-4">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      disabled={loadingStates[product.id]}
+                      className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-white font-bold shadow-md transition-all duration-200 hover:bg-accent/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loadingStates[product.id] ? (
+                        <span>Ekleniyor...</span>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-5 h-5" />
+                          <span>Sepete Ekle</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )
@@ -202,7 +225,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         <div className="text-center mt-10">
           <Link
             href="/urunler"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-8 text-white font-bold shadow-xl transition-all duration-200 hover:bg-primary/90 hover:shadow-2xl"
           >
             Tüm Ürünleri Gör
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

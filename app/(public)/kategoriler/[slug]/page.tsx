@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getAllCategories } from '@/lib/supabase/queries/categories'
+import { getAllCategories, getCategoryDescendantIds } from '@/lib/supabase/queries/categories'
 import { getBrands } from '@/lib/supabase/queries/brands'
 import { Breadcrumbs } from '@/components/seo/breadcrumbs'
 import { CategoryProductsClient } from '@/components/catalog/category-products-client'
 import { Category } from '@/types/catalog.types'
-import type { BestOfferProduct } from '@/lib/supabase/queries/products'
+import { getProductsByCategoryIdsWithOffers } from '@/lib/supabase/queries/products'
 
 // Force dynamic rendering to ensure cookies work properly
 export const dynamic = 'force-dynamic'
@@ -64,21 +64,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound()
   }
 
-  // Ürünleri çek (v_product_best_offer view kullan)
-  const { data: productsData } = await supabase
-    .from('v_product_best_offer' as 'catalog_products')
-    .select('*')
-    .eq('primary_category_id', category.id)
-    .eq('is_active', true)
-    .order('min_price', { ascending: true, nullsFirst: false })
-    .limit(100)
+  const allCategories = await getAllCategories()
+  const descendantCategoryIds = getCategoryDescendantIds(allCategories, category.id)
+  const relatedCategories = allCategories.filter((item) => descendantCategoryIds.includes(item.id))
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const products = (productsData || []) as any as BestOfferProduct[]
-
-  // Fetch all categories and brands for filters
-  const [allCategories, brands] = await Promise.all([
-    getAllCategories(),
+  const [products, brands] = await Promise.all([
+    getProductsByCategoryIdsWithOffers(descendantCategoryIds, 100, 0),
     getBrands(),
   ])
 
@@ -102,7 +93,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <div className="mt-8">
         <CategoryProductsClient 
           products={products}
-          categories={allCategories}
+          categories={relatedCategories}
           brands={brands}
           currentCategoryId={category.id}
         />

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { turkishCities } from '@/lib/validations/checkout'
-import { addressFormSchema, type AddressFormData } from '@/lib/validations/address'
+import { addressFormSchema, type AddressFormData, type AddressFormInput } from '@/lib/validations/address'
 
 export default function YeniAdresPage() {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function YeniAdresPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AddressFormData>({
+  } = useForm<AddressFormInput, unknown, AddressFormData>({
     resolver: zodResolver(addressFormSchema),
     defaultValues: {
       country: 'Türkiye',

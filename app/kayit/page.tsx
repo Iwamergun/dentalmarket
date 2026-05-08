@@ -123,7 +123,7 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-sm">
               <span className="text-white font-bold text-xl">DA</span>
             </div>
           </Link>

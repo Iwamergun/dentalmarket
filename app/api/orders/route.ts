@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { checkoutSchema } from '@/lib/validations/checkout'
 import { z } from 'zod'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
@@ -36,6 +37,40 @@ function generateOrderNumber(): string {
   return `DA-${timestamp}-${random}`
 }
 
+type CreateOrderTransactionClient = {
+  rpc: (
+    fn: 'create_order_transaction',
+    args: {
+      p_order_id: string
+      p_order_number: string
+      p_user_id: string | null
+      p_status: string
+      p_payment_status: string
+      p_payment_method: string
+      p_subtotal: number
+      p_shipping_cost: number
+      p_total: number
+      p_shipping_address: Record<string, unknown>
+      p_notes: string | null
+      p_items: Array<{
+        product_id: string
+        variant_id: string | null
+        quantity: number
+        price: number
+      }>
+    }
+  ) => Promise<{
+    data: Array<{
+      order_id: string
+      order_number: string
+      status: string
+      payment_method: string
+      total: number
+    }> | null
+    error: { message: string } | null
+  }>
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request)
@@ -48,6 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient()
+    const adminSupabase = createAdminClient()
     
     // Kullanıcı kontrolü (opsiyonel - misafir siparişi de olabilir)
     const { data: { user } } = await supabase.auth.getUser()
@@ -74,138 +110,80 @@ export async function POST(request: NextRequest) {
     const orderId = crypto.randomUUID()
 
     // Sipariş durumunu belirle
-    const orderStatus = paymentMethod === 'credit_card' ? 'pending' : 
-                        paymentMethod === 'bank_transfer' ? 'awaiting_payment' : 'confirmed'
+    const orderStatus = paymentMethod === 'cash_on_delivery' ? 'confirmed' : 'pending'
 
-    // Offer tipi
-    type OfferStock = { stock_quantity: number; min_order_quantity: number }
-
-    // Stok kontrolü yap
-    for (const item of items) {
-      let query = supabase
-        .from('offers')
-        .select('stock_quantity, min_order_quantity')
-        .eq('product_id', item.product_id)
-        .eq('is_active', true)
-      
-      if (item.variant_id) {
-        query = query.eq('variant_id', item.variant_id)
-      } else {
-        query = query.is('variant_id', null)
-      }
-
-      const { data } = await query.single()
-      const offer = data as OfferStock | null
-      
-      if (!offer) {
-        return NextResponse.json(
-          { error: `Ürün bulunamadı veya satışta değil` },
-          { status: 400 }
-        )
-      }
-
-      if ((offer.stock_quantity || 0) < item.quantity) {
-        return NextResponse.json(
-          { error: `Yetersiz stok. Mevcut: ${offer.stock_quantity || 0} adet` },
-          { status: 400 }
-        )
-      }
-    }
-
-    // Sipariş verisini hazırla
-    const orderData = {
-      id: orderId,
-      order_number: orderNumber,
-      user_id: user?.id || null,
-      status: orderStatus,
-      payment_status: 'pending',
-      payment_method: paymentMethod,
-      subtotal,
-      shipping_cost: shipping,
-      total,
-      shipping_address: JSON.stringify({
-        first_name: address.firstName,
-        last_name: address.lastName,
-        phone: address.phone,
-        email: address.email,
-        address: address.address,
-        city: address.city,
-        district: address.district,
-        postal_code: address.postalCode,
-        notes: address.notes || null,
-      }),
-      notes: address.notes || null,
-    }
-
-    // Sipariş kalemlerini hazırla
-    const orderItemsData = items.map(item => ({
-      order_id: orderId,
+    const rpcClient = adminSupabase as unknown as CreateOrderTransactionClient
+    const shippingAddressPayload = {
+      full_name: `${address.firstName} ${address.lastName}`.trim(),
+      phone: address.phone,
+      email: address.email,
+      address: address.address,
+      city: address.city,
+      district: address.district,
+      postal_code: address.postalCode,
+    } as Record<string, unknown>
+    const rpcItems = items.map((item) => ({
       product_id: item.product_id,
       variant_id: item.variant_id || null,
       quantity: item.quantity,
-      unit_price: item.price,
-      total_price: item.price * item.quantity,
+      price: item.price,
     }))
 
-    // Siparişi veritabanına kaydet
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: orderError } = await (supabase as any)
-      .from('orders')
-      .insert(orderData)
-    
-    if (orderError) {
-      // Tablo yoksa geç (development), varsa hata döndür
-      if (!orderError.message?.includes('does not exist')) {
+    const { data: transactionResult, error: transactionError } = await rpcClient.rpc(
+      'create_order_transaction',
+      {
+        p_order_id: orderId,
+        p_order_number: orderNumber,
+        p_user_id: user?.id || null,
+        p_status: orderStatus,
+        p_payment_status: 'pending',
+        p_payment_method: paymentMethod,
+        p_subtotal: subtotal,
+        p_shipping_cost: shipping,
+        p_total: total,
+        p_shipping_address: shippingAddressPayload,
+        p_notes: address.notes || null,
+        p_items: rpcItems,
+      }
+    )
+
+    if (transactionError) {
+      console.error('Order transaction error:', transactionError.message)
+
+      if (transactionError.message.includes('INSUFFICIENT_STOCK')) {
         return NextResponse.json(
-          { error: 'Sipariş oluşturulamadı' },
-          { status: 500 }
+          { error: 'Sipariş sırasında stok değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
+          { status: 409 }
         )
       }
-    }
 
-    // Offer tipi (stok güncelleme için)
-    type OfferWithId = { id: string; stock_quantity: number }
-
-    // Sipariş kalemleri ve stok güncelleme
-    if (!orderError) {
-      // Sipariş kalemlerini kaydet
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from('order_items').insert(orderItemsData)
-
-      // Stokları güncelle
-      for (const item of items) {
-        let updateQuery = supabase
-          .from('offers')
-          .select('id, stock_quantity')
-          .eq('product_id', item.product_id)
-          .eq('is_active', true)
-        
-        if (item.variant_id) {
-          updateQuery = updateQuery.eq('variant_id', item.variant_id)
-        } else {
-          updateQuery = updateQuery.is('variant_id', null)
-        }
-
-        const { data } = await updateQuery.single()
-        const offer = data as OfferWithId | null
-        
-        if (offer) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any)
-            .from('offers')
-            .update({ stock_quantity: (offer.stock_quantity || 0) - item.quantity })
-            .eq('id', offer.id)
-        }
+      if (transactionError.message.includes('MIN_ORDER_QUANTITY_NOT_MET')) {
+        return NextResponse.json(
+          { error: 'Bazı ürünlerde minimum sipariş miktarı sağlanmıyor.' },
+          { status: 400 }
+        )
       }
+
+      if (transactionError.message.includes('ACTIVE_OFFER_NOT_FOUND')) {
+        return NextResponse.json(
+          { error: 'Ürün bulunamadı veya satışta değil' },
+          { status: 400 }
+        )
+      }
+
+      return NextResponse.json(
+        { error: 'Sipariş oluşturulamadı' },
+        { status: 500 }
+      )
     }
 
-    // Order response objesi
-    const order = {
-      id: orderId,
-      order_number: orderNumber,
-      status: orderStatus,
-      payment_method: paymentMethod,
-      total,
+    const createdOrder = transactionResult?.[0]
+
+    if (!createdOrder) {
+      return NextResponse.json(
+        { error: 'Sipariş sonucu alınamadı' },
+        { status: 500 }
+      )
     }
 
     // Sepeti temizle (kullanıcı giriş yaptıysa)
@@ -224,6 +202,14 @@ export async function POST(request: NextRequest) {
           .eq('cart_id', cart.id)
       }
     }
+
+    const invoiceOrderItems = items.map((item) => ({
+      product_id: item.product_id,
+      variant_id: item.variant_id || null,
+      quantity: item.quantity,
+      unit_price: item.price,
+      total_price: item.price * item.quantity,
+    }))
 
     // -----------------------------------------------------------------------
     // Fatura oluştur ve onay e-postası gönder (hata olursa sipariş etkilenmez)
@@ -256,9 +242,9 @@ export async function POST(request: NextRequest) {
       const invoiceData = buildInvoiceData(rawOrder, invNumber)
 
       // Fetch product names for the invoice (best-effort; falls back to product_id prefix)
-      const productIds = [...new Set(orderItemsData.map((i) => i.product_id))]
+      const productIds = [...new Set(invoiceOrderItems.map((item) => item.product_id))]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: products } = await (supabase as any)
+      const { data: products } = await (adminSupabase as any)
         .from('catalog_products')
         .select('id, name, sku')
         .in('id', productIds)
@@ -269,7 +255,7 @@ export async function POST(request: NextRequest) {
       }
 
       const mappedItems = mapOrderItems(
-        orderItemsData.map((i) => ({
+        invoiceOrderItems.map((i) => ({
           product_id: i.product_id,
           variant_id: i.variant_id,
           quantity: i.quantity,
@@ -360,12 +346,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       order: {
-        id: order.id,
-        orderNumber: order.order_number,
-        status: order.status,
-        total: order.total,
-        paymentMethod: order.payment_method,
-        invoiceNumber,
+        id: createdOrder.order_id,
+        orderNumber: createdOrder.order_number,
+        status: createdOrder.status,
+        total: createdOrder.total,
+        paymentMethod,
+      invoiceNumber,
       },
       message: getOrderMessage(paymentMethod),
     })

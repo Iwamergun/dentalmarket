@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { turkishCities } from '@/lib/validations/checkout'
-import { addressFormSchema, type AddressFormData, type Address } from '@/lib/validations/address'
+import { addressFormSchema, type AddressFormData, type AddressFormInput, type Address } from '@/lib/validations/address'
 
 export default function AdresDuzenlePage() {
   const router = useRouter()
@@ -29,7 +29,7 @@ export default function AdresDuzenlePage() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<AddressFormData>({
+  } = useForm<AddressFormInput, unknown, AddressFormData>({
     resolver: zodResolver(addressFormSchema),
     defaultValues: {
       country: 'Türkiye',

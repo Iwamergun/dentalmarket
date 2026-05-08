@@ -64,6 +64,10 @@ interface Order {
   notes: string | null
   created_at: string
   updated_at: string
+  // Shipping tracking fields (added via DB migration)
+  tracking_number?: string | null
+  shipping_provider?: string | null
+  shipped_at?: string | null
 }
 
 const statusConfig: Record<string, { 
@@ -319,6 +323,38 @@ export default function SiparisDetayPage({
               </div>
             </div>
           </div>
+
+          {/* Tracking Info — only shown when shipped */}
+          {(order.tracking_number || order.shipping_provider) && (
+            <div className="bg-background-card rounded-xl border border-border p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Truck className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-text-primary">Kargo Takip</h2>
+              </div>
+              <div className="space-y-2 text-sm">
+                {order.shipping_provider && (
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Kargo Firması</span>
+                    <span className="font-medium text-text-primary">{order.shipping_provider}</span>
+                  </div>
+                )}
+                {order.tracking_number && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-text-secondary">Takip No</span>
+                    <span className="font-mono font-medium text-text-primary">{order.tracking_number}</span>
+                  </div>
+                )}
+                {order.shipped_at && (
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Kargoya Verildi</span>
+                    <span className="text-text-primary">
+                      {format(new Date(order.shipped_at), "d MMMM yyyy", { locale: tr })}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Order Items */}
           <div className="bg-background-card rounded-xl border border-border">

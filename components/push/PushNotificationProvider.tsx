@@ -3,8 +3,8 @@
 /**
  * PushNotificationProvider
  *
- * Client-only component — imported via dynamic() with ssr:false so it never
- * runs during server-side rendering. This keeps the SSR/SEO output clean.
+ * Client-only component rendered from RootLayout. As a Client Component, it
+ * only runs in the browser and does not affect server-rendered SEO output.
  *
  * What it does:
  *  1. Registers the service worker (/sw.js) on mount.

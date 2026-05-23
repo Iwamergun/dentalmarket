@@ -77,6 +77,16 @@ const paymentStatusColors: Record<string, string> = {
   refunded: 'bg-gray-100 text-gray-800',
 }
 
+const orderStatusOptions = [
+  { value: 'pending', label: 'Beklemede' },
+  { value: 'confirmed', label: 'Onaylandı' },
+  { value: 'processing', label: 'Hazırlanıyor' },
+  { value: 'paid', label: 'Ödendi' },
+  { value: 'shipped', label: 'Kargoda' },
+  { value: 'delivered', label: 'Teslim Edildi' },
+  { value: 'cancelled', label: 'İptal' },
+]
+
 export default function AdminOrdersPage() {
   const searchParams = useSearchParams()
 
@@ -173,21 +183,21 @@ export default function AdminOrdersPage() {
           {/* Durum Filtresi */}
           <select
             value={filters.status || ''}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            onChange={(e) => handleFilterChange('status', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
           >
             <option value="">Tüm Durumlar</option>
-            <option value="pending">Beklemede</option>
-            <option value="paid">Ödendi</option>
-            <option value="shipped">Kargoda</option>
-            <option value="delivered">Teslim Edildi</option>
-            <option value="cancelled">İptal</option>
+            {orderStatusOptions.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
           </select>
 
           {/* Ödeme Durumu Filtresi */}
           <select
             value={filters.payment_status || ''}
-            onChange={(e) => setFilters({ ...filters, payment_status: e.target.value })}
+            onChange={(e) => handleFilterChange('payment_status', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
           >
             <option value="">Tüm Ödemeler</option>
@@ -200,7 +210,7 @@ export default function AdminOrdersPage() {
           <input
             type="date"
             value={filters.startDate || ''}
-            onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+            onChange={(e) => handleFilterChange('startDate', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
             placeholder="Başlangıç Tarihi"
           />
@@ -209,7 +219,7 @@ export default function AdminOrdersPage() {
           <input
             type="date"
             value={filters.endDate || ''}
-            onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+            onChange={(e) => handleFilterChange('endDate', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
             placeholder="Bitiş Tarihi"
           />

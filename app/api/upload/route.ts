@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { S3Client } from '@aws-sdk/client-s3'
+import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -35,6 +36,17 @@ function getR2Client() {
   })
 }
 
+export function canUploadMedia(
+  profileRole: string | null | undefined,
+  metadata: Record<string, unknown> | null | undefined
+) {
+  if (profileRole === 'supplier') {
+    return true
+  }
+
+  return hasAdminAccess(profileRole, metadata)
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -50,7 +62,7 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'supplier')) {
+    if (!profile || !canUploadMedia(profile.role, getAuthMetadata(user))) {
       return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 })
     }
 

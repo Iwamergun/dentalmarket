@@ -7,13 +7,7 @@ import { WishlistProvider } from "./contexts/WishlistContext";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { CookieConsentBanner } from "@/components/analytics/cookie-consent";
-import dynamic from "next/dynamic";
-
-// Imported with ssr:false so it never runs during SSR and does not affect SEO
-const PushNotificationProvider = dynamic(
-  () => import("@/components/push/PushNotificationProvider"),
-  { ssr: false }
-)
+import PushNotificationProvider from "@/components/push/PushNotificationProvider";
 
 const outfit = Outfit({ 
   subsets: ["latin"],

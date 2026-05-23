@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Search, Package } from 'lucide-react'
 import type { Database } from '@/types/database.types'
 import { getImageUrl } from '@/lib/utils/imageHelper'
+import ImageUploader from '@/components/admin/ImageUploader'
 
 interface CatalogProduct {
   id: string
@@ -40,6 +41,7 @@ export default function YeniTeklifPage() {
     free_shipping_threshold: '',
     payment_options: [] as string[],
     notes: '',
+    offer_image: '',
   })
 
   const searchProducts = useCallback(async (query: string) => {
@@ -133,6 +135,7 @@ export default function YeniTeklifPage() {
           free_shipping_threshold: form.free_shipping_threshold ? parseFloat(form.free_shipping_threshold) : null,
           payment_options: form.payment_options.length > 0 ? form.payment_options : null,
           notes: form.notes || null,
+          offer_image: form.offer_image || null,
           currency: 'TRY',
           is_active: true,
         })
@@ -179,6 +182,9 @@ export default function YeniTeklifPage() {
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{selectedProduct.name}</p>
                 {selectedProduct.sku && <p className="text-sm text-gray-500">SKU: {selectedProduct.sku}</p>}
+                {selectedProduct.short_description && (
+                  <p className="text-sm text-gray-600 mt-0.5">{selectedProduct.short_description}</p>
+                )}
               </div>
               <button
                 type="button"
@@ -235,10 +241,21 @@ export default function YeniTeklifPage() {
           )}
         </div>
 
-        {/* Step 2: Offer form */}
+        {/* Step 2 & 3: Image upload + Offer details */}
         {selectedProduct && (
           <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900 border-t pt-6">2. Teklif Bilgileri</h2>
+            <div className="border-t pt-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">2. Ürün Görseli</h2>
+              <p className="text-sm text-gray-500 mb-3">
+                İsteğe bağlı: Teklifinize özgü bir görsel ekleyin. Eklenmezse katalog görseli kullanılır.
+              </p>
+              <ImageUploader
+                currentImage={form.offer_image || null}
+                onUpload={(path) => setForm((prev) => ({ ...prev, offer_image: path }))}
+              />
+            </div>
+
+            <h2 className="text-lg font-semibold text-gray-900 border-t pt-6">3. Teklif Bilgileri</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>

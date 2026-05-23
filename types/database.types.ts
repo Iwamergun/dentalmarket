@@ -380,6 +380,7 @@ export interface Database {
           lead_time_days: number
           min_order_quantity: number
           is_active: boolean
+          offer_image: string | null
           created_at: string
           updated_at: string
         }
@@ -396,6 +397,7 @@ export interface Database {
           lead_time_days: number
           min_order_quantity: number
           is_active?: boolean
+          offer_image?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -412,6 +414,7 @@ export interface Database {
           lead_time_days?: number
           min_order_quantity?: number
           is_active?: boolean
+          offer_image?: string | null
           created_at?: string
           updated_at?: string
         }

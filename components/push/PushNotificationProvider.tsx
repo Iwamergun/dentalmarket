@@ -23,7 +23,12 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
   const rawData = atob(base64)
-  return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)))
+  const buffer = new ArrayBuffer(rawData.length)
+  const view = new Uint8Array(buffer)
+  for (let i = 0; i < rawData.length; i++) {
+    view[i] = rawData.charCodeAt(i)
+  }
+  return view
 }
 
 async function subscribe() {
@@ -45,7 +50,7 @@ async function subscribe() {
 
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        applicationServerKey: urlBase64ToUint8Array(vapidKey).buffer as ArrayBuffer,
       })
     }
 

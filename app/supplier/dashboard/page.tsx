@@ -31,13 +31,16 @@ export default async function SupplierDashboardPage() {
 
   const supplierId = session?.user.id
 
-  // Get supplier's product IDs
-  const { data: supplierProducts } = await supabase
-    .from('catalog_products')
-    .select('id')
+  // Get supplier's product IDs from their offers
+  const { data: supplierOffersData } = await supabase
+    .from('offers')
+    .select('product_id')
     .eq('supplier_id', supplierId!)
+    .eq('is_active', true)
 
-  const productIds = (supplierProducts ?? []).map((p) => p.id)
+  const productIds = Array.from(
+    new Set(((supplierOffersData ?? []) as { product_id: string }[]).map((o) => o.product_id))
+  )
   const productsCount = productIds.length
 
   // Get orders for supplier's products

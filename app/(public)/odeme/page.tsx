@@ -57,6 +57,8 @@ export default function CheckoutPage() {
   // Ödeme yöntemi seçimi
   const handlePaymentSelect = (method: PaymentMethod) => {
     setPaymentMethod(method)
+    setCurrentStep(3)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // Siparişi tamamla

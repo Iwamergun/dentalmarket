@@ -32,8 +32,7 @@ export default async function SupplierDashboardPage() {
   const supplierId = session?.user.id
 
   // Get supplier's product IDs from their offers
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: supplierOffersData } = await (supabase as any)
+  const { data: supplierOffersData } = await supabase
     .from('offers')
     .select('product_id')
     .eq('supplier_id', supplierId!)

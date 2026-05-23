@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canUploadMedia } from '@/app/api/upload/route'
+import { canUploadMedia } from '@/lib/auth/upload-access'
 
 describe('upload access', () => {
   it('allows supplier role explicitly', () => {

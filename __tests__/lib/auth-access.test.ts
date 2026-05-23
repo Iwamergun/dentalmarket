@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
+import { getAuthMetadata, hasAdminAccess, hasCatalogAdminAccess, hasSupplierPanelAccess } from '@/lib/auth/access'
 
 describe('auth access helpers', () => {
   it('allows admin-like profile roles', () => {
@@ -18,5 +18,18 @@ describe('auth access helpers', () => {
 
   it('denies non-admin roles', () => {
     expect(hasAdminAccess('clinic', { role: 'customer' })).toBe(false)
+  })
+
+  it('catalog admin access should allow only central admin roles', () => {
+    expect(hasCatalogAdminAccess('admin')).toBe(true)
+    expect(hasCatalogAdminAccess('super_admin')).toBe(true)
+    expect(hasCatalogAdminAccess('depo')).toBe(false)
+  })
+
+  it('supplier panel access should allow supplier and depo-like roles', () => {
+    expect(hasSupplierPanelAccess('supplier', undefined)).toBe(true)
+    expect(hasSupplierPanelAccess('depo', undefined)).toBe(true)
+    expect(hasSupplierPanelAccess('admin', undefined)).toBe(false)
+    expect(hasSupplierPanelAccess('clinic', undefined)).toBe(false)
   })
 })

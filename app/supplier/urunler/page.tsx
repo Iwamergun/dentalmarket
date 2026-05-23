@@ -24,7 +24,7 @@ export default async function SupplierTekliflerimPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: supplierOffers } = await (supabase as any)
     .from('offers')
-    .select('id, product_id, price, stock_quantity, lead_time_days, shipping_cost, payment_options, notes, is_active, created_at, currency')
+    .select('id, product_id, price, stock_quantity, lead_time_days, shipping_cost, payment_options, notes, is_active, created_at, currency, offer_image')
     .eq('supplier_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -40,6 +40,7 @@ export default async function SupplierTekliflerimPage() {
     is_active: boolean
     created_at: string
     currency: string
+    offer_image: string | null
   }
 
   const offers = (supplierOffers ?? []) as OfferRow[]
@@ -98,7 +99,7 @@ export default async function SupplierTekliflerimPage() {
                     <tr key={offer.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <Image
-                          src={getImageUrl(product?.primary_image ?? null)}
+                          src={getImageUrl(offer.offer_image ?? product?.primary_image ?? null)}
                           alt={product?.name ?? ''}
                           width={40}
                           height={40}

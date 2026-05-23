@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
 import SupplierSidebar from '@/components/supplier/SupplierSidebar'
 import SupplierHeader from '@/components/supplier/SupplierHeader'
+import { getAuthMetadata, hasSupplierPanelAccess } from '@/lib/auth/access'
 
 export default async function SupplierLayout({
   children,
@@ -47,7 +48,7 @@ export default async function SupplierLayout({
     .eq('id', user.id)
     .single()
 
-  if (!profile || profile.role !== 'supplier') {
+  if (!profile || !hasSupplierPanelAccess(profile.role, getAuthMetadata(user))) {
     redirect('/')
   }
 

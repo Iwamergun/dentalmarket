@@ -108,4 +108,39 @@ describe('middleware route koruması', () => {
     const res = await middleware(req)
     expect(res.status).not.toBe(307)
   })
+
+  it('depo kullanıcı /admin/products/new yerine supplier teklif sayfasına yönlenmeli', async () => {
+    const mockFrom = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: 'depo' } }),
+    }
+    const mockClient = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'depo-1' } } }) },
+      from: vi.fn(() => mockFrom),
+    }
+    ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
+
+    const req = makeRequest('/admin/products/new')
+    const res = await middleware(req)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/supplier/urunler/yeni')
+  })
+
+  it('admin kullanıcı /admin/products/new erişimini korumalı', async () => {
+    const mockFrom = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: 'admin' } }),
+    }
+    const mockClient = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'admin-2' } } }) },
+      from: vi.fn(() => mockFrom),
+    }
+    ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
+
+    const req = makeRequest('/admin/products/new')
+    const res = await middleware(req)
+    expect(res.status).not.toBe(307)
+  })
 })

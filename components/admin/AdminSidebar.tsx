@@ -12,6 +12,7 @@ import {
   BarChart3,
   Settings,
   Warehouse,
+  MessageSquarePlus,
 } from 'lucide-react'
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { href: '/admin/customers', label: 'Müşteriler', icon: Users },
   { href: '/admin/categories', label: 'Kategoriler', icon: FolderTree },
   { href: '/admin/brands', label: 'Markalar', icon: Tag },
+  { href: '/admin/product-suggestions', label: 'Ürün Önerileri', icon: MessageSquarePlus },
   { href: '/admin/reports', label: 'Raporlar', icon: BarChart3 },
   { href: '/admin/settings', label: 'Ayarlar', icon: Settings },
 ]

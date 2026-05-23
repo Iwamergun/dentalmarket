@@ -7,7 +7,6 @@ import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
 import { getImageUrl } from '@/lib/utils/imageHelper'
-import ImageUploader from '@/components/admin/ImageUploader'
 
 const PAYMENT_OPTIONS = [
   { value: 'havale', label: 'Havale/EFT' },
@@ -20,8 +19,12 @@ const PAYMENT_OPTIONS = [
 type ProductInfo = {
   name: string
   sku: string | null
+  barcode: string | null
   primary_image: string | null
   short_description: string | null
+  description: string | null
+  category?: { name: string | null } | null
+  brand?: { name: string | null } | null
 }
 
 type SupplierOfferFormRecord = {
@@ -36,7 +39,6 @@ type SupplierOfferFormRecord = {
   free_shipping_threshold: number | null
   payment_options: string[] | null
   notes: string | null
-  offer_image: string | null
   is_active: boolean | null
 }
 
@@ -63,7 +65,6 @@ export default function TeklifDuzenlePage() {
     free_shipping_threshold: '',
     payment_options: [] as string[],
     notes: '',
-    offer_image: '',
     is_active: true,
   })
 
@@ -75,7 +76,7 @@ export default function TeklifDuzenlePage() {
       // Fetch the offer (id param is now the offer id)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: offer } = await (supabase.from('offers') as any)
-        .select('id, product_id, price, vat_rate, stock_quantity, min_order_quantity, lead_time_days, shipping_cost, free_shipping_threshold, payment_options, notes, offer_image, is_active')
+        .select('id, product_id, price, vat_rate, stock_quantity, min_order_quantity, lead_time_days, shipping_cost, free_shipping_threshold, payment_options, notes, is_active')
         .eq('id', offerId)
         .eq('supplier_id', user.id)
         .maybeSingle()
@@ -91,11 +92,24 @@ export default function TeklifDuzenlePage() {
       // Fetch product info (readonly)
       const { data: prod } = await supabase
         .from('catalog_products')
-        .select('name, sku, primary_image, short_description')
+        .select(`
+          name,
+          sku,
+          barcode,
+          primary_image,
+          short_description,
+          description,
+          brand:brands (
+            name
+          ),
+          category:categories!catalog_products_primary_category_id_fkey (
+            name
+          )
+        `)
         .eq('id', typedOffer.product_id)
         .single()
 
-      setProduct(prod ?? null)
+      setProduct(prod ? (prod as unknown as ProductInfo) : null)
 
       setForm({
         price: String(typedOffer.price ?? ''),
@@ -107,7 +121,6 @@ export default function TeklifDuzenlePage() {
         free_shipping_threshold: String(typedOffer.free_shipping_threshold ?? ''),
         payment_options: typedOffer.payment_options ?? [],
         notes: typedOffer.notes ?? '',
-        offer_image: typedOffer.offer_image ?? '',
         is_active: typedOffer.is_active ?? true,
       })
       setInitialLoading(false)
@@ -151,7 +164,6 @@ export default function TeklifDuzenlePage() {
           free_shipping_threshold: form.free_shipping_threshold ? parseFloat(form.free_shipping_threshold) : null,
           payment_options: form.payment_options.length > 0 ? form.payment_options : null,
           notes: form.notes || null,
-          offer_image: form.offer_image || null,
           is_active: form.is_active,
         })
         .eq('id', offerId)
@@ -204,7 +216,7 @@ export default function TeklifDuzenlePage() {
       {product && (
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-6 flex items-center gap-4">
           <Image
-            src={getImageUrl(form.offer_image || product.primary_image)}
+            src={getImageUrl(product.primary_image)}
             alt={product.name}
             width={64}
             height={64}
@@ -213,9 +225,17 @@ export default function TeklifDuzenlePage() {
           />
           <div>
             <h2 className="font-semibold text-gray-900">{product.name}</h2>
-            {product.sku && <p className="text-sm text-gray-500">SKU: {product.sku}</p>}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-0.5 text-sm text-gray-500">
+              {product.sku && <p>SKU: {product.sku}</p>}
+              {product.barcode && <p>Barkod: {product.barcode}</p>}
+              {product.category?.name && <p>Kategori: {product.category.name}</p>}
+              {product.brand?.name && <p>Marka: {product.brand.name}</p>}
+            </div>
             {product.short_description && (
               <p className="text-sm text-gray-600 mt-0.5">{product.short_description}</p>
+            )}
+            {product.description && (
+              <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">{product.description}</p>
             )}
           </div>
         </div>
@@ -223,20 +243,8 @@ export default function TeklifDuzenlePage() {
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Offer Image */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Ürün Görseli</h2>
-            <p className="text-sm text-gray-500 mb-3">
-              İsteğe bağlı: Teklifinize özgü bir görsel ekleyin. Eklenmezse katalog görseli kullanılır.
-            </p>
-            <ImageUploader
-              currentImage={form.offer_image || null}
-              onUpload={(path) => setForm((prev) => ({ ...prev, offer_image: path }))}
-            />
-          </div>
-
           {/* Price & Stock */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 border-t pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Fiyat (₺) <span className="text-red-500">*</span>

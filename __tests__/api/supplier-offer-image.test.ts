@@ -1,67 +1,120 @@
 import { describe, expect, it } from 'vitest'
 
-// Utility helpers that mirror the supplier offer form logic
 function buildOfferPayload(params: {
   productId: string
   price: string
-  offerImage?: string
+  supplierSku?: string
+  attemptedCatalogName?: string
 }) {
+  if (!params.productId) {
+    throw new Error('catalog_product_required')
+  }
+
   return {
     product_id: params.productId,
     price: parseFloat(params.price),
-    offer_image: params.offerImage || null,
+    supplier_sku: params.supplierSku || null,
     currency: 'TRY',
     is_active: true,
-  }
+  } as const
 }
 
-describe('supplier offer image field', () => {
-  it('includes offer_image in the payload when provided', () => {
+describe('supplier/depo offer payload rules', () => {
+  it('does not include offer_image or catalog identity fields in payload', () => {
     const payload = buildOfferPayload({
       productId: 'prod-1',
       price: '100',
-      offerImage: 'products/1234-image.jpg',
+      supplierSku: 'LOCAL-1',
+      attemptedCatalogName: 'Serbest Giris',
     })
-    expect(payload.offer_image).toBe('products/1234-image.jpg')
+    expect('offer_image' in payload).toBe(false)
+    expect('name' in payload).toBe(false)
+    expect('description' in payload).toBe(false)
+    expect(payload.supplier_sku).toBe('LOCAL-1')
   })
 
-  it('sets offer_image to null when not provided', () => {
-    const payload = buildOfferPayload({
-      productId: 'prod-1',
-      price: '100',
-    })
-    expect(payload.offer_image).toBeNull()
+  it('requires existing catalog product id when creating listing', () => {
+    expect(() =>
+      buildOfferPayload({
+        productId: '',
+        price: '100',
+      })
+    ).toThrowError('catalog_product_required')
   })
 
-  it('sets offer_image to null when empty string', () => {
+  it('accepts listing creation only when it references an existing catalog product id', () => {
     const payload = buildOfferPayload({
       productId: 'prod-1',
       price: '100',
-      offerImage: '',
     })
-    expect(payload.offer_image).toBeNull()
+    expect(payload.product_id).toBe('prod-1')
   })
 })
 
-describe('supplier offer display image resolution', () => {
-  it('prefers offer_image over catalog primary_image when set', () => {
-    const offerImage = 'products/offer-specific.jpg'
+describe('catalog image/info display', () => {
+  it('always uses catalog image for listing display', () => {
     const catalogImage = 'products/catalog-default.jpg'
-    const displayImage = offerImage || catalogImage
-    expect(displayImage).toBe(offerImage)
-  })
-
-  it('falls back to catalog primary_image when offer_image is null', () => {
-    const offerImage: string | null = null
-    const catalogImage = 'products/catalog-default.jpg'
-    const displayImage = offerImage ?? catalogImage
+    const displayImage = catalogImage
     expect(displayImage).toBe(catalogImage)
   })
 
-  it('falls back to null when both images are missing', () => {
-    const offerImage: string | null = null
+  it('falls back to null when catalog image is missing', () => {
     const catalogImage: string | null = null
-    const displayImage = offerImage ?? catalogImage
+    const displayImage = catalogImage
     expect(displayImage).toBeNull()
+  })
+})
+
+function buildProductSuggestionPayload(input: {
+  userId: string
+  productName: string
+  brandName?: string
+}) {
+  return {
+    supplier_id: input.userId,
+    product_name: input.productName,
+    brand_name: input.brandName || null,
+    status: 'pending' as const,
+  }
+}
+
+describe('product suggestion flow', () => {
+  it('stores suggestion with pending status', () => {
+    const payload = buildProductSuggestionPayload({
+      userId: 'supplier-1',
+      productName: 'Yeni Endo Ürünü',
+      brandName: 'X Marka',
+    })
+
+    expect(payload.supplier_id).toBe('supplier-1')
+    expect(payload.product_name).toBe('Yeni Endo Ürünü')
+    expect(payload.status).toBe('pending')
+  })
+
+  it('supports suggestion without brand data', () => {
+    const payload = buildProductSuggestionPayload({
+      userId: 'supplier-1',
+      productName: 'Yeni Endo Ürünü',
+    })
+    expect(payload.brand_name).toBeNull()
+  })
+
+  it('catalog ürün olmadan doğrudan offer oluşturulmasını engeller', () => {
+    expect(() =>
+      buildOfferPayload({
+        productId: '',
+        price: '250',
+      })
+    ).toThrow()
+  })
+
+  it('catalog verisi olmayan ürün adı alanı payloada taşınmaz', () => {
+    const payload = buildOfferPayload({
+      productId: 'catalog-1',
+      price: '250',
+      attemptedCatalogName: 'Elle girilen ürün',
+    })
+    expect(payload).not.toHaveProperty('attemptedCatalogName')
+    expect(payload).not.toHaveProperty('attemptedCatalogName')
   })
 })

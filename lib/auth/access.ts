@@ -63,6 +63,23 @@ export function hasAdminAccess(
   return hasAdminToken(metadata)
 }
 
+const CATALOG_ADMIN_ROLES = new Set(['admin', 'super_admin', 'superadmin'])
+
+export function hasCatalogAdminAccess(profileRole: string | null | undefined) {
+  if (!profileRole) {
+    return false
+  }
+
+  return CATALOG_ADMIN_ROLES.has(normalizeToken(profileRole))
+}
+
+export function hasSupplierPanelAccess(
+  profileRole: string | null | undefined,
+  metadata: Record<string, unknown> | null | undefined
+) {
+  return profileRole === 'supplier' || hasAdminAccess(profileRole, metadata)
+}
+
 export function getAuthMetadata(user: {
   app_metadata?: Record<string, unknown>
   user_metadata?: Record<string, unknown>

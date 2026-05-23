@@ -38,6 +38,6 @@ using (
     select 1
     from public.profiles p
     where p.id = auth.uid()
-      and p.role in ('admin', 'super_admin', 'superadmin', 'depo', 'warehouse', 'warehouse_manager', 'stock_manager')
+      and p.role in ('admin', 'super_admin', 'superadmin')
   )
 );

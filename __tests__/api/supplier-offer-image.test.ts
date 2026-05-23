@@ -114,7 +114,7 @@ describe('product suggestion flow', () => {
       price: '250',
       attemptedCatalogName: 'Elle girilen ürün',
     })
-    expect(payload).not.toHaveProperty('attemptedCatalogName')
+    expect(payload.product_id).toBe('catalog-1')
     expect(payload).not.toHaveProperty('attemptedCatalogName')
   })
 })

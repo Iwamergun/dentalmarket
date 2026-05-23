@@ -22,6 +22,20 @@ interface CatalogProduct {
   brand?: { name: string | null } | null
 }
 
+function mapCatalogProducts(data: unknown): CatalogProduct[] {
+  if (!Array.isArray(data)) {
+    return []
+  }
+
+  return data.filter((item): item is CatalogProduct => (
+    typeof item === 'object' &&
+    item !== null &&
+    'id' in item &&
+    'name' in item &&
+    'slug' in item
+  ))
+}
+
 export default function YeniTeklifPage() {
   const router = useRouter()
   const supabase = createBrowserClient<Database>(
@@ -45,6 +59,10 @@ export default function YeniTeklifPage() {
     payment_options: [] as string[],
     notes: '',
   })
+
+  const navigateToSuggestionForm = () => {
+    router.push(`/supplier/urun-oner${search ? `?query=${encodeURIComponent(search)}` : ''}`)
+  }
 
   const searchProducts = useCallback(async (query: string) => {
     if (query.length < 2) {
@@ -76,7 +94,7 @@ export default function YeniTeklifPage() {
         .order('name')
         .limit(20)
 
-      setResults(((data ?? []) as unknown) as CatalogProduct[])
+      setResults(mapCatalogProducts(data))
     } catch {
       console.error('Search error')
     } finally {
@@ -263,7 +281,7 @@ export default function YeniTeklifPage() {
                   <p className="text-sm text-amber-900">Sonuç bulunamadı. Ürün kataloğumuzda yoksa öneri gönderebilirsiniz.</p>
                   <button
                     type="button"
-                    onClick={() => router.push(`/supplier/urun-oner${search ? `?query=${encodeURIComponent(search)}` : ''}`)}
+                    onClick={navigateToSuggestionForm}
                     className="mt-2 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800"
                   >
                     + Ürün Öner
@@ -277,7 +295,7 @@ export default function YeniTeklifPage() {
         <div className="mb-6 -mt-3">
           <button
             type="button"
-            onClick={() => router.push(`/supplier/urun-oner${search ? `?query=${encodeURIComponent(search)}` : ''}`)}
+            onClick={navigateToSuggestionForm}
             className="text-sm font-medium text-blue-600 hover:text-blue-800"
           >
             + Ürün Öner

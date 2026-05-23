@@ -29,6 +29,7 @@ describe('auth access helpers', () => {
   it('supplier panel access should allow supplier and depo-like roles', () => {
     expect(hasSupplierPanelAccess('supplier', undefined)).toBe(true)
     expect(hasSupplierPanelAccess('depo', undefined)).toBe(true)
+    expect(hasSupplierPanelAccess('admin', undefined)).toBe(false)
     expect(hasSupplierPanelAccess('clinic', undefined)).toBe(false)
   })
 })

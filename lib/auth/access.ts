@@ -64,6 +64,45 @@ export function hasAdminAccess(
 }
 
 const CATALOG_ADMIN_ROLES = new Set(['admin', 'super_admin', 'superadmin'])
+const SUPPLIER_PANEL_TOKENS = new Set([
+  'supplier',
+  'depo',
+  'depot',
+  'warehouse',
+  'inventory',
+  'stock',
+  'inventory_manager',
+  'stock_manager',
+  'warehouse_manager',
+  'depo_yonetimi',
+  'depo_yoneticisi',
+  'depot_manager',
+])
+
+function hasSupplierPanelToken(value: unknown): boolean {
+  if (typeof value === 'string') {
+    return SUPPLIER_PANEL_TOKENS.has(normalizeToken(value))
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => hasSupplierPanelToken(item))
+  }
+
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const [key, entry] of Object.entries(record)) {
+    if ((entry === true || entry === 'true') && SUPPLIER_PANEL_TOKENS.has(normalizeToken(key))) {
+      return true
+    }
+  }
+
+  return ['role', 'roles', 'permission', 'permissions', 'name', 'code', 'key', 'slug', 'claims', 'authorities']
+    .some((field) => hasSupplierPanelToken(record[field]))
+}
 
 export function hasCatalogAdminAccess(profileRole: string | null | undefined) {
   if (!profileRole) {
@@ -77,7 +116,7 @@ export function hasSupplierPanelAccess(
   profileRole: string | null | undefined,
   metadata: Record<string, unknown> | null | undefined
 ) {
-  return profileRole === 'supplier' || hasAdminAccess(profileRole, metadata)
+  return hasSupplierPanelToken(profileRole) || hasSupplierPanelToken(metadata)
 }
 
 export function getAuthMetadata(user: {

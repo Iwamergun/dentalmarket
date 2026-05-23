@@ -35,6 +35,11 @@ export default async function AdminProductSuggestionsPage() {
     .order('created_at', { ascending: false })
 
   const rows = (suggestions ?? []) as ProductSuggestion[]
+  const supplierIds = [...new Set(rows.map((row) => row.supplier_id))]
+  const { data: suppliers } = supplierIds.length > 0
+    ? await supabase.from('profiles').select('id, company_name').in('id', supplierIds)
+    : { data: [] as { id: string; company_name: string | null }[] }
+  const supplierMap = new Map((suppliers ?? []).map((supplier) => [supplier.id, supplier.company_name ?? 'İsimsiz Tedarikçi']))
 
   return (
     <div>
@@ -63,7 +68,8 @@ export default async function AdminProductSuggestionsPage() {
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900">{row.product_name}</div>
-                      <div className="text-xs text-gray-500">Tedarikçi ID: {row.supplier_id}</div>
+                      <div className="text-xs text-gray-500">{supplierMap.get(row.supplier_id) ?? 'Bilinmeyen Tedarikçi'}</div>
+                      <div className="text-[11px] text-gray-400">ID: {row.supplier_id}</div>
                     </td>
                     <td className="px-6 py-4 text-gray-600">
                       {[row.brand_name, row.category_name].filter(Boolean).join(' / ') || '-'}

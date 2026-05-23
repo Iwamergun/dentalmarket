@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { getAuthMetadata, hasAdminAccess, hasCatalogAdminAccess } from '@/lib/auth/access'
 
+const ADMIN_PRODUCT_EDIT_PATH = /^\/admin\/products\/[^/]+\/edit$/
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -54,7 +56,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    const isRestrictedCatalogProductPath = pathname === '/admin/products/new' || /^\/admin\/products\/[^/]+\/edit$/.test(pathname)
+    const isRestrictedCatalogProductPath = pathname === '/admin/products/new' || ADMIN_PRODUCT_EDIT_PATH.test(pathname)
     if (isRestrictedCatalogProductPath && !hasCatalogAdminAccess(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/supplier/urunler/yeni'

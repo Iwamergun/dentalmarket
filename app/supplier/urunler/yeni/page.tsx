@@ -288,7 +288,7 @@ export default function YeniTeklifPage() {
 
               {search.length >= 2 && !searching && results.length === 0 && (
                 <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  <p className="text-sm text-amber-900">Sonuç bulunamadı. Ürün kataloğumuzda yoksa öneri gönderebilirsiniz.</p>
+                  <p className="text-sm text-amber-900">Sonuç bulunamadı. Ürün kataloğunda yoksa öneri gönderebilirsiniz.</p>
                   <button
                     type="button"
                     onClick={navigateToSuggestionForm}

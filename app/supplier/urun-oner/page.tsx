@@ -35,6 +35,18 @@ export default function UrunOnerPage() {
       toast.error('Ürün adı zorunludur')
       return
     }
+    if (form.reference_url.trim()) {
+      try {
+        const parsed = new URL(form.reference_url.trim())
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          toast.error('Referans URL http:// veya https:// ile başlamalıdır')
+          return
+        }
+      } catch {
+        toast.error('Geçerli bir referans URL girin')
+        return
+      }
+    }
 
     setLoading(true)
     try {

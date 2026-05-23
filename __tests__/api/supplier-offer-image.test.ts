@@ -99,7 +99,7 @@ describe('product suggestion flow', () => {
     expect(payload.brand_name).toBeNull()
   })
 
-  it('catalog ürün olmadan doğrudan offer oluşturulmasını engeller', () => {
+  it('prevents direct offer creation without catalog product', () => {
     expect(() =>
       buildOfferPayload({
         productId: '',

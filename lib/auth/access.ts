@@ -22,6 +22,7 @@ const ADMIN_TOKENS = new Set([
   'depo_yoneticisi',
   'depot_manager',
 ])
+const METADATA_TOKEN_FIELDS = ['role', 'roles', 'permission', 'permissions', 'name', 'code', 'key', 'slug', 'claims', 'authorities']
 
 function normalizeToken(value: string) {
   return value.trim().toLowerCase().replace(/[\s-]+/g, '_')
@@ -48,8 +49,7 @@ function hasAdminToken(value: unknown): boolean {
     }
   }
 
-  return ['role', 'roles', 'permission', 'permissions', 'name', 'code', 'key', 'slug', 'claims', 'authorities']
-    .some((field) => hasAdminToken(record[field]))
+  return METADATA_TOKEN_FIELDS.some((field) => hasAdminToken(record[field]))
 }
 
 export function hasAdminAccess(
@@ -100,8 +100,7 @@ function hasSupplierPanelToken(value: unknown): boolean {
     }
   }
 
-  return ['role', 'roles', 'permission', 'permissions', 'name', 'code', 'key', 'slug', 'claims', 'authorities']
-    .some((field) => hasSupplierPanelToken(record[field]))
+  return METADATA_TOKEN_FIELDS.some((field) => hasSupplierPanelToken(record[field]))
 }
 
 export function hasCatalogAdminAccess(profileRole: string | null | undefined) {

@@ -54,8 +54,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    const isCatalogManagementPath = pathname === '/admin/products/new' || /^\/admin\/products\/[^/]+\/edit$/.test(pathname)
-    if (isCatalogManagementPath && !hasCatalogAdminAccess(profile?.role)) {
+    const isRestrictedCatalogProductPath = pathname === '/admin/products/new' || /^\/admin\/products\/[^/]+\/edit$/.test(pathname)
+    if (isRestrictedCatalogProductPath && !hasCatalogAdminAccess(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/supplier/urunler/yeni'
       return NextResponse.redirect(url)

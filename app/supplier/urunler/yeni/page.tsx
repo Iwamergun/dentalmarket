@@ -27,13 +27,23 @@ function mapCatalogProducts(data: unknown): CatalogProduct[] {
     return []
   }
 
-  return data.filter((item): item is CatalogProduct => (
-    typeof item === 'object' &&
-    item !== null &&
-    'id' in item &&
-    'name' in item &&
-    'slug' in item
-  ))
+  return data.filter((item): item is CatalogProduct => {
+    if (typeof item !== 'object' || item === null) {
+      return false
+    }
+
+    const record = item as Record<string, unknown>
+    return (
+      typeof record.id === 'string' &&
+      typeof record.name === 'string' &&
+      typeof record.slug === 'string' &&
+      'sku' in record &&
+      'barcode' in record &&
+      'primary_image' in record &&
+      'short_description' in record &&
+      'description' in record
+    )
+  })
 }
 
 export default function YeniTeklifPage() {

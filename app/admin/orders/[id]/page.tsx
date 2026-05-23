@@ -79,6 +79,7 @@ interface Order {
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'Beklemede' },
+  { value: 'confirmed', label: 'Onaylandı' },
   { value: 'processing', label: 'Hazırlanıyor' },
   { value: 'paid', label: 'Ödendi' },
   { value: 'shipped', label: 'Kargoda' },

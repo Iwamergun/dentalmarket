@@ -1,12 +1,24 @@
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
+
+type ShippingAddress = {
+  full_name?: string
+  phone?: string
+  email?: string
+  address?: string
+  city?: string
+  district?: string
+  postal_code?: string
+}
 
 type SupplierOrderSummary = {
   id: string
   order_number: string
   status: string
   created_at: string
+  shipping_address: ShippingAddress | string | null
 }
 
 export default async function SupplierSiparislerPage() {
@@ -32,18 +44,35 @@ export default async function SupplierSiparislerPage() {
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Get supplier's product IDs first
-  const { data: supplierProducts } = await supabase
-    .from('catalog_products')
-    .select('id, name')
-    .eq('supplier_id', session!.user.id)
+  if (!user) {
+    redirect('/giris')
+  }
 
-  const productIds = (supplierProducts ?? []).map((p) => p.id)
+  // Get supplier's product IDs from their offers
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: supplierOffersData } = await (supabase as any)
+    .from('offers')
+    .select('product_id')
+    .eq('supplier_id', user!.id)
+    .eq('is_active', true)
+
+  const productIds = Array.from(
+    new Set(((supplierOffersData ?? []) as { product_id: string }[]).map((o) => o.product_id))
+  )
+
+  // Fetch product names for display
+  const { data: supplierProductNames } = productIds.length > 0
+    ? await supabase
+        .from('catalog_products')
+        .select('id, name')
+        .in('id', productIds)
+    : { data: [] as { id: string; name: string }[] }
+
   const productNameMap = Object.fromEntries(
-    (supplierProducts ?? []).map((p) => [p.id, p.name])
+    (supplierProductNames ?? []).map((p) => [p.id, p.name])
   )
 
   const { data: orderItems } = productIds.length > 0
@@ -55,7 +84,7 @@ export default async function SupplierSiparislerPage() {
           quantity,
           unit_price,
           total_price,
-          orders!inner(id, order_number, status, created_at)
+          orders!inner(id, order_number, status, created_at, shipping_address)
         `)
         .in('product_id', productIds)
         .order('created_at', { referencedTable: 'orders', ascending: false })
@@ -63,6 +92,7 @@ export default async function SupplierSiparislerPage() {
 
   const statusLabels: Record<string, string> = {
     pending: 'Bekliyor',
+    confirmed: 'Onaylandı',
     processing: 'İşleniyor',
     shipped: 'Kargoda',
     delivered: 'Teslim Edildi',
@@ -71,6 +101,7 @@ export default async function SupplierSiparislerPage() {
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800',
+    confirmed: 'bg-green-100 text-green-800',
     processing: 'bg-blue-100 text-blue-800',
     shipped: 'bg-purple-100 text-purple-800',
     delivered: 'bg-green-100 text-green-800',
@@ -88,10 +119,26 @@ export default async function SupplierSiparislerPage() {
         order_number: String(rawOrder.order_number),
         status: String(rawOrder.status),
         created_at: String(rawOrder.created_at),
+        shipping_address: ('shipping_address' in rawOrder
+          ? rawOrder.shipping_address
+          : null) as ShippingAddress | string | null,
       }
     }
 
     return null
+  }
+
+  const getCustomerName = (shippingAddress: ShippingAddress | string | null): string => {
+    if (!shippingAddress) return '-'
+    if (typeof shippingAddress === 'string') {
+      try {
+        const parsed = JSON.parse(shippingAddress) as ShippingAddress
+        return parsed.full_name || '-'
+      } catch {
+        return '-'
+      }
+    }
+    return shippingAddress.full_name || '-'
   }
 
   return (
@@ -128,7 +175,9 @@ export default async function SupplierSiparislerPage() {
                       <td className="px-6 py-4 font-medium text-gray-900">
                         #{order.order_number}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">-</td>
+                      <td className="px-6 py-4 text-gray-600">
+                        {getCustomerName(order.shipping_address)}
+                      </td>
                       <td className="px-6 py-4 text-gray-600">
                         {productNameMap[item.product_id] ?? '-'}
                       </td>

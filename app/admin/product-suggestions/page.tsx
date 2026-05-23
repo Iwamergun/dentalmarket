@@ -39,7 +39,9 @@ export default async function AdminProductSuggestionsPage() {
   const { data: suppliers } = supplierIds.length > 0
     ? await supabase.from('profiles').select('id, company_name').in('id', supplierIds)
     : { data: [] as { id: string; company_name: string | null }[] }
-  const supplierMap = new Map((suppliers ?? []).map((supplier) => [supplier.id, supplier.company_name ?? 'İsimsiz Tedarikçi']))
+  const supplierMap = new Map(
+    (suppliers ?? []).map((supplier) => [supplier.id, supplier.company_name ?? 'İsimsiz Tedarikçi'])
+  )
 
   return (
     <div>

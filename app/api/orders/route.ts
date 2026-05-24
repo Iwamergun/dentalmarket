@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
       }>
 
       const offerIds = Array.from(
-        new Set(notificationItems.map((item) => item.offer_id).filter((offerId): offerId is string => Boolean(offerId)))
+        new Set(notificationItems.map((item) => item.offer_id).filter((offerId): offerId is string => offerId !== null))
       )
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

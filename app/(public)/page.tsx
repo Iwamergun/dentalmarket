@@ -21,7 +21,7 @@ export default async function HomePage() {
   ])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(118,59,255,0.08),_transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,248,252,1))]">
       {/* Hero Section */}
       <HeroSection />
 
@@ -29,12 +29,12 @@ export default async function HomePage() {
       <ProductCarousel fallbackProducts={products} />
       
       <main>
-        <div className="container mx-auto px-4 py-8">
+        <div className="container-main py-10 md:py-14">
           <div className="flex flex-col lg:flex-row gap-8">
             <HomeCatalogFilter categories={categories} brands={brands} />
             
             {/* Main Content */}
-            <div className="flex-1 space-y-16">
+            <div className="flex-1 space-y-14 md:space-y-16">
               {/* Category Grid */}
               <CategoryGrid categories={categories} />
               

@@ -13,6 +13,8 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [scrollOffset, setScrollOffset] = useState(0)
   const profileRef = useRef<HTMLDivElement>(null)
   const { user, loading } = useAuth()
 
@@ -55,11 +57,33 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    function handleScroll() {
+      const nextScrollOffset = Math.min(window.scrollY, 180)
+      setScrollOffset(nextScrollOffset)
+      setIsScrolled(nextScrollOffset > 24)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const headerHeight = isScrolled ? 'h-14 md:h-[3.85rem]' : 'h-[4.5rem] md:h-[4.75rem]'
+  const glowStyle = {
+    opacity: isScrolled ? 0.55 : 0.8,
+  }
+
   return (
-    <header className="sticky top-0 z-50 shadow-lg">
+    <header className="sticky top-0 z-50 px-2 pt-2 transition-all duration-300 md:px-4">
       {/* Top Bar */}
-      <div className="bg-primary text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
-        <div className="container mx-auto px-4">
+      <div
+        className={[
+          'overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-primary/90 text-white shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition-all duration-300',
+          isScrolled ? 'pointer-events-none max-h-0 translate-y-[-8px] border-transparent opacity-0' : 'max-h-16 opacity-100',
+        ].join(' ')}
+      >
+        <div className="container-main">
           <div className="flex h-10 items-center justify-between text-sm">
             <div className="hidden md:flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-accent" />
@@ -80,18 +104,31 @@ export function Header() {
       </div>
 
       {/* Main Header - White */}
-      <div className="bg-white shadow-lg">
-        <div className="container mx-auto px-4">
-          <div className="flex h-20 items-center justify-between gap-4">
+      <div
+        className={[
+          'rounded-[1.75rem] border shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition-colors duration-300',
+          isScrolled
+            ? 'border-white/60 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.10)]'
+            : 'border-border/60 bg-white',
+        ].join(' ')}
+      >
+        <div className="container-main relative rounded-[inherit]">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+            <div className="absolute inset-x-[12%] top-[-4.5rem] h-28 rounded-full bg-gradient-to-r from-secondary/12 via-accent/18 to-primary/12 blur-3xl transition-opacity duration-300" style={glowStyle} />
+          </div>
+          <div className={['relative flex items-center justify-between gap-4 transition-all duration-300', headerHeight].join(' ')}>
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-md">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent shadow-lg shadow-secondary/20">
                 <span className="text-white font-bold text-xl">DA</span>
               </div>
               <div className="hidden sm:block">
                 <span className="text-2xl font-extrabold text-primary">
                   Dent Alışveriş
                 </span>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-secondary-text">
+                  Premium dental marketplace
+                </p>
               </div>
             </Link>
 
@@ -101,9 +138,9 @@ export function Header() {
                 <input
                   type="text"
                   placeholder="Ürün, marka veya kategori ara..."
-                  className="w-full h-12 pl-5 pr-14 rounded-xl border-2 border-border text-body-text placeholder-secondary-text focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 shadow-sm"
+                  className="h-12 w-full rounded-2xl border border-white/50 bg-white/70 pl-5 pr-14 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                 />
-                <button className="absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center rounded-lg bg-primary px-4 text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-lg">
+                <button className="absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center rounded-xl bg-primary px-4 text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-lg">
                   <Search className="w-5 h-5" />
                 </button>
               </div>
@@ -114,13 +151,13 @@ export function Header() {
               {/* Mobile Search Toggle */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="md:hidden p-2.5 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200"
+                className="rounded-2xl border border-transparent p-2.5 text-secondary-text transition-all duration-200 hover:border-white/40 hover:bg-white/50 hover:text-primary md:hidden"
               >
                 <Search className="w-6 h-6" />
               </button>
 
               {/* Favorites */}
-              <Link href="/profil/favorilerim" className="hidden sm:flex p-2.5 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200">
+              <Link href="/profil/favorilerim" className="hidden rounded-2xl border border-transparent p-2.5 text-secondary-text transition-all duration-200 hover:border-white/40 hover:bg-white/50 hover:text-primary sm:flex">
                 <Heart className="w-6 h-6" />
               </Link>
 
@@ -134,9 +171,9 @@ export function Header() {
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 p-2 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200"
+                    className="flex items-center gap-2 rounded-2xl border border-transparent p-2 text-secondary-text transition-all duration-200 hover:border-white/40 hover:bg-white/50 hover:text-primary"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary shadow-md">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary shadow-md">
                       <span className="text-white text-sm font-semibold">
                         {user.email?.charAt(0).toUpperCase() || 'U'}
                       </span>
@@ -152,23 +189,24 @@ export function Header() {
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-border rounded-2xl shadow-2xl py-2 z-50 animate-fade-in">
-                      <div className="px-4 py-3 border-b-2 border-border">
-                        <p className="text-sm font-bold text-body-text truncate">
+                    <div className="absolute right-0 z-50 mt-3 w-60 overflow-hidden rounded-[1.5rem] border border-primary/10 bg-white py-1.5 text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.18)] ring-1 ring-slate-950/5 animate-fade-in">
+                      <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-br from-primary/8 via-secondary/8 to-transparent" />
+                      <div className="relative border-b border-slate-200/80 px-4 py-2.5">
+                        <p className="text-sm font-bold text-slate-900 truncate">
                           {user.user_metadata?.full_name || 'Kullanıcı'}
                         </p>
-                        <p className="text-xs text-secondary-text truncate">
+                        <p className="text-xs text-slate-500 truncate">
                           {user.email}
                         </p>
                       </div>
 
-                      <div className="py-1">
+                      <div className="relative py-1">
                         <Link
                           href="/profil"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-secondary-text hover:text-primary hover:bg-muted transition-colors"
+                          className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                           Profilim
@@ -176,9 +214,9 @@ export function Header() {
                         <Link
                           href="/profil/siparislerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-secondary-text hover:text-primary hover:bg-muted transition-colors"
+                          className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                           </svg>
                           Siparişlerim
@@ -186,9 +224,9 @@ export function Header() {
                         <Link
                           href="/profil/favorilerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-secondary-text hover:text-primary hover:bg-muted transition-colors"
+                          className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                           Favorilerim
@@ -196,9 +234,9 @@ export function Header() {
                         <Link
                           href="/profil/adreslerim"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-secondary-text hover:text-primary hover:bg-muted transition-colors"
+                          className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
@@ -207,25 +245,25 @@ export function Header() {
                       </div>
 
                       {isAdmin && (
-                        <div className="border-t-2 border-border pt-1 mt-1">
+                        <div className="mt-1 border-t border-slate-200/80 pt-1">
                           <Link
                             href="/admin/dashboard"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-secondary-text hover:text-primary hover:bg-muted transition-colors"
+                            className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                           >
-                            <Shield className="w-5 h-5" />
+                            <Shield className="h-5 w-5 text-slate-500" />
                             Admin Panel
                           </Link>
                         </div>
                       )}
 
-                      <div className="border-t-2 border-border pt-1 mt-1">
+                      <div className="mt-1 border-t border-slate-200/80 pt-1">
                         <Link
                           href="/cikis"
                           onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-destructive hover:bg-destructive/10 transition-colors"
+                          className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-red-600 transition-colors hover:bg-red-50"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                           </svg>
                           Çıkış Yap
@@ -237,7 +275,7 @@ export function Header() {
               ) : (
                 <Link 
                   href="/giris" 
-                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-white font-bold shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-xl"
+                  className="inline-flex h-10 items-center gap-2 rounded-2xl bg-primary px-5 text-white font-bold shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-xl"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -248,7 +286,7 @@ export function Header() {
 
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2.5 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200 lg:hidden"
+                className="rounded-2xl border border-transparent p-2.5 text-secondary-text transition-all duration-200 hover:border-white/40 hover:bg-white/50 hover:text-primary lg:hidden"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -261,7 +299,7 @@ export function Header() {
               <input
                 type="text"
                 placeholder="Ürün, marka veya kategori ara..."
-                className="w-full h-10 px-4 rounded-xl border-2 border-border text-body-text placeholder-secondary-text focus:border-primary focus:outline-none transition-all duration-200"
+                className="h-11 w-full rounded-2xl border border-white/50 bg-white/75 px-4 text-body-text placeholder-secondary-text backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none"
                 autoFocus
               />
             </div>
@@ -271,20 +309,22 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden border-t-2 border-border bg-white shadow-lg animate-fade-in">
-          <nav className="container mx-auto px-4 py-4 space-y-2">
-            <Link href="/kategoriler" className="block px-4 py-3 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200 font-medium">
-              Kategoriler
-            </Link>
-            <Link href="/markalar" className="block px-4 py-3 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200 font-medium">
-              Markalar
-            </Link>
-            <Link href="/urunler" className="block px-4 py-3 rounded-xl text-secondary-text hover:text-primary hover:bg-muted transition-all duration-200 font-medium">
-              Tüm Ürünler
-            </Link>
-            <Link href="/kampanyalar" className="block px-4 py-3 rounded-xl text-accent hover:bg-accent/10 transition-all duration-200 font-bold">
-              Kampanyalar
-            </Link>
+        <div className="animate-fade-in lg:hidden">
+          <nav className="mx-2 mt-2 rounded-[1.75rem] border border-border/60 bg-white/84 px-4 py-4 shadow-xl backdrop-blur-xl md:mx-4">
+            <div className="space-y-2">
+              <Link href="/kategoriler" className="block rounded-2xl px-4 py-3 font-medium text-secondary-text transition-all duration-200 hover:bg-muted hover:text-primary">
+                Kategoriler
+              </Link>
+              <Link href="/markalar" className="block rounded-2xl px-4 py-3 font-medium text-secondary-text transition-all duration-200 hover:bg-muted hover:text-primary">
+                Markalar
+              </Link>
+              <Link href="/urunler" className="block rounded-2xl px-4 py-3 font-medium text-secondary-text transition-all duration-200 hover:bg-muted hover:text-primary">
+                Tüm Ürünler
+              </Link>
+              <Link href="/kampanyalar" className="block rounded-2xl px-4 py-3 font-bold text-accent transition-all duration-200 hover:bg-accent/10">
+                Kampanyalar
+              </Link>
+            </div>
           </nav>
         </div>
       )}

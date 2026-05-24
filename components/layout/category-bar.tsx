@@ -89,8 +89,8 @@ export function CategoryBar() {
 
   if (isLoading) {
     return (
-      <nav className="hidden border-b-2 border-primary/10 bg-muted lg:block">
-        <div className="container mx-auto px-4">
+      <nav className="mx-2 mt-2 hidden rounded-[1.5rem] border border-border/60 bg-white/70 backdrop-blur-xl lg:block md:mx-4">
+        <div className="container-main">
           <div className="flex items-center gap-1 h-12">
             {[...Array(7)].map((_, i) => (
               <div key={i} className="h-6 w-24 bg-muted rounded animate-pulse" />
@@ -105,15 +105,15 @@ export function CategoryBar() {
     /* position:relative + z-40 → stacking context above <main> so dropdown renders on top */
     <nav
       ref={navRef}
-      className="relative z-40 hidden overflow-x-clip border-b-2 border-primary/10 bg-muted shadow-[inset_0_-1px_0_rgba(84,48,165,0.04)] lg:block"
+      className="relative z-40 mx-2 mt-2 hidden overflow-x-clip rounded-[1.5rem] border border-border/60 bg-white/66 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl lg:block md:mx-4"
     >
-      <div className="container mx-auto px-4">
+      <div className="container-main">
         <div className="flex w-full items-center gap-2 py-1">
           <button
             type="button"
             aria-label="Kategorileri sola kaydır"
             onClick={() => scrollCategories('left')}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-white text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -142,10 +142,10 @@ export function CategoryBar() {
                     <Link
                       href={`/kategoriler/${category.slug}`}
                       className={[
-                        'flex items-center gap-1 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200',
+                        'flex items-center gap-1 whitespace-nowrap rounded-2xl px-4 py-2 text-sm font-medium transition-all duration-200',
                         isOpen
-                          ? 'text-secondary bg-white shadow-sm'
-                          : 'text-secondary-text hover:text-secondary hover:bg-white',
+                          ? 'bg-white/90 text-secondary shadow-sm'
+                          : 'text-secondary-text hover:bg-white/72 hover:text-secondary',
                       ].join(' ')}
                     >
                       {category.name}
@@ -162,7 +162,7 @@ export function CategoryBar() {
               <div className="shrink-0 ml-3 pl-3 border-l border-primary/15">
                 <Link
                   href="/kategoriler"
-                  className="flex items-center gap-1.5 rounded-xl border border-secondary/30 bg-secondary/8 px-4 py-2 text-sm font-bold text-secondary whitespace-nowrap transition-all duration-200 hover:bg-secondary hover:text-white"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-2xl border border-secondary/25 bg-secondary/10 px-4 py-2 text-sm font-bold text-secondary transition-all duration-200 hover:bg-secondary hover:text-white"
                 >
                   <LayoutGrid className="h-4 w-4" />
                   Tüm Kategorileri Gör
@@ -175,7 +175,7 @@ export function CategoryBar() {
             type="button"
             aria-label="Kategorileri sağa kaydır"
             onClick={() => scrollCategories('right')}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-white text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -189,7 +189,7 @@ export function CategoryBar() {
       {hoveredCategory && hoveredCategory.children.length > 0 && (
         <div
           style={{ left: `${dropdownLeft}px` }}
-          className="absolute top-full z-50 mt-0 min-w-[230px] max-h-[70vh] overflow-y-auto rounded-2xl border border-border bg-white py-2 shadow-2xl"
+          className="absolute top-full z-50 mt-2 max-h-[70vh] min-w-[230px] overflow-y-auto rounded-3xl border border-border/60 bg-white/90 py-2 shadow-2xl backdrop-blur-xl"
           onMouseEnter={() => cancelClose(hoveredCategory.id)}
           onMouseLeave={scheduleClose}
         >

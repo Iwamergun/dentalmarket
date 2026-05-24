@@ -2,8 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database.types'
-import AdminSidebar from '@/components/admin/AdminSidebar'
-import AdminHeader from '@/components/admin/AdminHeader'
+import AdminShell from '@/components/admin/AdminShell'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
 export default async function AdminLayout({
@@ -53,14 +52,6 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <AdminSidebar />
-      <div className="flex flex-1 flex-col">
-        <AdminHeader user={user} />
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <AdminShell user={user}>{children}</AdminShell>
   )
 }

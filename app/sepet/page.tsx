@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
   ShoppingCart, Trash2, Plus, Minus, ArrowLeft, ShoppingBag,
   Loader2, TrendingDown, TrendingUp, AlertTriangle, XCircle,
-  Tag, Truck, X
+  Tag, Truck, X, ChevronDown, Home, Package, LayoutGrid, Tags, Sparkles
 } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { useCart, CartItem } from '@/app/contexts/CartContext'
@@ -230,6 +230,56 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: {
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function QuickNavDropdown() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const links = [
+    { href: '/', label: 'Anasayfa', icon: Home },
+    { href: '/urunler', label: 'Tüm Ürünler', icon: Package },
+    { href: '/kategoriler', label: 'Kategoriler', icon: LayoutGrid },
+    { href: '/markalar', label: 'Markalar', icon: Tags },
+    { href: '/kampanyalar', label: 'Kampanyalar', icon: Sparkles },
+  ]
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-2 text-sm font-medium text-text-primary shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+      >
+        Hızlı Menü
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-border bg-white py-1.5 shadow-[0_24px_60px_rgba(15,23,42,0.18)] ring-1 ring-slate-950/5 animate-fade-in">
+          {links.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="mx-1.5 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
+            >
+              <Icon className="w-4 h-4 text-slate-500" />
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -540,9 +590,12 @@ export default function SepetPage() {
   if (items.length === 0) {
     return (
       <div className="container-main py-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-8">
-          Sepetim
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
+            Sepetim
+          </h1>
+          <QuickNavDropdown />
+        </div>
         <EmptyCart />
       </div>
     )
@@ -559,18 +612,21 @@ export default function SepetPage() {
           </span>
         </h1>
         
-        <button
-          onClick={handleClearCart}
-          disabled={clearing}
-          className="text-sm text-text-muted hover:text-red-500 transition-colors flex items-center gap-1"
-        >
-          {clearing ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Trash2 className="w-4 h-4" />
-          )}
-          Sepeti Temizle
-        </button>
+        <div className="flex items-center gap-3">
+          <QuickNavDropdown />
+          <button
+            onClick={handleClearCart}
+            disabled={clearing}
+            className="text-sm text-text-muted hover:text-red-500 transition-colors flex items-center gap-1"
+          >
+            {clearing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+            Sepeti Temizle
+          </button>
+        </div>
       </div>
 
       {/* Content */}

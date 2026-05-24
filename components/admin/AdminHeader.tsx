@@ -3,16 +3,17 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-import { LogOut, Home } from 'lucide-react'
+import { LogOut, Home, Search, ShieldCheck, Menu } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import NotificationBell from '@/components/notifications/NotificationBell'
 
 interface AdminHeaderProps {
   user: User
+  onMenuToggle?: () => void
 }
 
-export default function AdminHeader({ user }: AdminHeaderProps) {
+export default function AdminHeader({ user, onMenuToggle }: AdminHeaderProps) {
   const router = useRouter()
   const supabase = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,39 +27,66 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="flex items-center justify-between px-6 py-4">
-        <h2 className="text-xl font-semibold text-gray-800">
-          Hoş Geldiniz, Admin
-        </h2>
-
-        <div className="flex items-center gap-4">
-          {/* Homepage Link */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Ana Sayfaya Dön"
-          >
-            <Home className="w-4 h-4" />
-            <span className="hidden md:inline">Ana Sayfa</span>
-          </Link>
-
-          <NotificationBell />
-
-          {/* User info */}
-          <div className="text-right">
-            <p className="text-sm font-medium text-gray-700">{user.email}</p>
-            <p className="text-xs text-gray-500">Admin</p>
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="flex flex-col gap-4 px-4 py-4 md:px-6 xl:px-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onMenuToggle}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border/60 bg-card/80 text-body-text shadow-subtle lg:hidden"
+                aria-label="Menüyü aç"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary-text">
+              Admin Control Center
+            </p>
+            </div>
+            <h2 className="mt-2 text-2xl font-semibold text-foreground">
+              Hoş geldiniz, yönetim paneli hazır.
+            </h2>
           </div>
 
-          {/* Logout butonu */}
-          <button
-            onClick={handleLogout}
-            className="p-2 text-gray-600 hover:text-red-600"
-            title="Çıkış Yap"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="hidden min-w-[280px] items-center gap-3 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 text-secondary-text shadow-subtle md:flex">
+              <Search className="h-4 w-4" />
+              <span className="text-sm">Sipariş, ürün veya müşteri ara...</span>
+            </div>
+
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 text-sm font-medium text-body-text shadow-subtle transition-colors hover:border-secondary/30 hover:text-secondary"
+              title="Ana Sayfaya Dön"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden md:inline">Ana Sayfa</span>
+            </Link>
+
+            <NotificationBell />
+
+            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/90 px-4 py-3 shadow-subtle">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-accent text-sm font-semibold text-white">
+                {(user.email?.[0] ?? 'A').toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{user.email}</p>
+                <p className="mt-1 inline-flex items-center gap-1 text-xs text-secondary-text">
+                  <ShieldCheck className="h-3.5 w-3.5 text-success" />
+                  Admin yetkisi aktif
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 text-destructive transition-colors hover:bg-destructive hover:text-white"
+              title="Çıkış Yap"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

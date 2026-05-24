@@ -24,67 +24,79 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 
 export default function RecentOrders({ orders }: RecentOrdersProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Son Siparişler</h2>
+    <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-premium backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-border/60 bg-gradient-to-r from-secondary/10 via-background to-accent/10 px-6 py-5">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary-text">
+            Sipariş Akışı
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-foreground">Son Siparişler</h2>
+        </div>
+        <div className="rounded-full border border-border/60 bg-background/80 px-3 py-1 text-xs font-medium text-secondary-text">
+          {orders.length} kayıt
+        </div>
       </div>
 
       {orders.length === 0 ? (
-        <div className="p-6 text-center text-gray-500">Henüz sipariş yok</div>
+        <div className="px-6 py-12 text-center text-secondary-text">Henüz sipariş yok</div>
       ) : (
-        <table className="w-full">
-          <thead>
-            <tr className="text-left text-sm text-gray-500 border-b border-gray-200">
-              <th className="px-6 py-3 font-medium">Sipariş No</th>
-              <th className="px-6 py-3 font-medium">Müşteri</th>
-              <th className="px-6 py-3 font-medium">Toplam</th>
-              <th className="px-6 py-3 font-medium">Durum</th>
-              <th className="px-6 py-3 font-medium">Tarih</th>
-              <th className="px-6 py-3 font-medium">Aksiyon</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border/60 text-left text-xs uppercase tracking-[0.18em] text-secondary-text">
+                <th className="px-6 py-4 font-semibold">Sipariş No</th>
+                <th className="px-6 py-4 font-semibold">Müşteri</th>
+                <th className="px-6 py-4 font-semibold">Toplam</th>
+                <th className="px-6 py-4 font-semibold">Durum</th>
+                <th className="px-6 py-4 font-semibold">Tarih</th>
+                <th className="px-6 py-4 font-semibold">Aksiyon</th>
+              </tr>
+            </thead>
+            <tbody>
             {orders.map((order) => {
               const status = statusConfig[order.status] ?? {
-                label: order.status,
-                className: 'bg-gray-100 text-gray-800',
+                label: order.status.replace('_', ' '),
+                className: 'bg-muted text-foreground',
               }
 
               return (
-                <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {order.order_number}
+                <tr key={order.id} className="border-b border-border/40 transition-colors hover:bg-secondary/5">
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">
+                    <div className="inline-flex rounded-full border border-border/60 bg-background px-3 py-1 font-mono text-xs text-secondary">
+                      {order.order_number}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-body-text">
                     {order.profiles?.company_name ?? '-'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                      {Number(order.total ?? 0).toLocaleString('tr-TR')} ₺
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">
+                    {Number(order.total ?? 0).toLocaleString('tr-TR')} ₺
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${status.className}`}
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}
                     >
                       {status.label}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-secondary-text">
                     {new Date(order.created_at).toLocaleDateString('tr-TR')}
                   </td>
                   <td className="px-6 py-4">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                      className="inline-flex items-center gap-1 rounded-full border border-secondary/20 bg-secondary/10 px-3 py-1.5 text-sm font-medium text-secondary transition-colors hover:bg-secondary hover:text-white"
                     >
                       Görüntüle
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink className="h-4 w-4" />
                     </Link>
                   </td>
                 </tr>
               )
             })}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

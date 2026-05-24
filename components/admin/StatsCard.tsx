@@ -36,21 +36,27 @@ export default function StatsCard({
   const Icon = iconMap[icon as keyof typeof iconMap] || Package
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <div className="flex justify-between items-start">
+    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/90 p-6 shadow-premium backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1">
+      <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
+      <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-secondary/10 blur-3xl" />
+      <div className="absolute -bottom-12 left-0 h-24 w-24 rounded-full bg-accent/10 blur-3xl" />
+
+      <div className="relative flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-secondary-text">
+            {title}
+          </p>
+          <p className="text-3xl font-bold text-foreground">{value}</p>
           {trend && (
-            <div className="flex items-center mt-2">
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-3 py-1.5">
               {trendUp ? (
-                <ArrowUpRight className="w-4 h-4 text-green-600" />
+                <ArrowUpRight className="h-4 w-4 text-success" />
               ) : (
-                <ArrowDownRight className="w-4 h-4 text-red-600" />
+                <ArrowDownRight className="h-4 w-4 text-destructive" />
               )}
               <span
-                className={`text-xs ml-1 ${
-                  trendUp ? 'text-green-600' : 'text-red-600'
+                className={`text-xs font-semibold ${
+                  trendUp ? 'text-success' : 'text-destructive'
                 }`}
               >
                 {trend}
@@ -58,8 +64,8 @@ export default function StatsCard({
             </div>
           )}
         </div>
-        <div className="bg-blue-100 text-blue-600 p-3 rounded-lg">
-          <Icon className="w-6 h-6" />
+        <div className="rounded-2xl border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-accent/10 p-4 text-secondary shadow-subtle">
+          <Icon className="h-6 w-6" />
         </div>
       </div>
     </div>

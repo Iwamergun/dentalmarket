@@ -120,7 +120,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .btn-outline:hover {
-    @apply border-secondary text-secondary bg-secondary/5;
+    @apply border-secondary text-secondary bg-muted;
   }
   
   /* Section Titles */
@@ -143,7 +143,8 @@ h1, h2, h3, h4, h5, h6 {
   
   /* Container */
   .container-main {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+    max-width: 1536px;
   }
 }
 

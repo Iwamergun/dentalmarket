@@ -71,13 +71,12 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
   }
 
   return (
-    <section className="py-12 md:py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section className="rounded-[2rem] border border-border/60 bg-white/80 px-5 py-10 shadow-subtle backdrop-blur-sm md:px-8 md:py-12">
+      <div>
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-body-text mb-3">Öne Çıkan Ürünler</h2>
-          <p className="text-secondary-text text-lg">
-            En çok tercih edilen ürünler
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary-text">Ürün seçkisi</p>
+          <h2 className="mt-3 text-3xl font-bold text-body-text md:text-4xl">Öne Çıkan Ürünler</h2>
+          <p className="mt-3 text-base text-secondary-text md:text-lg">En çok tercih edilen ürünleri daha sade bir kart sistemiyle keşfedin.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -89,7 +88,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             return (
               <div
                 key={product.id}
-                className="group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border-2 border-border bg-white transition-all duration-300 hover:border-primary/40 hover:shadow-2xl"
+                className="group flex min-h-[420px] flex-col overflow-hidden rounded-3xl border border-border/60 bg-background/90 shadow-subtle transition-all duration-300 hover:-translate-y-1 hover:border-secondary/25 hover:shadow-premium"
               >
                 {/* Image */}
                 <div className="relative aspect-square bg-muted overflow-hidden">
@@ -110,7 +109,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   
                   {/* Discount Badge */}
                   {discount > 0 && (
-                    <div className="absolute top-3 left-3 rounded-lg border-2 border-white bg-destructive px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                    <div className="absolute top-3 left-3 rounded-full border border-white/80 bg-destructive px-3 py-1.5 text-xs font-semibold text-white shadow-md">
                       %{discount} İndirim
                     </div>
                   )}
@@ -118,7 +117,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   {/* Wishlist Button */}
                   <button
                     onClick={() => handleToggleWishlist(product.id)}
-                    className={`absolute top-3 right-3 p-2.5 rounded-xl bg-white/95 backdrop-blur shadow-md transition-all duration-200 ${
+                    className={`absolute top-3 right-3 rounded-2xl bg-white/95 p-2.5 shadow-md backdrop-blur transition-all duration-200 ${
                       isInWishlist(product.id)
                         ? 'text-destructive scale-110'
                         : 'text-secondary-text hover:text-destructive hover:scale-110'
@@ -132,12 +131,12 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                 <div className="flex flex-1 flex-col p-5">
                   {/* Brand */}
                   {product.brand_id && (
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em] mb-2">PREMIUM BRAND</p>
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Premium Brand</p>
                   )}
 
                   {/* Title */}
                   <Link href={`/urunler/${product.slug}`}>
-                    <h3 className="font-bold text-body-text mb-3 line-clamp-2 group-hover:text-primary transition-colors min-h-[3rem]">
+                    <h3 className="mb-3 min-h-[3rem] line-clamp-2 font-semibold text-body-text transition-colors group-hover:text-primary">
                       {product.name}
                     </h3>
                   </Link>
@@ -165,7 +164,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                       <button
                         type="button"
                         onClick={() => router.push('/giris')}
-                        className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -179,7 +178,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                             {formatPrice(price)}
                           </p>
                         )}
-                        <p className="text-2xl font-extrabold text-primary">
+                        <p className="text-2xl font-bold text-primary">
                           {formatPrice(discountedPrice)}
                         </p>
                       </>
@@ -189,11 +188,11 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   {/* Stock Info */}
                   <div className="mb-4">
                     {isLowStock ? (
-                      <p className="text-xs text-destructive font-bold bg-destructive/10 px-2.5 py-1 rounded-full inline-block animate-pulse">
+                      <p className="inline-block rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-semibold text-destructive">
                         Son {stock} Ürün!
                       </p>
                     ) : (
-                      <p className="text-xs text-success font-bold bg-success/10 px-2.5 py-1 rounded-full inline-block">
+                      <p className="inline-block rounded-full bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">
                         Stokta ({stock} adet)
                       </p>
                     )}
@@ -204,7 +203,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     <button
                       onClick={() => handleAddToCart(product)}
                       disabled={loadingStates[product.id]}
-                      className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent text-white font-bold shadow-md transition-all duration-200 hover:bg-accent/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {loadingStates[product.id] ? (
                         <span>Ekleniyor...</span>
@@ -225,7 +224,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         <div className="text-center mt-10">
           <Link
             href="/urunler"
-            className="inline-flex h-12 items-center gap-2 rounded-xl bg-primary px-8 text-white font-bold shadow-xl transition-all duration-200 hover:bg-primary/90 hover:shadow-2xl"
+            className="inline-flex h-12 items-center gap-2 rounded-2xl bg-primary px-8 text-sm font-semibold text-white shadow-premium transition-all duration-200 hover:bg-primary/90"
           >
             Tüm Ürünleri Gör
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -138,7 +138,7 @@ export default function YeniUrunPage() {
       return
     }
 
-    if (!form.name || !form.sku || !form.price) {
+    if (!form.name.trim() || !form.sku || !form.price) {
       toast.error('Ürün adı, SKU ve fiyat zorunludur')
       return
     }

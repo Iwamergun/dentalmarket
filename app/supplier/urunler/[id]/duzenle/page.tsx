@@ -216,7 +216,7 @@ export default function UrunDuzenlePage() {
       return
     }
 
-    if (!currentProductId || !form.name || !form.sku || !form.price) {
+    if (!currentProductId || !form.name.trim() || !form.sku || !form.price) {
       toast.error('Ürün adı, SKU ve fiyat zorunludur')
       return
     }

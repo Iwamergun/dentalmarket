@@ -71,6 +71,10 @@ export function slugifyProductName(text: string) {
     .replace(/^-|-$/g, '')
 }
 
+export function resolveProductSlug(name: string, slug?: string | null) {
+  return slug || slugifyProductName(name)
+}
+
 export function applyCatalogProductSelection(
   form: SupplierProductFormState,
   product: CatalogProductSelection
@@ -78,7 +82,7 @@ export function applyCatalogProductSelection(
   return {
     ...form,
     name: product.name,
-    slug: product.slug || slugifyProductName(product.name),
+    slug: resolveProductSlug(product.name, product.slug),
     sku: product.sku ?? '',
     barcode: product.barcode ?? '',
     short_description: product.short_description ?? '',
@@ -107,7 +111,7 @@ export function buildSupplierProductFormState(params: {
 
   return {
     name: product.name,
-    slug: product.slug || slugifyProductName(product.name),
+    slug: resolveProductSlug(product.name, product.slug),
     sku: product.sku ?? '',
     barcode: product.barcode ?? '',
     short_description: product.short_description ?? '',
@@ -138,7 +142,7 @@ export function buildCatalogProductPayload(
   return {
     supplier_id: supplierId,
     name: form.name,
-    slug: form.slug || slugifyProductName(form.name),
+    slug: resolveProductSlug(form.name, form.slug),
     sku: form.sku || null,
     barcode: form.barcode || null,
     short_description: form.short_description || null,

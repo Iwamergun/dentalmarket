@@ -1,33 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
-import { getImageUrl } from '@/lib/utils/imageHelper'
+import ImageUploader from '@/components/admin/ImageUploader'
+import CatalogProductNameSelect from '@/components/supplier/CatalogProductNameSelect'
+import {
+  applyCatalogProductSelection,
+  buildCatalogProductPayload,
+  buildOfferPayload,
+  buildSupplierProductFormState,
+  defaultSupplierProductFormState,
+  type CatalogProductSelection,
+  type SupplierProductFormState,
+} from '@/lib/products/supplierProductForm'
 
-const PAYMENT_OPTIONS = [
-  { value: 'havale', label: 'Havale/EFT' },
-  { value: 'kredi_karti', label: 'Kredi Kartı' },
-  { value: 'vade_30', label: '30 Gün Vade' },
-  { value: 'vade_60', label: '60 Gün Vade' },
-  { value: 'vade_90', label: '90 Gün Vade' },
-] as const
+type CatalogSearchProduct = CatalogProductSelection
 
-type ProductInfo = {
-  name: string
-  sku: string | null
-  barcode: string | null
-  primary_image: string | null
-  short_description: string | null
-  description: string | null
-  category?: { name: string | null } | null
-  brand?: { name: string | null } | null
-}
-
-type SupplierOfferFormRecord = {
+type OfferRecord = {
   id: string
   product_id: string
   price: number | null
@@ -42,7 +34,19 @@ type SupplierOfferFormRecord = {
   is_active: boolean | null
 }
 
-export default function TeklifDuzenlePage() {
+type ExistingProductRecord = CatalogProductSelection & {
+  supplier_id: string | null
+}
+
+const PAYMENT_OPTIONS = [
+  { value: 'havale', label: 'Havale/EFT' },
+  { value: 'kredi_karti', label: 'Kredi Kartı' },
+  { value: 'vade_30', label: '30 Gün Vade' },
+  { value: 'vade_60', label: '60 Gün Vade' },
+  { value: 'vade_90', label: '90 Gün Vade' },
+]
+
+export default function UrunDuzenlePage() {
   const router = useRouter()
   const { id: offerId } = useParams<{ id: string }>()
   const supabase = createBrowserClient<Database>(
@@ -50,30 +54,60 @@ export default function TeklifDuzenlePage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([])
+  const [nameSearch, setNameSearch] = useState('')
+  const [results, setResults] = useState<CatalogSearchProduct[]>([])
+  const [searching, setSearching] = useState(false)
+  const [selectedCatalogProductId, setSelectedCatalogProductId] = useState<string | null>(null)
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null)
+  const [currentProductSupplierId, setCurrentProductSupplierId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const [product, setProduct] = useState<ProductInfo | null>(null)
+  const [form, setForm] = useState<SupplierProductFormState>(defaultSupplierProductFormState)
 
-  const [form, setForm] = useState({
-    price: '',
-    vat_rate: '20',
-    stock_quantity: '',
-    min_order_quantity: '1',
-    lead_time_days: '',
-    shipping_cost: '',
-    free_shipping_threshold: '',
-    payment_options: [] as string[],
-    notes: '',
-    is_active: true,
-  })
+  const searchProducts = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setResults([])
+      return
+    }
+
+    setSearching(true)
+    try {
+      const { data } = await supabase
+        .from('catalog_products')
+        .select('id, name, slug, sku, barcode, short_description, description, primary_category_id, brand_id, primary_image, compare_at_price')
+        .eq('is_active', true)
+        .or(`name.ilike.%${query}%,sku.ilike.%${query}%`)
+        .order('name')
+        .limit(20)
+
+      setResults((data ?? []) as CatalogSearchProduct[])
+    } catch (error) {
+      console.error('Catalog product search error:', error)
+      setResults([])
+    } finally {
+      setSearching(false)
+    }
+  }, [supabase])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchProducts(nameSearch)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [nameSearch, searchProducts])
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/giris'); return }
+      if (!user) {
+        router.push('/giris')
+        return
+      }
 
-      // Fetch the offer (id param is now the offer id)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: offer } = await (supabase.from('offers') as any)
         .select('id, product_id, price, vat_rate, stock_quantity, min_order_quantity, lead_time_days, shipping_cost, free_shipping_threshold, payment_options, notes, is_active')
@@ -81,120 +115,222 @@ export default function TeklifDuzenlePage() {
         .eq('supplier_id', user.id)
         .maybeSingle()
 
-      const typedOffer = offer as SupplierOfferFormRecord | null
+      const typedOffer = offer as OfferRecord | null
 
       if (!typedOffer) {
-        toast.error('Teklif bulunamadı veya yetkiniz yok')
+        toast.error('Ürün bulunamadı')
         router.push('/supplier/urunler')
         return
       }
 
-      // Fetch product info (readonly)
-      const { data: prod } = await supabase
-        .from('catalog_products')
-        .select(`
-          name,
-          sku,
-          barcode,
-          primary_image,
-          short_description,
-          description,
-          brand:brands (
-            name
-          ),
-          category:categories!catalog_products_primary_category_id_fkey (
-            name
-          )
-        `)
-        .eq('id', typedOffer.product_id)
-        .single()
+      const [{ data: cats }, { data: brs }, { data: product }] = await Promise.all([
+        supabase.from('categories').select('id, name').eq('is_active', true).order('name'),
+        supabase.from('brands').select('id, name').eq('is_active', true).order('name'),
+        supabase
+          .from('catalog_products')
+          .select('id, supplier_id, name, slug, sku, barcode, short_description, description, primary_category_id, brand_id, primary_image, compare_at_price')
+          .eq('id', typedOffer.product_id)
+          .single(),
+      ])
 
-      setProduct(prod ? (prod as unknown as ProductInfo) : null)
+      const typedProduct = product as ExistingProductRecord | null
 
-      setForm({
-        price: String(typedOffer.price ?? ''),
-        vat_rate: String(typedOffer.vat_rate ?? 20),
-        stock_quantity: String(typedOffer.stock_quantity ?? ''),
-        min_order_quantity: String(typedOffer.min_order_quantity ?? 1),
-        lead_time_days: String(typedOffer.lead_time_days ?? ''),
-        shipping_cost: String(typedOffer.shipping_cost ?? ''),
-        free_shipping_threshold: String(typedOffer.free_shipping_threshold ?? ''),
-        payment_options: typedOffer.payment_options ?? [],
-        notes: typedOffer.notes ?? '',
-        is_active: typedOffer.is_active ?? true,
-      })
+      if (!typedProduct) {
+        toast.error('Ürün bulunamadı')
+        router.push('/supplier/urunler')
+        return
+      }
+
+      setCategories(cats ?? [])
+      setBrands(brs ?? [])
+      setCurrentProductId(typedProduct.id)
+      setCurrentProductSupplierId(typedProduct.supplier_id)
+      setSelectedCatalogProductId(typedProduct.id)
+      setNameSearch(typedProduct.name)
+      setForm(buildSupplierProductFormState({
+        product: typedProduct,
+        price: typedOffer.price,
+        vatRate: typedOffer.vat_rate,
+        stockQuantity: typedOffer.stock_quantity,
+        minOrderQuantity: typedOffer.min_order_quantity,
+        leadTimeDays: typedOffer.lead_time_days,
+        shippingCost: typedOffer.shipping_cost,
+        freeShippingThreshold: typedOffer.free_shipping_threshold,
+        paymentOptions: typedOffer.payment_options,
+        notes: typedOffer.notes,
+        isActive: typedOffer.is_active,
+      }))
       setInitialLoading(false)
     }
+
     fetchData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offerId])
 
+  const handleCatalogSearchChange = (value: string) => {
+    setNameSearch(value)
+    setSelectedCatalogProductId(null)
+  }
+
+  const handleCatalogSelect = (productId: string) => {
+    const selectedProduct = results.find((product) => product.id === productId)
+    if (!selectedProduct) {
+      return
+    }
+
+    setSelectedCatalogProductId(selectedProduct.id)
+    setNameSearch(selectedProduct.name)
+    setResults([])
+    setForm((prev) => applyCatalogProductSelection(prev, selectedProduct))
+  }
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
-  }
-
-  const togglePayment = (val: string) => {
     setForm((prev) => ({
       ...prev,
-      payment_options: prev.payment_options.includes(val)
-        ? prev.payment_options.filter((v) => v !== val)
-        : [...prev.payment_options, val],
+      [name]: type === 'checkbox' ? checked : value,
     }))
+  }
+
+  const togglePaymentOption = (opt: string) => {
+    setForm((prev) => ({
+      ...prev,
+      payment_options: prev.payment_options.includes(opt)
+        ? prev.payment_options.filter((item) => item !== opt)
+        : [...prev.payment_options, opt],
+    }))
+  }
+
+  const navigateToSuggestionForm = () => {
+    router.push(`/supplier/urun-oner${nameSearch ? `?query=${encodeURIComponent(nameSearch)}` : ''}`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.price) { toast.error('Fiyat zorunludur'); return }
+
+    if (!selectedCatalogProductId) {
+      toast.error('Ürün adı için katalogdan seçim yapın')
+      return
+    }
+
+    if (!currentProductId || !form.name.trim() || !form.sku || !form.price) {
+      toast.error('Ürün adı, SKU ve fiyat zorunludur')
+      return
+    }
 
     setLoading(true)
+    let createdProductId: string | null = null
+
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        toast.error('Oturum bulunamadı')
+        return
+      }
+
+      let nextProductId = currentProductId
+      const catalogPayload = buildCatalogProductPayload(form, user.id)
+
+      if (currentProductSupplierId === user.id) {
+        const { error: productError } = await supabase
+          .from('catalog_products')
+          .update(catalogPayload)
+          .eq('id', currentProductId)
+          .eq('supplier_id', user.id)
+
+        if (productError) {
+          throw productError
+        }
+      } else {
+        const { data: product, error: productError } = await supabase
+          .from('catalog_products')
+          .insert(catalogPayload)
+          .select('id')
+          .single()
+
+        if (productError || !product) {
+          throw productError
+        }
+
+        createdProductId = product.id
+        nextProductId = product.id
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.from('offers') as any)
-        .update({
-          price: parseFloat(form.price),
-          vat_rate: parseInt(form.vat_rate) || 20,
-          stock_quantity: parseInt(form.stock_quantity) || 0,
-          min_order_quantity: parseInt(form.min_order_quantity) || 1,
-          lead_time_days: form.lead_time_days ? parseInt(form.lead_time_days) : null,
-          shipping_cost: form.shipping_cost ? parseFloat(form.shipping_cost) : null,
-          free_shipping_threshold: form.free_shipping_threshold ? parseFloat(form.free_shipping_threshold) : null,
-          payment_options: form.payment_options.length > 0 ? form.payment_options : null,
-          notes: form.notes || null,
-          is_active: form.is_active,
-        })
+      const { error: offerError } = await (supabase.from('offers') as any)
+        .update(buildOfferPayload(form, user.id, nextProductId))
         .eq('id', offerId)
+        .eq('supplier_id', user.id)
 
-      if (error) throw error
+      if (offerError) {
+        throw offerError
+      }
 
-      toast.success('Teklif başarıyla güncellendi')
+      if (createdProductId) {
+        setCurrentProductId(createdProductId)
+        setCurrentProductSupplierId(user.id)
+      }
+
+      toast.success('Ürün başarıyla güncellendi')
       router.push('/supplier/urunler')
     } catch (error) {
-      console.error('Offer update error:', error)
-      toast.error('Teklif güncellenirken bir hata oluştu')
+      if (createdProductId) {
+        await supabase
+          .from('catalog_products')
+          .delete()
+          .eq('id', createdProductId)
+      }
+
+      console.error('Supplier product update error:', error)
+      toast.error('Ürün güncellenirken bir hata oluştu')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async () => {
+    if (!currentProductId) {
+      return
+    }
+
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('offers')
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        toast.error('Oturum bulunamadı')
+        return
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: offerError } = await (supabase.from('offers') as any)
         .delete()
         .eq('id', offerId)
+        .eq('supplier_id', user.id)
 
-      if (error) throw error
+      if (offerError) {
+        throw offerError
+      }
 
-      toast.success('Teklif başarıyla silindi')
+      if (currentProductSupplierId === user.id) {
+        const { error: productError } = await supabase
+          .from('catalog_products')
+          .delete()
+          .eq('id', currentProductId)
+          .eq('supplier_id', user.id)
+
+        if (productError) {
+          console.error('Supplier-owned product cleanup error:', productError)
+        }
+      }
+
+      toast.success('Ürün başarıyla silindi')
       router.push('/supplier/urunler')
     } catch (error) {
-      console.error('Offer deletion error:', error)
-      toast.error('Teklif silinirken bir hata oluştu')
+      console.error('Supplier product delete error:', error)
+      toast.error('Ürün silinirken bir hata oluştu')
     } finally {
       setLoading(false)
     }
@@ -210,159 +346,253 @@ export default function TeklifDuzenlePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Teklif Düzenle</h1>
-
-      {/* Readonly Product Info */}
-      {product && (
-        <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-6 flex items-center gap-4">
-          <Image
-            src={getImageUrl(product.primary_image)}
-            alt={product.name}
-            width={64}
-            height={64}
-            className="w-16 h-16 rounded-lg object-cover bg-white border"
-            unoptimized
-          />
-          <div>
-            <h2 className="font-semibold text-gray-900">{product.name}</h2>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-0.5 text-sm text-gray-500">
-              {product.sku && <p>SKU: {product.sku}</p>}
-              {product.barcode && <p>Barkod: {product.barcode}</p>}
-              {product.category?.name && <p>Kategori: {product.category.name}</p>}
-              {product.brand?.name && <p>Marka: {product.brand.name}</p>}
-            </div>
-            {product.short_description && (
-              <p className="text-sm text-gray-600 mt-0.5">{product.short_description}</p>
-            )}
-            {product.description && (
-              <p className="text-sm text-gray-600 mt-0.5 line-clamp-2">{product.description}</p>
-            )}
-          </div>
-        </div>
-      )}
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Ürün Düzenle</h1>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Price & Stock */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CatalogProductNameSelect
+              value={nameSearch}
+              searching={searching}
+              results={results.map((product) => ({
+                id: product.id,
+                name: product.name,
+                sku: product.sku,
+              }))}
+              selectedProductId={selectedCatalogProductId}
+              onValueChange={handleCatalogSearchChange}
+              onSelect={handleCatalogSelect}
+              onSuggest={navigateToSuggestionForm}
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+              <input
+                type="text"
+                name="slug"
+                value={form.slug}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fiyat (₺) <span className="text-red-500">*</span>
+                SKU <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
-                name="price"
-                value={form.price}
+                type="text"
+                name="sku"
+                value={form.sku}
                 onChange={handleChange}
-                step="0.01"
-                min="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">KDV Oranı (%)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Barkod</label>
               <input
-                type="number"
-                name="vat_rate"
-                value={form.vat_rate}
+                type="text"
+                name="barcode"
+                value={form.barcode}
                 onChange={handleChange}
-                min="0"
-                max="100"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stok Miktarı</label>
-              <input
-                type="number"
-                name="stock_quantity"
-                value={form.stock_quantity}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+              <select
+                name="primary_category_id"
+                value={form.primary_category_id}
                 onChange={handleChange}
-                min="0"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="">Kategori seçin</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min. Sipariş Adedi</label>
-              <input
-                type="number"
-                name="min_order_quantity"
-                value={form.min_order_quantity}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Marka</label>
+              <select
+                name="brand_id"
+                value={form.brand_id}
                 onChange={handleChange}
-                min="1"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="">Marka seçin</option>
+                {brands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Delivery & Shipping */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Teslimat Süresi (gün)</label>
-              <input
-                type="number"
-                name="lead_time_days"
-                value={form.lead_time_days}
-                onChange={handleChange}
-                min="0"
-                placeholder="0 = Aynı gün"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Kargo Ücreti (₺)</label>
-              <input
-                type="number"
-                name="shipping_cost"
-                value={form.shipping_cost}
-                onChange={handleChange}
-                step="0.01"
-                min="0"
-                placeholder="0 = Ücretsiz"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ücretsiz Kargo Alt Limiti (₺)</label>
-              <input
-                type="number"
-                name="free_shipping_threshold"
-                value={form.free_shipping_threshold}
-                onChange={handleChange}
-                step="0.01"
-                min="0"
-                placeholder="Boş = yok"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kısa Açıklama</label>
+            <input
+              type="text"
+              name="short_description"
+              value={form.short_description}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={4}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <ImageUploader
+            currentImage={form.primary_image || null}
+            onUpload={(path) => setForm((prev) => ({ ...prev, primary_image: path }))}
+          />
+
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 border-t pt-6">Fiyat & Stok</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Fiyat (₺) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Karşılaştırma Fiyatı (₺)</label>
+                <input
+                  type="number"
+                  name="compare_at_price"
+                  value={form.compare_at_price}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">KDV Oranı (%)</label>
+                <input
+                  type="number"
+                  name="vat_rate"
+                  value={form.vat_rate}
+                  onChange={handleChange}
+                  min="0"
+                  max="100"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stok Miktarı</label>
+                <input
+                  type="number"
+                  name="stock_quantity"
+                  value={form.stock_quantity}
+                  onChange={handleChange}
+                  min="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Min. Sipariş Adedi</label>
+                <input
+                  type="number"
+                  name="min_order_quantity"
+                  value={form.min_order_quantity}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Teslimat Süresi (gün)</label>
+                <input
+                  type="number"
+                  name="lead_time_days"
+                  value={form.lead_time_days}
+                  onChange={handleChange}
+                  min="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kargo Ücreti (₺)</label>
+                <input
+                  type="number"
+                  name="shipping_cost"
+                  value={form.shipping_cost}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ücretsiz Kargo Eşiği (₺)</label>
+                <input
+                  type="number"
+                  name="free_shipping_threshold"
+                  value={form.free_shipping_threshold}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  placeholder="Boş = yok"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Payment Options */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Ödeme Seçenekleri</label>
             <div className="flex flex-wrap gap-2">
-              {PAYMENT_OPTIONS.map((opt) => {
-                const selected = form.payment_options.includes(opt.value)
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => togglePayment(opt.value)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                      selected
-                        ? 'bg-blue-100 border-blue-400 text-blue-700'
-                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                )
-              })}
+              {PAYMENT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => togglePaymentOption(option.value)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    form.payment_options.includes(option.value)
+                      ? 'bg-blue-100 border-blue-300 text-blue-800'
+                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Notlar</label>
             <textarea
@@ -370,12 +600,10 @@ export default function TeklifDuzenlePage() {
               value={form.notes}
               onChange={handleChange}
               rows={3}
-              placeholder="Ek bilgiler, özel koşullar..."
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* Active toggle */}
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -385,10 +613,11 @@ export default function TeklifDuzenlePage() {
               onChange={handleChange}
               className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Aktif</label>
+            <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+              Aktif
+            </label>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center justify-between border-t pt-6">
             <div className="flex items-center gap-4">
               <button
@@ -413,7 +642,7 @@ export default function TeklifDuzenlePage() {
                 onClick={() => setDeleteConfirm(true)}
                 className="px-6 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 text-sm font-medium"
               >
-                Teklifi Sil
+                Ürünü Sil
               </button>
             ) : (
               <div className="flex items-center gap-2">

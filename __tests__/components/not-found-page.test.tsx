@@ -9,6 +9,11 @@ describe('NotFound page', () => {
     expect(screen.getByText('404')).toBeInTheDocument()
   })
 
+  it('yeni marka logosunu göstermeli', () => {
+    render(<NotFound />)
+    expect(screen.getByAltText('dentalışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+  })
+
   it('"Sayfa Bulunamadı" başlığı render edilmeli', () => {
     render(<NotFound />)
     expect(screen.getByText('Sayfa Bulunamadı')).toBeInTheDocument()

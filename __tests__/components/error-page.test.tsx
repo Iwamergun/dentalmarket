@@ -13,6 +13,11 @@ describe('Error page', () => {
     expect(screen.getByText('Bir Hata Oluştu')).toBeInTheDocument()
   })
 
+  it('yeni marka logosunu göstermeli', () => {
+    render(<ErrorPage error={mockError} reset={mockReset} />)
+    expect(screen.getByAltText('dentalışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+  })
+
   it('"Tekrar Dene" butonu görünmeli', () => {
     render(<ErrorPage error={mockError} reset={mockReset} />)
     expect(screen.getByText('Tekrar Dene')).toBeInTheDocument()

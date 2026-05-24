@@ -11,13 +11,13 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Bildirim', body: event.data.text() }
   }
 
-  const { title = 'Dent Alışveriş', body = '', url = '/', icon = '/favicon.ico' } = payload
+  const { title = 'Dent Alışveriş', body = '', url = '/', icon = '/favicon.svg' } = payload
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon,
-      badge: '/favicon.ico',
+      badge: '/favicon.svg',
       data: { url },
     })
   )

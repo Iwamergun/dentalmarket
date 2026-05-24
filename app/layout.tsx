@@ -25,6 +25,22 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: "Dent Alışveriş - Diş Hekimliği Ürünleri ve Ekipmanları",
   description: "Diş hekimliği ürünleri ve ekipmanları için önde gelen B2B e-ticaret platformu",
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: '/favicon.svg',
+    apple: [{ url: '/apple-touch-icon.svg', type: 'image/svg+xml' }],
+  },
+  openGraph: {
+    title: 'Dent Alışveriş - Diş Hekimliği Ürünleri ve Ekipmanları',
+    description: 'Diş hekimliği ürünleri ve ekipmanları için önde gelen B2B e-ticaret platformu',
+    images: [
+      {
+        url: '/brand/dentalisveris-logo.svg',
+        type: 'image/svg+xml',
+        alt: 'dentalışveriş premium brand logo',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

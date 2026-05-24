@@ -1,0 +1,15 @@
+<svg width="180" height="180" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>dentalışveriş apple touch icon</title>
+  <rect width="512" height="512" rx="116" fill="#0B1220"/>
+  <rect x="86" y="86" width="340" height="340" rx="96" fill="#111827" stroke="#D7B56D" stroke-width="8"/>
+  <circle cx="256" cy="256" r="136" fill="url(#glow)" opacity="0.3"/>
+  <path d="M255.6 154.2C230 128 177.4 136 163 177C147.5 221.4 169.6 293 195.7 338.7C206.8 358.2 231.1 354.8 235 332.8L245.5 274.8C247.5 263.6 264.5 263.6 266.5 274.8L277 332.8C280.9 354.8 305.2 358.2 316.3 338.7C342.4 293 364.5 221.4 349 177C334.6 136 282 128 255.6 154.2Z" fill="#F8FAFC"/>
+  <path d="M186 243C212.9 267.3 299.1 267.3 326 243" stroke="#D7B56D" stroke-width="18" stroke-linecap="round"/>
+  <path d="M334 112L347.5 147.5L383 161L347.5 174.5L334 210L320.5 174.5L285 161L320.5 147.5L334 112Z" fill="#D7B56D"/>
+  <defs>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(136)">
+      <stop stop-color="#D7B56D"/>
+      <stop offset="1" stop-color="#D7B56D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

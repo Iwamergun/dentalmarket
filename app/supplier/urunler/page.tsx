@@ -60,7 +60,7 @@ export default async function SupplierTekliflerimPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Tekliflerim</h1>
         <Link
-          href="/supplier/urunler/yeni"
+          href="/admin/products/new"
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />

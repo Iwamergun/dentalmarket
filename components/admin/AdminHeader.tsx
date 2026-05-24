@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
-import { Bell, LogOut, Home } from 'lucide-react'
+import { LogOut, Home } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
+import NotificationBell from '@/components/notifications/NotificationBell'
 
 interface AdminHeaderProps {
   user: User
@@ -42,11 +43,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
             <span className="hidden md:inline">Ana Sayfa</span>
           </Link>
 
-          {/* Bildirim butonu */}
-          <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-          </button>
+          <NotificationBell />
 
           {/* User info */}
           <div className="text-right">

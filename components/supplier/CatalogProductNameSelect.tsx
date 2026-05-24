@@ -15,7 +15,7 @@ interface CatalogProductNameSelectProps {
   selectedProductId: string | null
   onValueChange: (value: string) => void
   onSelect: (productId: string) => void
-  onSuggest: () => void
+  onSuggest?: () => void
 }
 
 export default function CatalogProductNameSelect({
@@ -82,7 +82,7 @@ export default function CatalogProductNameSelect({
         </p>
       )}
 
-      {hasSearch && !searching && results.length === 0 && (
+      {hasSearch && !searching && results.length === 0 && onSuggest && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm text-amber-900">
             Sonuç bulunamadı. Katalogda yoksa öneri gönderebilirsiniz.

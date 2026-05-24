@@ -5,6 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { LogOut } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
+import NotificationBell from '@/components/notifications/NotificationBell'
 
 interface SupplierHeaderProps {
   user: User
@@ -31,6 +32,8 @@ export default function SupplierHeader({ user }: SupplierHeaderProps) {
         </h2>
 
         <div className="flex items-center gap-4">
+          <NotificationBell />
+
           <div className="text-right">
             <p className="text-sm font-medium text-gray-700">{user.email}</p>
             <p className="text-xs text-gray-500">Tedarikçi</p>

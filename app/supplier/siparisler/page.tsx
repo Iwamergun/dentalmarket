@@ -21,8 +21,14 @@ type SupplierOrderSummary = {
   shipping_address: ShippingAddress | string | null
 }
 
-export default async function SupplierSiparislerPage() {
+export default async function SupplierSiparislerPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ orderNumber?: string }>
+}) {
   const cookieStore = await cookies()
+  const resolvedSearchParams = searchParams ? await searchParams : {}
+  const orderNumberFilter = resolvedSearchParams.orderNumber?.trim()
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -140,9 +146,24 @@ export default async function SupplierSiparislerPage() {
     return shippingAddress.full_name || '-'
   }
 
+  const filteredOrderItems = (orderItems ?? []).filter((item) => {
+    if (!orderNumberFilter) {
+      return true
+    }
+
+    const order = getOrderSummary(item.orders)
+    return order?.order_number === orderNumberFilter
+  })
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Siparişler</h1>
+
+      {orderNumberFilter && (
+        <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+          Filtrelenen sipariş: <span className="font-semibold">{orderNumberFilter}</span>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="overflow-x-auto">
@@ -159,14 +180,14 @@ export default async function SupplierSiparislerPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {(orderItems ?? []).length === 0 ? (
+              {filteredOrderItems.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                    Henüz sipariş yok
+                    {orderNumberFilter ? 'Bu siparişe ait kayıt bulunamadı' : 'Henüz sipariş yok'}
                   </td>
                 </tr>
               ) : (
-                (orderItems ?? []).map((item) => {
+                filteredOrderItems.map((item) => {
                   const order = getOrderSummary(item.orders)
                   if (!order) return null
                   return (

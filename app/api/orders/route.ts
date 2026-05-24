@@ -5,6 +5,10 @@ import { checkoutSchema } from '@/lib/validations/checkout'
 import { z } from 'zod'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import {
+  buildSupplierOrderNotifications,
+  resolveClinicNotificationName,
+} from '@/lib/notifications/order-notifications'
+import {
   generateInvoiceNumber,
   buildInvoiceData,
   mapOrderItems,
@@ -183,6 +187,97 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Sipariş sonucu alınamadı' },
         { status: 500 }
+      )
+    }
+
+    try {
+      const shippingFullName = `${address.firstName} ${address.lastName}`.trim()
+      const clinicName = user?.id
+        ? await (async () => {
+            const { data: profile } = await adminSupabase
+              .from('profiles')
+              .select('company_name')
+              .eq('id', user.id)
+              .maybeSingle()
+
+            return resolveClinicNotificationName({
+              companyName: profile?.company_name,
+              shippingFullName,
+            })
+          })()
+        : resolveClinicNotificationName({ shippingFullName })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: orderItemsForNotifications } = await (adminSupabase as any)
+        .from('order_items')
+        .select('offer_id, product_id, quantity, product_name')
+        .eq('order_id', orderId)
+
+      const notificationItems = (orderItemsForNotifications ?? []) as Array<{
+        offer_id: string | null
+        product_id: string
+        quantity: number
+        product_name: string | null
+      }>
+
+      const offerIds = Array.from(
+        new Set(notificationItems.map((item) => item.offer_id).filter((offerId): offerId is string => Boolean(offerId)))
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: offersForNotifications } = offerIds.length > 0 ? await (adminSupabase as any)
+        .from('offers')
+        .select('id, supplier_id')
+        .in('id', offerIds) : { data: [] as Array<{ id: string; supplier_id: string }> }
+
+      const offerSupplierMap = new Map(
+        ((offersForNotifications ?? []) as Array<{ id: string; supplier_id: string }>)
+          .map((offer) => [offer.id, offer.supplier_id])
+      )
+
+      const missingNameProductIds = Array.from(
+        new Set(
+          notificationItems
+            .filter((item) => !item.product_name)
+            .map((item) => item.product_id)
+        )
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: productNamesForNotifications } = missingNameProductIds.length > 0 ? await (adminSupabase as any)
+        .from('catalog_products')
+        .select('id, name')
+        .in('id', missingNameProductIds) : { data: [] as Array<{ id: string; name: string }> }
+
+      const productNameMap = new Map(
+        ((productNamesForNotifications ?? []) as Array<{ id: string; name: string }>)
+          .map((product) => [product.id, product.name])
+      )
+
+      const notifications = buildSupplierOrderNotifications({
+        orderId,
+        orderNumber,
+        clinicName,
+        items: notificationItems.map((item) => ({
+          supplierId: item.offer_id ? offerSupplierMap.get(item.offer_id) ?? null : null,
+          productName: item.product_name ?? productNameMap.get(item.product_id) ?? 'Ürün',
+          quantity: item.quantity,
+        })),
+      })
+
+      if (notifications.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (adminSupabase as any)
+          .from('user_notifications')
+          .upsert(notifications, {
+            onConflict: 'user_id,dedupe_key',
+            ignoreDuplicates: true,
+          })
+      }
+    } catch (notificationError) {
+      console.error(
+        'Order notification error (non-fatal):',
+        notificationError instanceof Error ? notificationError.message : notificationError
       )
     }
 

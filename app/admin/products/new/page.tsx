@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
 import ImageUploader from '@/components/admin/ImageUploader'
+import CatalogProductNameSelect from '@/components/supplier/CatalogProductNameSelect'
+import type { CatalogProductSelection } from '@/lib/products/supplierProductForm'
 
 function slugify(text: string) {
   return text
@@ -29,6 +31,10 @@ export default function AdminNewProductPage() {
 
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
   const [brands, setBrands] = useState<{ id: string; name: string }[]>([])
+  const [nameSearch, setNameSearch] = useState('')
+  const [results, setResults] = useState<CatalogProductSelection[]>([])
+  const [searching, setSearching] = useState(false)
+  const [selectedCatalogProductId, setSelectedCatalogProductId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     name: '',
@@ -48,6 +54,31 @@ export default function AdminNewProductPage() {
     min_order_quantity: '1',
   })
 
+  const searchProducts = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setResults([])
+      return
+    }
+
+    setSearching(true)
+    try {
+      const { data } = await supabase
+        .from('catalog_products')
+        .select('id, name, slug, sku, barcode, short_description, description, primary_category_id, brand_id, primary_image, compare_at_price')
+        .eq('is_active', true)
+        .or(`name.ilike.%${query}%,sku.ilike.%${query}%`)
+        .order('name')
+        .limit(20)
+
+      setResults((data ?? []) as CatalogProductSelection[])
+    } catch (error) {
+      console.error('Catalog product search error:', error)
+      setResults([])
+    } finally {
+      setSearching(false)
+    }
+  }, [supabase])
+
   useEffect(() => {
     const fetchData = async () => {
       const [{ data: cats }, { data: brs }] = await Promise.all([
@@ -61,9 +92,40 @@ export default function AdminNewProductPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value
-    setForm((prev) => ({ ...prev, name, slug: slugify(name) }))
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchProducts(nameSearch)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [nameSearch, searchProducts])
+
+  const handleCatalogSearchChange = (value: string) => {
+    setNameSearch(value)
+    setSelectedCatalogProductId(null)
+  }
+
+  const handleCatalogSelect = (productId: string) => {
+    const selectedProduct = results.find((product) => product.id === productId)
+    if (!selectedProduct) {
+      return
+    }
+
+    setSelectedCatalogProductId(selectedProduct.id)
+    setNameSearch(selectedProduct.name)
+    setResults([])
+    setForm((prev) => ({
+      ...prev,
+      name: selectedProduct.name,
+      slug: selectedProduct.slug || slugify(selectedProduct.name),
+      sku: selectedProduct.sku ?? '',
+      barcode: selectedProduct.barcode ?? '',
+      short_description: selectedProduct.short_description ?? '',
+      description: selectedProduct.description ?? '',
+      primary_category_id: selectedProduct.primary_category_id ?? '',
+      brand_id: selectedProduct.brand_id ?? '',
+      primary_image: selectedProduct.primary_image ?? '',
+    }))
   }
 
   const handleChange = (
@@ -79,6 +141,11 @@ export default function AdminNewProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!selectedCatalogProductId) {
+      toast.error('Ürün adı için katalogdan seçim yapın')
+      return
+    }
+
     if (!form.name || !form.sku || !form.price) {
       toast.error('Ürün adı, SKU ve fiyat zorunludur')
       return
@@ -156,19 +223,18 @@ export default function AdminNewProductPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ürün Adı <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleNameChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+            <CatalogProductNameSelect
+              value={nameSearch}
+              searching={searching}
+              results={results.map((product) => ({
+                id: product.id,
+                name: product.name,
+                sku: product.sku,
+              }))}
+              selectedProductId={selectedCatalogProductId}
+              onValueChange={handleCatalogSearchChange}
+              onSelect={handleCatalogSelect}
+            />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
               <input

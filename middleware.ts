@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    const isRestrictedCatalogProductPath = pathname === '/admin/products/new' || ADMIN_PRODUCT_EDIT_PATH.test(pathname)
+    const isRestrictedCatalogProductPath = ADMIN_PRODUCT_EDIT_PATH.test(pathname)
     if (isRestrictedCatalogProductPath && !hasCatalogAdminAccess(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/supplier/urunler/yeni'

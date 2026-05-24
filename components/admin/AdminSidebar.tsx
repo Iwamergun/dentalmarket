@@ -66,7 +66,7 @@ export default function AdminSidebar({ mobileOpen = false, onClose }: AdminSideb
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/45">
                 Spark Admin
               </p>
-              <h1 className="mt-1 text-lg font-semibold text-white">Dent Alışveriş</h1>
+              <h1 className="mt-1 text-lg font-semibold text-white">DentAlışveriş</h1>
             </div>
           </div>
           <button

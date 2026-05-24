@@ -25,7 +25,7 @@ const brandLogoSources: Record<BrandLogoVariant, { src: string; width: number; h
 
 export function BrandLogo({
   variant = 'full',
-  alt = 'dentalışveriş',
+  alt = 'DentAlışveriş',
   className,
   ...props
 }: BrandLogoProps) {

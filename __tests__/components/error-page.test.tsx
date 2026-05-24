@@ -15,7 +15,7 @@ describe('Error page', () => {
 
   it('yeni marka logosunu göstermeli', () => {
     render(<ErrorPage error={mockError} reset={mockReset} />)
-    expect(screen.getByAltText('dentalışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+    expect(screen.getByAltText('DentAlışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
   })
 
   it('"Tekrar Dene" butonu görünmeli', () => {

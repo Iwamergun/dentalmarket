@@ -11,7 +11,7 @@ describe('NotFound page', () => {
 
   it('yeni marka logosunu göstermeli', () => {
     render(<NotFound />)
-    expect(screen.getByAltText('dentalışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+    expect(screen.getByAltText('DentAlışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
   })
 
   it('"Sayfa Bulunamadı" başlığı render edilmeli', () => {

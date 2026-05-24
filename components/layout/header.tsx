@@ -120,12 +120,11 @@ export function Header() {
             <Link href="/" className="flex items-center gap-3 shrink-0">
               <BrandLogo
                 variant="icon"
-                className="h-12 w-12 shrink-0 sm:hidden"
+                className="h-12 w-12 shrink-0 rounded-2xl md:h-14 md:w-14"
               />
-              <BrandLogo
-                variant="full"
-                className="hidden h-10 w-auto sm:block md:h-11"
-              />
+              <span className="font-serif text-[1.3rem] font-semibold tracking-[0.01em] text-slate-900 sm:text-[1.45rem] md:text-[1.6rem]">
+                DentAlışveriş
+              </span>
             </Link>
 
             {/* Search Bar - Desktop */}

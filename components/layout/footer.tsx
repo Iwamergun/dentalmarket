@@ -84,7 +84,6 @@ export async function Footer() {
                 className="h-10 w-auto max-w-full"
               />
             </Link>
-            <p className="mb-5 text-xs font-medium uppercase tracking-[0.22em] text-slate-400">Premium dental marketplace</p>
             <p className="max-w-md text-sm leading-6 text-slate-300">
               Türkiye&apos;nin dental B2B ticaretini daha hızlı, daha güvenilir ve daha okunabilir bir arayüzle yeniden düzenliyoruz.
             </p>
@@ -197,7 +196,7 @@ export async function Footer() {
 
       <div className="border-t border-primary/10 bg-white/55">
         <div className="container-main flex flex-col items-center justify-between gap-4 py-6 text-sm text-slate-500 md:flex-row">
-          <p>© {new Date().getFullYear()} Dent Alışveriş. Tüm hakları saklıdır.</p>
+          <p>© {new Date().getFullYear()} DentAlışveriş. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-6">
             <Link href="/gizlilik-politikasi" className="transition-colors hover:text-primary">
               Gizlilik Politikası

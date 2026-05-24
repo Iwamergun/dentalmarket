@@ -29,7 +29,7 @@ export default function SupplierSidebar() {
             className="h-11 w-11 shrink-0"
           />
           <div>
-            <h1 className="text-lg font-bold leading-tight text-white">Dent Alışveriş</h1>
+            <h1 className="text-lg font-bold leading-tight text-white">DentAlışveriş</h1>
             <p className="mt-1 text-xs text-gray-400">Tedarikçi Paneli</p>
           </div>
         </Link>

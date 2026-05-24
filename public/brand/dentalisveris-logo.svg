@@ -1,25 +1,19 @@
-<svg width="960" height="240" viewBox="0 0 960 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <title>dentalışveriş premium logo</title>
-  <rect x="24" y="24" width="192" height="192" rx="52" fill="#0B1220"/>
-  <rect x="36" y="36" width="168" height="168" rx="44" fill="#111827" stroke="#D7B56D" stroke-width="4"/>
-  <circle cx="120" cy="120" r="66" fill="url(#glow)" opacity="0.42"/>
-  <path d="M119.9 73.5C107.1 60.4 80.7 64.4 73.5 85.1C65.7 107.5 76.8 143.6 89.8 166.8C95.4 176.6 107.6 174.9 109.6 163.8L114.7 134.6C115.8 128.9 124 128.9 125.1 134.6L130.2 163.8C132.2 174.9 144.4 176.6 150 166.8C163 143.6 174.1 107.5 166.3 85.1C159.1 64.4 132.7 60.4 119.9 73.5Z" fill="#F8FAFC"/>
-  <path d="M84 116C97.9 128.6 142.1 128.6 156 116" stroke="#D7B56D" stroke-width="9" stroke-linecap="round"/>
-  <path d="M158 58L163.8 72.4L178 78L163.8 83.6L158 98L152.2 83.6L138 78L152.2 72.4L158 58Z" fill="#D7B56D"/>
-  <circle cx="78" cy="64" r="5" fill="#D7B56D"/>
-  <text x="252" y="112" fill="#0B1220" font-family="Outfit, Inter, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-2.5">dentalışveriş</text>
-  <path d="M253 139H667" stroke="url(#goldLine)" stroke-width="6" stroke-linecap="round"/>
-  <circle cx="688" cy="139" r="6" fill="#D7B56D"/>
-  <text x="252" y="182" fill="#6B7280" font-family="DM Sans, Inter, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="3">PREMIUM DENTAL MARKETPLACE</text>
+<svg width="960" height="220" viewBox="0 0 960 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>DentAlışveriş logo</title>
+  <rect x="20" y="20" width="180" height="180" rx="48" fill="#0B1220"/>
+  <rect x="32" y="32" width="156" height="156" rx="40" fill="#111827" stroke="#D7B56D" stroke-width="4"/>
+  <circle cx="110" cy="110" r="61" fill="url(#glow)" opacity="0.42"/>
+  <path d="M109.9 67.8C98.1 55.7 73.8 59.4 67.2 78.5C60 99.2 70.3 132.6 82.2 154.1C87.4 163.2 98.6 161.6 100.4 151.3L105.1 124.2C106.1 119 113.7 119 114.7 124.2L119.4 151.3C121.2 161.6 132.4 163.2 137.6 154.1C149.5 132.6 159.8 99.2 152.6 78.5C146 59.4 121.7 55.7 109.9 67.8Z" fill="#F8FAFC"/>
+  <path d="M76 106C88.8 117.6 129.2 117.6 142 106" stroke="#D7B56D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M144 54L149.2 67L162 72L149.2 77L144 90L138.8 77L126 72L138.8 67L144 54Z" fill="#D7B56D"/>
+  <circle cx="70" cy="60" r="4.5" fill="#D7B56D"/>
+
+  <text x="238" y="132" fill="#0B1220" font-family="Cormorant Garamond, Playfair Display, Georgia, serif" font-size="74" font-weight="700" letter-spacing="0.2">DentAlışveriş</text>
+
   <defs>
-    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(120 120) rotate(90) scale(66)">
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(110 110) rotate(90) scale(61)">
       <stop stop-color="#D7B56D"/>
       <stop offset="1" stop-color="#D7B56D" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="goldLine" x1="253" y1="139" x2="667" y2="139" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#B98A32"/>
-      <stop offset="0.5" stop-color="#F3D790"/>
-      <stop offset="1" stop-color="#B98A32"/>
-    </linearGradient>
   </defs>
 </svg>

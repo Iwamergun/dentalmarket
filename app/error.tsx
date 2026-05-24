@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 
 export default function Error({
   error,
@@ -24,14 +25,11 @@ export default function Error({
         .tooth-wobble { animation: wobble 1.8s ease-in-out infinite; }
       `}</style>
 
-      {/* Brand Logo */}
-      <div className="mb-8 flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-md">
-          <span className="text-lg font-bold text-white">DA</span>
-        </div>
-        <span className="text-xl font-extrabold text-primary">
-          Dent Alışveriş
-        </span>
+      <div className="mb-8 flex justify-center">
+        <BrandLogo
+          variant="full"
+          className="h-11 w-auto max-w-[240px]"
+        />
       </div>
 
       <div className="w-full max-w-md rounded-2xl border border-border bg-background-card p-8 text-center shadow-lg">

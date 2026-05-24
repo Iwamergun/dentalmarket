@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 
 async function getFooterStats() {
   try {
@@ -78,14 +79,12 @@ export async function Footer() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1fr]">
           <div className="rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-primary via-secondary to-[#0f172a] px-6 py-7 text-slate-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
             <Link href="/" className="mb-5 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent shadow-lg shadow-primary/20">
-                <span className="text-lg font-bold text-white">DA</span>
-              </div>
-              <div>
-                <span className="block text-2xl font-extrabold text-white">Dent Alışveriş</span>
-                <span className="text-xs font-medium uppercase tracking-[0.22em] text-slate-400">Premium dental marketplace</span>
-              </div>
+              <BrandLogo
+                variant="full"
+                className="h-10 w-auto max-w-full"
+              />
             </Link>
+            <p className="mb-5 text-xs font-medium uppercase tracking-[0.22em] text-slate-400">Premium dental marketplace</p>
             <p className="max-w-md text-sm leading-6 text-slate-300">
               Türkiye&apos;nin dental B2B ticaretini daha hızlı, daha güvenilir ve daha okunabilir bir arayüzle yeniden düzenliyoruz.
             </p>

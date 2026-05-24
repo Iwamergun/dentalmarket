@@ -9,6 +9,11 @@ describe('Loading page', () => {
     expect(screen.getByText(/yükleniyor/i)).toBeInTheDocument()
   })
 
+  it('yeni marka logosu render edilmeli', () => {
+    render(<Loading />)
+    expect(screen.getByAltText('dentalışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+  })
+
   it('spinner (animate-spin class\'lı element) mevcut olmalı', () => {
     const { container } = render(<Loading />)
     const spinner = container.querySelector('.animate-spin')

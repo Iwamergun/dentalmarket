@@ -6,6 +6,7 @@ import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { Shield, Phone, Mail, Menu, X, Search, Heart, Sparkles } from 'lucide-react'
 
 export function Header() {
@@ -14,7 +15,6 @@ export function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [scrollOffset, setScrollOffset] = useState(0)
   const profileRef = useRef<HTMLDivElement>(null)
   const { user, loading } = useAuth()
 
@@ -60,7 +60,6 @@ export function Header() {
   useEffect(() => {
     function handleScroll() {
       const nextScrollOffset = Math.min(window.scrollY, 180)
-      setScrollOffset(nextScrollOffset)
       setIsScrolled(nextScrollOffset > 24)
     }
 
@@ -118,18 +117,15 @@ export function Header() {
           </div>
           <div className={['relative flex items-center justify-between gap-4 transition-all duration-300', headerHeight].join(' ')}>
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent shadow-lg shadow-secondary/20">
-                <span className="text-white font-bold text-xl">DA</span>
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-2xl font-extrabold text-primary">
-                  Dent Alışveriş
-                </span>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-secondary-text">
-                  Premium dental marketplace
-                </p>
-              </div>
+            <Link href="/" className="flex items-center gap-3 shrink-0">
+              <BrandLogo
+                variant="icon"
+                className="h-12 w-12 shrink-0 sm:hidden"
+              />
+              <BrandLogo
+                variant="full"
+                className="hidden h-10 w-auto sm:block md:h-11"
+              />
             </Link>
 
             {/* Search Bar - Desktop */}

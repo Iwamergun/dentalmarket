@@ -66,7 +66,7 @@ export default function ProfilPage() {
               .from('profiles')
               .insert({
                 id: user.id,
-                role: 'customer',
+                role: 'clinic',
               })
               .select()
               .single()

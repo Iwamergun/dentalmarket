@@ -18,6 +18,7 @@ import {
 } from '@/lib/invoice/generate-invoice-pdf'
 import { sendEmail, isEmailConfigured } from '@/lib/email/mailer'
 import { buildOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation'
+import { calculateShippingCost } from '@/lib/orders/shipping'
 
 // Sipariş oluşturma request şeması
 const createOrderSchema = z.object({
@@ -75,6 +76,16 @@ type CreateOrderTransactionClient = {
   }>
 }
 
+type ActiveOfferRow = {
+  id: string
+  product_id: string
+  variant_id: string | null
+  supplier_id: string
+  price: number
+  shipping_cost: number | null
+  free_shipping_threshold: number | null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request)
@@ -120,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     const { data: offersData, error: offersError } = await adminSupabase
       .from('offers')
-      .select('id, product_id, variant_id, price')
+      .select('id, product_id, variant_id, supplier_id, price, shipping_cost, free_shipping_threshold')
       .in('product_id', uniqueProductIds)
       .eq('is_active', true)
       .order('price', { ascending: true })
@@ -134,11 +145,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Her (product_id, variant_id) çifti için en ucuz teklifin fiyatını bul
-    const offerPriceMap = new Map<string, number>()
-    for (const offer of (offersData ?? [])) {
+    const offerMap = new Map<string, ActiveOfferRow>()
+    for (const offer of ((offersData ?? []) as ActiveOfferRow[])) {
       const key = `${offer.product_id}:${offer.variant_id ?? ''}`
-      if (!offerPriceMap.has(key)) {
-        offerPriceMap.set(key, offer.price)
+      if (!offerMap.has(key)) {
+        offerMap.set(key, offer)
       }
     }
 
@@ -150,10 +161,20 @@ export async function POST(request: NextRequest) {
       quantity: number
       price: number
     }> = []
+    const serverShippingItems: Array<{
+      offer: {
+        supplier_id: string
+        shipping_cost: number | null
+        free_shipping_threshold: number | null
+      }
+      quantity: number
+      unitPrice: number
+    }> = []
 
     for (const item of items) {
       const key = `${item.product_id}:${item.variant_id ?? ''}`
-      const serverPrice = offerPriceMap.get(key)
+      const selectedOffer = offerMap.get(key)
+      const serverPrice = selectedOffer?.price
 
       if (serverPrice === undefined) {
         return NextResponse.json(
@@ -177,6 +198,17 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
         price: serverPrice,
       })
+      if (selectedOffer) {
+        serverShippingItems.push({
+          offer: {
+            supplier_id: selectedOffer.supplier_id,
+            shipping_cost: selectedOffer.shipping_cost,
+            free_shipping_threshold: selectedOffer.free_shipping_threshold,
+          },
+          quantity: item.quantity,
+          unitPrice: serverPrice,
+        })
+      }
     }
 
     // İstemcinin bildirdiği ara toplam ile sunucuda hesaplanan ara toplamı karşılaştır
@@ -187,7 +219,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const serverTotal = serverSubtotal + shipping
+    const serverShipping = calculateShippingCost(serverShippingItems)
+    if (Math.abs(shipping - serverShipping) > PRICE_TOLERANCE) {
+      return NextResponse.json(
+        { error: 'Kargo tutarı değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
+        { status: 409 }
+      )
+    }
+
+    const serverTotal = serverSubtotal + serverShipping
     if (Math.abs(total - serverTotal) > PRICE_TOLERANCE) {
       return NextResponse.json(
         { error: 'Toplam tutar değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
@@ -224,7 +264,7 @@ export async function POST(request: NextRequest) {
         p_payment_status: 'pending',
         p_payment_method: paymentMethod,
         p_subtotal: serverSubtotal,
-        p_shipping_cost: shipping,
+        p_shipping_cost: serverShipping,
         p_total: serverTotal,
         p_shipping_address: shippingAddressPayload,
         p_notes: address.notes || null,
@@ -399,7 +439,7 @@ export async function POST(request: NextRequest) {
         id: orderId,
         order_number: orderNumber,
         subtotal: serverSubtotal,
-        shipping_cost: shipping,
+        shipping_cost: serverShipping,
         total: serverTotal,
         shipping_address: {
           first_name: address.firstName,
@@ -480,7 +520,7 @@ export async function POST(request: NextRequest) {
           customerName: `${address.firstName} ${address.lastName}`,
           paymentMethod,
           subtotal: serverSubtotal,
-          shippingCost: shipping,
+          shippingCost: serverShipping,
           total: serverTotal,
           items: mappedItems.map((mi) => ({
             product_name: mi.product_name,

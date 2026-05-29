@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
+import { hasCatalogAdminAccess } from '@/lib/auth/access'
 
 type ProductSuggestion = {
   id: string
@@ -27,7 +27,7 @@ export default async function AdminProductSuggestionsPage() {
     .eq('id', user.id)
     .single()
 
-  if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) redirect('/')
+  if (!hasCatalogAdminAccess(profile?.role)) redirect('/')
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: suggestions } = await ((supabase as any).from('product_suggestions') as any)

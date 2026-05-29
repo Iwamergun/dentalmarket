@@ -21,6 +21,11 @@ describe('loginSchema', () => {
 
 describe('registerSchema', () => {
   const validData = {
+    role: 'clinic',
+    company_name: 'Klinik A',
+    tax_number: '',
+    phone: '05321234567',
+    store_description: '',
     firstName: 'Ali',
     lastName: 'Yılmaz',
     email: 'ali@example.com',
@@ -41,6 +46,41 @@ describe('registerSchema', () => {
   it('eksik zorunlu alan reddedilmeli', () => {
     const { firstName, ...rest } = validData
     const result = registerSchema.safeParse(rest)
+    expect(result.success).toBe(false)
+  })
+
+  it('depo için vergi numarası zorunlu olmalı', () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      role: 'depo',
+      tax_number: '',
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('depo için vergi numarası 10 hane ve sadece rakam olmalı', () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      role: 'depo',
+      tax_number: '12345678901',
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('clinic için vergi numarası opsiyonel olmalı', () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      role: 'clinic',
+      tax_number: '',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('kayıttan admin rolü atanamamalı', () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      role: 'admin',
+    })
     expect(result.success).toBe(false)
   })
 })

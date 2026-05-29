@@ -1,5 +1,6 @@
 const ADMIN_TOKENS = new Set([
   'admin',
+  'depo',
   'super_admin',
   'superadmin',
   'admin:access',
@@ -53,18 +54,7 @@ export function hasAdminAccess(
 
 const CATALOG_ADMIN_ROLES = new Set(['admin', 'super_admin', 'superadmin'])
 const SUPPLIER_PANEL_TOKENS = new Set([
-  'supplier',
   'depo',
-  'depot',
-  'warehouse',
-  'inventory',
-  'stock',
-  'inventory_manager',
-  'stock_manager',
-  'warehouse_manager',
-  'depo_yonetimi',
-  'depo_yoneticisi',
-  'depot_manager',
 ])
 
 function hasSupplierPanelToken(value: unknown): boolean {

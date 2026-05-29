@@ -64,7 +64,7 @@ async function getSupplierData(slug: string) {
     .from('profiles')
     .select('id, company_name, store_description, store_logo_url, store_slug, phone, avg_rating, total_ratings, total_sales')
     .eq('store_slug', slug)
-    .eq('role', 'supplier')
+    .eq('role', 'depo')
     .eq('is_active', true)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .single() as any)

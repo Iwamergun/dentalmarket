@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,16 +12,21 @@ import { Input } from '@/components/ui/input'
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const supabase = createClient()
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     getValues,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      role: 'clinic',
+      company_name: '',
+      tax_number: '',
+      phone: '',
+      store_description: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -35,24 +39,24 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            full_name: `${data.firstName} ${data.lastName}`,
-          },
-          emailRedirectTo: `${window.location.origin}/giris`,
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          ...data,
+          emailRedirectTo: `${window.location.origin}/giris`,
+        }),
       })
 
-      if (error) {
-        if (error.message.includes('already registered')) {
+      const result = await response.json()
+
+      if (!response.ok) {
+        if (result?.error?.includes('zaten kayıtlı')) {
           toast.error('Bu e-posta adresi zaten kayıtlı')
         } else {
-          toast.error(error.message || 'Kayıt olurken bir hata oluştu')
+          toast.error(result?.error || 'Kayıt olurken bir hata oluştu')
         }
         return
       }
@@ -66,6 +70,8 @@ export default function RegisterPage() {
       setIsLoading(false)
     }
   }
+
+  const selectedRole = watch('role')
 
   // Email doğrulama başarı ekranı
   if (isSuccess) {
@@ -197,6 +203,94 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-500">{errors.email.message}</p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-text-primary">
+                Hesap Türü
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 cursor-pointer">
+                  <input type="radio" value="clinic" disabled={isLoading} {...register('role')} />
+                  <span className="text-sm text-text-primary">Klinik / Müşteri</span>
+                </label>
+                <label className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 cursor-pointer">
+                  <input type="radio" value="depo" disabled={isLoading} {...register('role')} />
+                  <span className="text-sm text-text-primary">Depo / Satıcı</span>
+                </label>
+              </div>
+              {errors.role && (
+                <p className="text-sm text-red-500">{errors.role.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="company_name" className="block text-sm font-medium text-text-primary">
+                Firma / Klinik Adı
+              </label>
+              <Input
+                id="company_name"
+                type="text"
+                placeholder="Firma adınız"
+                disabled={isLoading}
+                {...register('company_name')}
+                className={errors.company_name ? 'border-red-500 focus:border-red-500' : ''}
+              />
+              {errors.company_name && (
+                <p className="text-sm text-red-500">{errors.company_name.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-text-primary">
+                Telefon
+              </label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="05XXXXXXXXX"
+                disabled={isLoading}
+                {...register('phone')}
+                className={errors.phone ? 'border-red-500 focus:border-red-500' : ''}
+              />
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="tax_number" className="block text-sm font-medium text-text-primary">
+                Vergi Numarası {selectedRole === 'clinic' ? '(Opsiyonel)' : ''}
+              </label>
+              <Input
+                id="tax_number"
+                type="text"
+                placeholder="10 haneli vergi no"
+                disabled={isLoading}
+                {...register('tax_number')}
+                className={errors.tax_number ? 'border-red-500 focus:border-red-500' : ''}
+              />
+              {errors.tax_number && (
+                <p className="text-sm text-red-500">{errors.tax_number.message}</p>
+              )}
+            </div>
+
+            {selectedRole === 'depo' && (
+              <div className="space-y-2">
+                <label htmlFor="store_description" className="block text-sm font-medium text-text-primary">
+                  Mağaza Açıklaması (Opsiyonel)
+                </label>
+                <textarea
+                  id="store_description"
+                  rows={3}
+                  disabled={isLoading}
+                  {...register('store_description')}
+                  className={`w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.store_description ? 'border-red-500 focus:border-red-500' : 'border-border'}`}
+                />
+                {errors.store_description && (
+                  <p className="text-sm text-red-500">{errors.store_description.message}</p>
+                )}
+              </div>
+            )}
 
             {/* Password */}
             <div className="space-y-2">

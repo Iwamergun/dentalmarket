@@ -4,12 +4,12 @@ import { getAuthMetadata, hasAdminAccess, hasCatalogAdminAccess, hasSupplierPane
 describe('auth access helpers', () => {
   it('allows admin-like profile roles', () => {
     expect(hasAdminAccess('admin')).toBe(true)
+    expect(hasAdminAccess('depo')).toBe(true)
     expect(hasAdminAccess('super_admin')).toBe(true)
     expect(hasAdminAccess('superadmin')).toBe(true)
   })
 
-  it('depo/warehouse/stock rolleri artık admin sayılmaz — depo ≠ admin', () => {
-    expect(hasAdminAccess('depo')).toBe(false)
+  it('legacy warehouse/stock rolleri admin sayılmaz', () => {
     expect(hasAdminAccess('depot')).toBe(false)
     expect(hasAdminAccess('warehouse')).toBe(false)
     expect(hasAdminAccess('stock')).toBe(false)
@@ -48,12 +48,9 @@ describe('auth access helpers', () => {
     expect(hasCatalogAdminAccess('depo')).toBe(false)
   })
 
-  it('supplier panel access should allow supplier and depo-like roles but not admin', () => {
-    expect(hasSupplierPanelAccess('supplier')).toBe(true)
+  it('supplier panel access should allow only depo role', () => {
     expect(hasSupplierPanelAccess('depo')).toBe(true)
-    expect(hasSupplierPanelAccess('warehouse')).toBe(true)
-    expect(hasSupplierPanelAccess('stock_manager')).toBe(true)
-    // admin tek başına tedarikçi paneline erişemez
+    expect(hasSupplierPanelAccess('supplier')).toBe(false)
     expect(hasSupplierPanelAccess('admin')).toBe(false)
     expect(hasSupplierPanelAccess('clinic')).toBe(false)
   })

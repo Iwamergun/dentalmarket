@@ -16,7 +16,7 @@ export const loginSchema = z.object({
 // Register şeması
 export const registerSchema = z.object({
   role: z.enum(['clinic', 'depo'], {
-    errorMap: () => ({ message: 'Lütfen bir hesap türü seçin' }),
+    error: () => 'Lütfen bir hesap türü seçin',
   }),
   company_name: z.string().trim(),
   tax_number: z.string().trim().optional(),

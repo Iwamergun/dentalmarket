@@ -13,6 +13,7 @@ import {
   Settings,
   Warehouse,
   MessageSquarePlus,
+  UserCheck,
   X,
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand/BrandLogo'
@@ -31,6 +32,7 @@ const menuGroups = [
       { href: '/admin/orders', label: 'Siparişler', icon: ShoppingCart },
       { href: '/admin/products', label: 'Ürünler', icon: Package },
       { href: '/admin/stock', label: 'Stok Yönetimi', icon: Warehouse },
+      { href: '/admin/suppliers', label: 'Depo Onayları', icon: UserCheck },
     ],
   },
   {

@@ -20,6 +20,12 @@ export default async function SupplierTekliflerimPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/giris')
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_active')
+    .eq('id', user.id)
+    .single()
+
   // Get supplier's offers with full details
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: supplierOffers } = await (supabase as any)
@@ -59,13 +65,19 @@ export default async function SupplierTekliflerimPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Tekliflerim</h1>
-        <Link
-          href="/admin/products/new"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Yeni Teklif Ver
-        </Link>
+        {profile?.is_active === false ? (
+          <span className="inline-flex items-center rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-700">
+            Onay bekleniyor
+          </span>
+        ) : (
+          <Link
+            href="/admin/products/new"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            Yeni Teklif Ver
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">

@@ -44,7 +44,7 @@ export default async function SupplierLayout({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, is_active')
     .eq('id', user.id)
     .single()
 
@@ -57,6 +57,11 @@ export default async function SupplierLayout({
       <SupplierSidebar />
       <div className="flex flex-1 flex-col">
         <SupplierHeader user={user} />
+        {profile?.is_active === false ? (
+          <div className="border-b border-amber-200 bg-amber-50 px-6 py-3 text-sm text-amber-800">
+            Hesabınız onay bekliyor. Onaylanana kadar yeni teklif yayınlayamazsınız.
+          </div>
+        ) : null}
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
           {children}
         </main>

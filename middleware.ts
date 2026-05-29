@@ -3,6 +3,12 @@ import { createServerClient } from '@supabase/ssr'
 import { hasAdminAccess, hasCatalogAdminAccess, hasSupplierPanelAccess } from '@/lib/auth/access'
 
 const ADMIN_PRODUCT_EDIT_PATH = /^\/admin\/products\/[^/]+\/edit$/
+const SUPPLIER_OFFER_EDIT_PATH = /^\/supplier\/urunler\/[^/]+\/duzenle$/
+const DEPO_PUBLISH_PATHS = new Set([
+  '/admin/products/new',
+  '/supplier/urunler/yeni',
+])
+const ADMIN_ONLY_PATH_PREFIXES = ['/admin/categories', '/admin/brands', '/admin/customers', '/admin/reports', '/admin/settings', '/admin/orders', '/admin/suppliers']
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -46,7 +52,7 @@ export async function middleware(request: NextRequest) {
     // Profile kontrolü
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, is_active')
       .eq('id', user.id)
       .single()
 
@@ -57,9 +63,17 @@ export async function middleware(request: NextRequest) {
     }
 
     const isRestrictedCatalogProductPath = ADMIN_PRODUCT_EDIT_PATH.test(pathname)
-    if (isRestrictedCatalogProductPath && !hasCatalogAdminAccess(profile?.role)) {
+    const isPlatformAdminOnlyPath = ADMIN_ONLY_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+    if ((isRestrictedCatalogProductPath || isPlatformAdminOnlyPath) && !hasCatalogAdminAccess(profile?.role)) {
       const url = request.nextUrl.clone()
-      url.pathname = '/supplier/urunler/yeni'
+      url.pathname = '/admin/dashboard'
+      return NextResponse.redirect(url)
+    }
+
+    const isAdminDepoPublishPath = DEPO_PUBLISH_PATHS.has(pathname) || ADMIN_PRODUCT_EDIT_PATH.test(pathname)
+    if (isAdminDepoPublishPath && hasSupplierPanelAccess(profile?.role) && profile?.is_active === false) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/supplier/dashboard'
       return NextResponse.redirect(url)
     }
   }
@@ -74,13 +88,20 @@ export async function middleware(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, is_active')
       .eq('id', user.id)
       .single()
 
     if (!hasSupplierPanelAccess(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+
+    const isSupplierDepoPublishPath = DEPO_PUBLISH_PATHS.has(pathname) || SUPPLIER_OFFER_EDIT_PATH.test(pathname)
+    if (isSupplierDepoPublishPath && profile?.is_active === false) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/supplier/dashboard'
       return NextResponse.redirect(url)
     }
   }

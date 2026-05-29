@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
-import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
+import { hasCatalogAdminAccess } from '@/lib/auth/access'
 
 const VALID_ORDER_STATUSES = [
   'pending',
@@ -43,7 +43,7 @@ export async function PATCH(
       .eq('id', user.id)
       .single()
 
-    if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
+    if (!hasCatalogAdminAccess(profile?.role)) {
       return NextResponse.json(
         { success: false, error: 'Bu işlem için yetkiniz yok' },
         { status: 403 }
@@ -138,7 +138,7 @@ export async function GET(
       .eq('id', user.id)
       .single()
 
-    if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
+    if (!hasCatalogAdminAccess(profile?.role)) {
       return NextResponse.json(
         { success: false, error: 'Bu işlem için yetkiniz yok' },
         { status: 403 }

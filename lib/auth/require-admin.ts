@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
+import { hasCatalogAdminAccess } from '@/lib/auth/access'
 
 export async function requireAdminAccess() {
   const supabase = await createClient()
@@ -19,7 +19,7 @@ export async function requireAdminAccess() {
     .eq('id', user.id)
     .single()
 
-  if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
+  if (!hasCatalogAdminAccess(profile?.role)) {
     redirect('/')
   }
 

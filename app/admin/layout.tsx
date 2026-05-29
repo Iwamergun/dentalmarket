@@ -5,6 +5,11 @@ import type { Database } from '@/types/database.types'
 import AdminShell from '@/components/admin/AdminShell'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 
+// Admin yüzeyleri kullanıcıya özeldir ve her istekte güvenilir kaynaktan
+// (profiles.role / app_metadata) yetki doğrulaması yapar. Bu nedenle build
+// sırasında statik prerender edilmemeli; request-time'da çalışmalıdır.
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({
   children,
 }: {

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
 import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
@@ -12,10 +13,12 @@ import { Shield, Phone, Mail, Menu, X, Search, Heart, Sparkles } from 'lucide-re
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
   const { user, loading } = useAuth()
 
   // Check admin role
@@ -71,6 +74,14 @@ export function Header() {
   const headerHeight = isScrolled ? 'h-14 md:h-[3.85rem]' : 'h-[4.5rem] md:h-[4.75rem]'
   const glowStyle = {
     opacity: isScrolled ? 0.55 : 0.8,
+  }
+  const submitSearch = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault()
+    const query = searchQuery.trim()
+    if (!query) return
+    router.push(`/urunler?q=${encodeURIComponent(query)}`)
+    setIsSearchOpen(false)
+    setSearchQuery('')
   }
 
   return (
@@ -128,18 +139,24 @@ export function Header() {
             </Link>
 
             {/* Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+            <form onSubmit={submitSearch} className="hidden md:flex flex-1 max-w-2xl mx-4">
               <div className="relative w-full">
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Ürün, marka veya kategori ara..."
                   className="h-12 w-full rounded-2xl border border-white/50 bg-white/70 pl-5 pr-14 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                 />
-                <button className="absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center rounded-xl bg-primary px-4 text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-lg">
+                <button
+                  type="submit"
+                  aria-label="Ara"
+                  className="absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center rounded-xl bg-primary px-4 text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-lg"
+                >
                   <Search className="w-5 h-5" />
                 </button>
               </div>
-            </div>
+            </form>
 
             {/* Actions */}
             <div className="flex items-center gap-2">
@@ -288,15 +305,43 @@ export function Header() {
             </div>
           </div>
 
+          <div className="relative hidden pb-3 lg:block">
+            <nav className="flex items-center gap-2 rounded-2xl border border-border/60 bg-white/80 px-3 py-2 backdrop-blur">
+              <Link href="/kategoriler" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
+                Kategoriler
+              </Link>
+              <Link href="/markalar" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
+                Markalar
+              </Link>
+              <Link href="/urunler" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
+                Tüm Ürünler
+              </Link>
+              <Link href="/kampanyalar" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
+                Kampanyalar
+              </Link>
+            </nav>
+          </div>
+
           {/* Mobile Search */}
           {isSearchOpen && (
             <div className="md:hidden pb-4 animate-fade-in">
-              <input
-                type="text"
-                placeholder="Ürün, marka veya kategori ara..."
-                className="h-11 w-full rounded-2xl border border-white/50 bg-white/75 px-4 text-body-text placeholder-secondary-text backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none"
-                autoFocus
-              />
+              <form onSubmit={submitSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Ürün, marka veya kategori ara..."
+                  className="h-11 w-full rounded-2xl border border-white/50 bg-white/75 px-4 pr-12 text-body-text placeholder-secondary-text backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  aria-label="Ara"
+                  className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl bg-primary text-white shadow-sm"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </form>
             </div>
           )}
         </div>

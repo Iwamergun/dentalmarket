@@ -30,7 +30,7 @@ const createOrderSchema = z.object({
     price: z.number(),
   })).min(1, 'Sepet boş olamaz'),
   subtotal: z.number(),
-  shipping: z.number(),
+  shipping: z.number().min(0),
   total: z.number(),
 })
 
@@ -109,6 +109,92 @@ export async function POST(request: NextRequest) {
 
     const { address, paymentMethod, items, subtotal, shipping, total } = validationResult.data
 
+    // ------------------------------------------------------------------
+    // Sunucu tarafı fiyat doğrulaması — istemciden gelen fiyatlara
+    // güvenilmez; her kalemin gerçek birim fiyatı offers tablosundan
+    // (aktif, en ucuz teklif) yeniden hesaplanır.
+    // ------------------------------------------------------------------
+    const PRICE_TOLERANCE = 0.01
+
+    const uniqueProductIds = [...new Set(items.map((i) => i.product_id))]
+
+    const { data: offersData, error: offersError } = await adminSupabase
+      .from('offers')
+      .select('id, product_id, variant_id, price')
+      .in('product_id', uniqueProductIds)
+      .eq('is_active', true)
+      .order('price', { ascending: true })
+      .order('created_at', { ascending: true })
+
+    if (offersError) {
+      return NextResponse.json(
+        { error: 'Fiyatlar doğrulanırken hata oluştu' },
+        { status: 500 }
+      )
+    }
+
+    // Her (product_id, variant_id) çifti için en ucuz teklifin fiyatını bul
+    const offerPriceMap = new Map<string, number>()
+    for (const offer of (offersData ?? [])) {
+      const key = `${offer.product_id}:${offer.variant_id ?? ''}`
+      if (!offerPriceMap.has(key)) {
+        offerPriceMap.set(key, offer.price)
+      }
+    }
+
+    // Her kalem için sunucu fiyatını belirle ve subtotal hesapla
+    let serverSubtotal = 0
+    const serverPricedItems: Array<{
+      product_id: string
+      variant_id: string | null
+      quantity: number
+      price: number
+    }> = []
+
+    for (const item of items) {
+      const key = `${item.product_id}:${item.variant_id ?? ''}`
+      const serverPrice = offerPriceMap.get(key)
+
+      if (serverPrice === undefined) {
+        return NextResponse.json(
+          { error: 'Ürün bulunamadı veya satışta değil' },
+          { status: 400 }
+        )
+      }
+
+      // İstemcinin gönderdiği fiyat sunucu fiyatından farklıysa hata dön
+      if (Math.abs(item.price - serverPrice) > PRICE_TOLERANCE) {
+        return NextResponse.json(
+          { error: 'Ürün fiyatları değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
+          { status: 409 }
+        )
+      }
+
+      serverSubtotal += serverPrice * item.quantity
+      serverPricedItems.push({
+        product_id: item.product_id,
+        variant_id: item.variant_id || null,
+        quantity: item.quantity,
+        price: serverPrice,
+      })
+    }
+
+    // İstemcinin bildirdiği ara toplam ile sunucuda hesaplanan ara toplamı karşılaştır
+    if (Math.abs(subtotal - serverSubtotal) > PRICE_TOLERANCE) {
+      return NextResponse.json(
+        { error: 'Sepet tutarı değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
+        { status: 409 }
+      )
+    }
+
+    const serverTotal = serverSubtotal + shipping
+    if (Math.abs(total - serverTotal) > PRICE_TOLERANCE) {
+      return NextResponse.json(
+        { error: 'Toplam tutar değişti. Lütfen sepetinizi yenileyip tekrar deneyin.' },
+        { status: 409 }
+      )
+    }
+
     // Sipariş numarası ve ID oluştur
     const orderNumber = generateOrderNumber()
     const orderId = crypto.randomUUID()
@@ -126,12 +212,7 @@ export async function POST(request: NextRequest) {
       district: address.district,
       postal_code: address.postalCode,
     } as Record<string, unknown>
-    const rpcItems = items.map((item) => ({
-      product_id: item.product_id,
-      variant_id: item.variant_id || null,
-      quantity: item.quantity,
-      price: item.price,
-    }))
+    const rpcItems = serverPricedItems
 
     const { data: transactionResult, error: transactionError } = await rpcClient.rpc(
       'create_order_transaction',
@@ -142,9 +223,9 @@ export async function POST(request: NextRequest) {
         p_status: orderStatus,
         p_payment_status: 'pending',
         p_payment_method: paymentMethod,
-        p_subtotal: subtotal,
+        p_subtotal: serverSubtotal,
         p_shipping_cost: shipping,
-        p_total: total,
+        p_total: serverTotal,
         p_shipping_address: shippingAddressPayload,
         p_notes: address.notes || null,
         p_items: rpcItems,
@@ -298,9 +379,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const invoiceOrderItems = items.map((item) => ({
+    const invoiceOrderItems = serverPricedItems.map((item) => ({
       product_id: item.product_id,
-      variant_id: item.variant_id || null,
+      variant_id: item.variant_id,
       quantity: item.quantity,
       unit_price: item.price,
       total_price: item.price * item.quantity,
@@ -317,9 +398,9 @@ export async function POST(request: NextRequest) {
       const rawOrder: RawOrder = {
         id: orderId,
         order_number: orderNumber,
-        subtotal,
+        subtotal: serverSubtotal,
         shipping_cost: shipping,
-        total,
+        total: serverTotal,
         shipping_address: {
           first_name: address.firstName,
           last_name: address.lastName,
@@ -398,9 +479,9 @@ export async function POST(request: NextRequest) {
           orderNumber,
           customerName: `${address.firstName} ${address.lastName}`,
           paymentMethod,
-          subtotal,
+          subtotal: serverSubtotal,
           shippingCost: shipping,
-          total,
+          total: serverTotal,
           items: mappedItems.map((mi) => ({
             product_name: mi.product_name,
             product_sku: mi.product_sku,

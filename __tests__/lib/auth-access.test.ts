@@ -3,21 +3,43 @@ import { getAuthMetadata, hasAdminAccess, hasCatalogAdminAccess, hasSupplierPane
 
 describe('auth access helpers', () => {
   it('allows admin-like profile roles', () => {
-    expect(hasAdminAccess('admin', undefined)).toBe(true)
-    expect(hasAdminAccess('stock_manager', undefined)).toBe(true)
+    expect(hasAdminAccess('admin')).toBe(true)
+    expect(hasAdminAccess('super_admin')).toBe(true)
+    expect(hasAdminAccess('superadmin')).toBe(true)
   })
 
-  it('allows admin access from user metadata', () => {
+  it('depo/warehouse/stock rolleri artık admin sayılmaz — depo ≠ admin', () => {
+    expect(hasAdminAccess('depo')).toBe(false)
+    expect(hasAdminAccess('depot')).toBe(false)
+    expect(hasAdminAccess('warehouse')).toBe(false)
+    expect(hasAdminAccess('stock')).toBe(false)
+    expect(hasAdminAccess('stock_manager')).toBe(false)
+    expect(hasAdminAccess('inventory_manager')).toBe(false)
+    expect(hasAdminAccess('warehouse_manager')).toBe(false)
+  })
+
+  it('user_metadata üzerinden admin yetkisi verilmez', () => {
+    // user_metadata kullanıcı tarafından değiştirilebildiğinden güvenilmez
     const metadata = getAuthMetadata({
       app_metadata: { roles: ['clinic_user'] },
       user_metadata: { roles: ['inventory_manager'] },
     })
+    expect(hasAdminAccess(null, metadata)).toBe(false)
+  })
 
-    expect(hasAdminAccess(null, metadata)).toBe(true)
+  it('getAuthMetadata yalnızca app_metadata döndürür', () => {
+    const metadata = getAuthMetadata({
+      app_metadata: { custom_role: 'trusted' },
+      user_metadata: { custom_role: 'untrusted' },
+    })
+    expect(metadata).toEqual({ custom_role: 'trusted' })
   })
 
   it('denies non-admin roles', () => {
-    expect(hasAdminAccess('clinic', { role: 'customer' })).toBe(false)
+    expect(hasAdminAccess('clinic')).toBe(false)
+    expect(hasAdminAccess('user')).toBe(false)
+    expect(hasAdminAccess(null)).toBe(false)
+    expect(hasAdminAccess(undefined)).toBe(false)
   })
 
   it('catalog admin access should allow only central admin roles', () => {
@@ -26,10 +48,13 @@ describe('auth access helpers', () => {
     expect(hasCatalogAdminAccess('depo')).toBe(false)
   })
 
-  it('supplier panel access should allow supplier and depo-like roles', () => {
-    expect(hasSupplierPanelAccess('supplier', undefined)).toBe(true)
-    expect(hasSupplierPanelAccess('depo', undefined)).toBe(true)
-    expect(hasSupplierPanelAccess('admin', undefined)).toBe(false)
-    expect(hasSupplierPanelAccess('clinic', undefined)).toBe(false)
+  it('supplier panel access should allow supplier and depo-like roles but not admin', () => {
+    expect(hasSupplierPanelAccess('supplier')).toBe(true)
+    expect(hasSupplierPanelAccess('depo')).toBe(true)
+    expect(hasSupplierPanelAccess('warehouse')).toBe(true)
+    expect(hasSupplierPanelAccess('stock_manager')).toBe(true)
+    // admin tek başına tedarikçi paneline erişemez
+    expect(hasSupplierPanelAccess('admin')).toBe(false)
+    expect(hasSupplierPanelAccess('clinic')).toBe(false)
   })
 })

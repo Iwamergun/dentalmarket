@@ -109,7 +109,7 @@ describe('middleware route koruması', () => {
     expect(res.status).not.toBe(307)
   })
 
-  it('depo kullanıcı /admin/products/new erişimini korumalı', async () => {
+  it('depo kullanıcı /admin\'e erişememelidir — depo ≠ admin', async () => {
     const mockFrom = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
@@ -120,12 +120,46 @@ describe('middleware route koruması', () => {
       from: vi.fn(() => mockFrom),
     }
     ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
-    const req = makeRequest('/admin/products/new')
+    const req = makeRequest('/admin')
+    const res = await middleware(req)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toMatch(/\/$/)
+  })
+
+  it('depo kullanıcı /supplier\'a erişebilmeli', async () => {
+    const mockFrom = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: 'depo' } }),
+    }
+    const mockClient = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'depo-1' } } }) },
+      from: vi.fn(() => mockFrom),
+    }
+    ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
+    const req = makeRequest('/supplier/urunler')
     const res = await middleware(req)
     expect(res.status).not.toBe(307)
   })
 
-  it('admin kullanıcı /admin/products/new erişimini korumalı', async () => {
+  it('clinic kullanıcı /supplier\'a erişememeli', async () => {
+    const mockFrom = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { role: 'clinic' } }),
+    }
+    const mockClient = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'clinic-1' } } }) },
+      from: vi.fn(() => mockFrom),
+    }
+    ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
+    const req = makeRequest('/supplier/urunler')
+    const res = await middleware(req)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toMatch(/\/$/)
+  })
+
+  it('admin kullanıcı /admin/products/new erişebilmeli', async () => {
     const mockFrom = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),

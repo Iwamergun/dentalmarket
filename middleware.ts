@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { getAuthMetadata, hasAdminAccess, hasCatalogAdminAccess } from '@/lib/auth/access'
+import { hasAdminAccess, hasCatalogAdminAccess, hasSupplierPanelAccess } from '@/lib/auth/access'
 
 const ADMIN_PRODUCT_EDIT_PATH = /^\/admin\/products\/[^/]+\/edit$/
 
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!hasAdminAccess(profile?.role, getAuthMetadata(user))) {
+    if (!hasAdminAccess(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)
@@ -69,6 +69,18 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/giris'
+      return NextResponse.redirect(url)
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!hasSupplierPanelAccess(profile?.role)) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
       return NextResponse.redirect(url)
     }
   }

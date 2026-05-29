@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   applyCatalogProductSelection,
-  buildCatalogProductPayload,
   buildOfferPayload,
   buildSupplierProductFormState,
   defaultSupplierProductFormState,
@@ -34,7 +33,7 @@ describe('supplier product form helpers', () => {
 
     expect(selected.name).toBe('Ağız Aynası')
     expect(selected.slug).toBe('agiz-aynasi')
-    expect(selected.sku).toBe('AA-001')
+    expect(selected.sku).toBe('')
     expect(selected.barcode).toBe('869000000001')
     expect(selected.primary_category_id).toBe('cat-1')
     expect(selected.brand_id).toBe('brand-1')
@@ -68,12 +67,16 @@ describe('supplier product form helpers', () => {
       freeShippingThreshold: 1000,
       paymentOptions: ['havale'],
       notes: 'Aynı gün kargo',
+      supplierSku: 'SUP-44',
+      description: 'Depo açıklaması',
+      expiryDate: '2026-12-31',
       isActive: false,
     })
 
     expect(form.name).toBe('Bonding Seti')
-    expect(form.sku).toBe('BD-44')
-    expect(form.description).toBe('Adeziv ve primer seti')
+    expect(form.sku).toBe('SUP-44')
+    expect(form.description).toBe('Depo açıklaması')
+    expect(form.expiry_date).toBe('2026-12-31')
     expect(form.primary_image).toBe('products/bonding.jpg')
     expect(form.price).toBe('499')
     expect(form.vat_rate).toBe('10')
@@ -84,7 +87,7 @@ describe('supplier product form helpers', () => {
     expect(form.is_active).toBe(false)
   })
 
-  it('builds catalog and offer payloads without allowing free-typed product names', () => {
+  it('builds offer payload with supplier-level fields', () => {
     const form = {
       ...defaultSupplierProductFormState,
       name: 'Fissür Örtücü',
@@ -92,7 +95,8 @@ describe('supplier product form helpers', () => {
       sku: 'FS-9',
       barcode: '99887766',
       short_description: 'Akışkan',
-      description: 'Katalog seçimi sonrası düzenlendi',
+      description: 'Depo açıklaması',
+      expiry_date: '2027-01-15',
       primary_category_id: 'cat-9',
       brand_id: 'brand-9',
       primary_image: 'products/fissur.jpg',
@@ -110,25 +114,12 @@ describe('supplier product form helpers', () => {
     }
 
     expect(slugifyProductName('Fissür Örtücü')).toBe('fissur-ortucu')
-    expect(buildCatalogProductPayload(form, 'supplier-1')).toEqual({
-      supplier_id: 'supplier-1',
-      name: 'Fissür Örtücü',
-      slug: 'fissur-ortucu',
-      sku: 'FS-9',
-      barcode: '99887766',
-      short_description: 'Akışkan',
-      description: 'Katalog seçimi sonrası düzenlendi',
-      primary_category_id: 'cat-9',
-      brand_id: 'brand-9',
-      primary_image: 'products/fissur.jpg',
-      compare_at_price: 220,
-      is_active: true,
-    })
-
     expect(buildOfferPayload(form, 'supplier-1', 'product-1')).toEqual({
       supplier_id: 'supplier-1',
       product_id: 'product-1',
       supplier_sku: 'FS-9',
+      description: 'Depo açıklaması',
+      expiry_date: '2027-01-15',
       price: 199.9,
       vat_rate: 20,
       stock_quantity: 14,

@@ -19,6 +19,7 @@ export type SupplierProductFormState = {
   free_shipping_threshold: string
   payment_options: string[]
   notes: string
+  expiry_date: string
 }
 
 export type CatalogProductSelection = {
@@ -56,6 +57,7 @@ export const defaultSupplierProductFormState: SupplierProductFormState = {
   free_shipping_threshold: '',
   payment_options: [],
   notes: '',
+  expiry_date: '',
 }
 
 export function slugifyProductName(text: string) {
@@ -83,10 +85,8 @@ export function applyCatalogProductSelection(
     ...form,
     name: product.name,
     slug: resolveProductSlug(product.name, product.slug),
-    sku: product.sku ?? '',
     barcode: product.barcode ?? '',
     short_description: product.short_description ?? '',
-    description: product.description ?? '',
     primary_category_id: product.primary_category_id ?? '',
     brand_id: product.brand_id ?? '',
     primary_image: product.primary_image ?? '',
@@ -105,6 +105,9 @@ export function buildSupplierProductFormState(params: {
   freeShippingThreshold?: number | null
   paymentOptions?: string[] | null
   notes?: string | null
+  supplierSku?: string | null
+  description?: string | null
+  expiryDate?: string | null
   isActive?: boolean | null
 }): SupplierProductFormState {
   const { product } = params
@@ -112,10 +115,10 @@ export function buildSupplierProductFormState(params: {
   return {
     name: product.name,
     slug: resolveProductSlug(product.name, product.slug),
-    sku: product.sku ?? '',
+    sku: params.supplierSku ?? '',
     barcode: product.barcode ?? '',
     short_description: product.short_description ?? '',
-    description: product.description ?? '',
+    description: params.description ?? '',
     primary_category_id: product.primary_category_id ?? '',
     brand_id: product.brand_id ?? '',
     primary_image: product.primary_image ?? '',
@@ -132,6 +135,7 @@ export function buildSupplierProductFormState(params: {
       : '',
     payment_options: params.paymentOptions ?? [],
     notes: params.notes ?? '',
+    expiry_date: params.expiryDate ?? '',
   }
 }
 
@@ -175,6 +179,8 @@ export function buildOfferPayload(
       : null,
     payment_options: form.payment_options.length > 0 ? form.payment_options : null,
     notes: form.notes || null,
+    description: form.description || null,
+    expiry_date: form.expiry_date || null,
     currency: 'TRY',
     is_active: form.is_active,
   }

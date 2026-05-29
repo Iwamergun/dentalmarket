@@ -1,10 +1,11 @@
-import { hasAdminAccess } from '@/lib/auth/access'
+import { hasAdminAccess, hasSupplierPanelAccess } from '@/lib/auth/access'
 
 export function canUploadMedia(
   profileRole: string | null | undefined,
-  metadata: Record<string, unknown> | null | undefined
+  metadata?: Record<string, unknown> | null | undefined
 ) {
-  if (profileRole === 'supplier') {
+  // Tedarikçi ve depo rolündeki kullanıcılar medya yükleyebilir
+  if (hasSupplierPanelAccess(profileRole, metadata)) {
     return true
   }
 

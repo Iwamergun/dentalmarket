@@ -471,9 +471,13 @@ export interface Database {
           payment_status: string
           payment_method: string
           subtotal: number
+          discount: number
           shipping_cost: number
+          tax: number
           total: number
-          shipping_address: string
+          shipping_address: Json
+          billing_address: Json | null
+          customer_note: string | null
           notes: string | null
           created_at: string
           updated_at: string
@@ -486,9 +490,13 @@ export interface Database {
           payment_status: string
           payment_method: string
           subtotal: number
+          discount?: number
           shipping_cost: number
+          tax?: number
           total: number
-          shipping_address: string
+          shipping_address: Json
+          billing_address?: Json | null
+          customer_note?: string | null
           notes?: string | null
           created_at?: string
           updated_at?: string
@@ -501,9 +509,13 @@ export interface Database {
           payment_status?: string
           payment_method?: string
           subtotal?: number
+          discount?: number
           shipping_cost?: number
+          tax?: number
           total?: number
-          shipping_address?: string
+          shipping_address?: Json
+          billing_address?: Json | null
+          customer_note?: string | null
           notes?: string | null
           created_at?: string
           updated_at?: string
@@ -516,6 +528,9 @@ export interface Database {
           order_id: string
           product_id: string
           variant_id: string | null
+          offer_id: string | null
+          product_name: string | null
+          product_sku: string | null
           quantity: number
           unit_price: number
           total_price: number
@@ -526,6 +541,9 @@ export interface Database {
           order_id: string
           product_id: string
           variant_id?: string | null
+          offer_id?: string | null
+          product_name?: string | null
+          product_sku?: string | null
           quantity: number
           unit_price: number
           total_price: number
@@ -536,6 +554,9 @@ export interface Database {
           order_id?: string
           product_id?: string
           variant_id?: string | null
+          offer_id?: string | null
+          product_name?: string | null
+          product_sku?: string | null
           quantity?: number
           unit_price?: number
           total_price?: number

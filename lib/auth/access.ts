@@ -6,21 +6,6 @@ const ADMIN_TOKENS = new Set([
   'admin_access',
   'dashboard:admin',
   'manage:admin',
-  'depo',
-  'depot',
-  'warehouse',
-  'inventory',
-  'inventory:access',
-  'inventory_access',
-  'stock',
-  'stock:access',
-  'stock_access',
-  'inventory_manager',
-  'stock_manager',
-  'warehouse_manager',
-  'depo_yonetimi',
-  'depo_yoneticisi',
-  'depot_manager',
 ])
 const METADATA_TOKEN_FIELDS = ['role', 'roles', 'permission', 'permissions', 'name', 'code', 'key', 'slug', 'claims', 'authorities']
 
@@ -52,15 +37,18 @@ function hasAdminToken(value: unknown): boolean {
   return METADATA_TOKEN_FIELDS.some((field) => hasAdminToken(record[field]))
 }
 
+/**
+ * @param profileRole - Güvenilir kaynak: profiles.role (sunucu tarafından kontrol edilir).
+ * @param _metadata - @deprecated Artık kullanılmıyor. Admin yetkisi yalnızca
+ *   `profileRole` üzerinden belirlenir. Bu parametre geriye dönük uyumluluk
+ *   için imzada korunmuştur; herhangi bir etki yapmaz.
+ */
 export function hasAdminAccess(
   profileRole: string | null | undefined,
-  metadata: Record<string, unknown> | null | undefined
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _metadata?: Record<string, unknown> | null | undefined
 ) {
-  if (hasAdminToken(profileRole)) {
-    return true
-  }
-
-  return hasAdminToken(metadata)
+  return hasAdminToken(profileRole)
 }
 
 const CATALOG_ADMIN_ROLES = new Set(['admin', 'super_admin', 'superadmin'])
@@ -111,11 +99,18 @@ export function hasCatalogAdminAccess(profileRole: string | null | undefined) {
   return CATALOG_ADMIN_ROLES.has(normalizeToken(profileRole))
 }
 
+/**
+ * @param profileRole - Güvenilir kaynak: profiles.role (sunucu tarafından kontrol edilir).
+ * @param _metadata - @deprecated Artık kullanılmıyor. Tedarikçi paneli yetkisi yalnızca
+ *   `profileRole` üzerinden belirlenir. Bu parametre geriye dönük uyumluluk
+ *   için imzada korunmuştur; herhangi bir etki yapmaz.
+ */
 export function hasSupplierPanelAccess(
   profileRole: string | null | undefined,
-  metadata: Record<string, unknown> | null | undefined
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _metadata?: Record<string, unknown> | null | undefined
 ) {
-  return hasSupplierPanelToken(profileRole) || hasSupplierPanelToken(metadata)
+  return hasSupplierPanelToken(profileRole)
 }
 
 export function getAuthMetadata(user: {
@@ -126,8 +121,7 @@ export function getAuthMetadata(user: {
     return undefined
   }
 
-  return {
-    ...(user.app_metadata ?? {}),
-    ...(user.user_metadata ?? {}),
-  }
+  // Yalnızca app_metadata döndürülür; user_metadata kullanıcı tarafından
+  // değiştirilebildiğinden yetki kararlarında güvenilmez kaynak sayılır.
+  return user.app_metadata ?? {}
 }

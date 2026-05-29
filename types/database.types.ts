@@ -373,6 +373,8 @@ export interface Database {
           product_id: string
           variant_id: string | null
           supplier_sku: string | null
+          description: string | null
+          expiry_date: string | null
           price: number
           shipping_cost: number | null
           free_shipping_threshold: number | null
@@ -392,6 +394,8 @@ export interface Database {
           product_id: string
           variant_id?: string | null
           supplier_sku?: string | null
+          description?: string | null
+          expiry_date?: string | null
           price: number
           shipping_cost?: number | null
           free_shipping_threshold?: number | null
@@ -411,6 +415,8 @@ export interface Database {
           product_id?: string
           variant_id?: string | null
           supplier_sku?: string | null
+          description?: string | null
+          expiry_date?: string | null
           price?: number
           shipping_cost?: number | null
           free_shipping_threshold?: number | null

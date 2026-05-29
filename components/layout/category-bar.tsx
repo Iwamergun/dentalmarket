@@ -13,6 +13,7 @@ interface CategoryWithChildren extends Category {
 export function CategoryBar() {
   const [categories, setCategories] = useState<CategoryWithChildren[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasFetchError, setHasFetchError] = useState(false)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [dropdownLeft, setDropdownLeft] = useState(0)
 
@@ -23,29 +24,43 @@ export function CategoryBar() {
 
   useEffect(() => {
     async function fetchCategories() {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
+      try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
 
-      const { data } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true })
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
 
-      const all = (data || []) as Category[]
-      const roots = all.filter((c) => !c.parent_id)
+        if (error) {
+          console.error('Error fetching categories for category bar:', error)
+          setHasFetchError(true)
+          setCategories([])
+          return
+        }
 
-      setCategories(
-        roots.map((root) => ({
-          ...root,
-          children: all
-            .filter((c) => c.parent_id === root.id)
-            .sort((a, b) => a.name.localeCompare(b.name, 'tr')),
-        }))
-      )
-      setIsLoading(false)
+        const all = (data || []) as Category[]
+        const roots = all.filter((c) => !c.parent_id)
+
+        setCategories(
+          roots.map((root) => ({
+            ...root,
+            children: all
+              .filter((c) => c.parent_id === root.id)
+              .sort((a, b) => a.name.localeCompare(b.name, 'tr')),
+          }))
+        )
+      } catch (error) {
+        console.error('Unexpected error fetching categories for category bar:', error)
+        setHasFetchError(true)
+        setCategories([])
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     fetchCategories()
@@ -95,6 +110,18 @@ export function CategoryBar() {
             {[...Array(7)].map((_, i) => (
               <div key={i} className="h-6 w-24 bg-muted rounded animate-pulse" />
             ))}
+          </div>
+        </div>
+      </nav>
+    )
+  }
+
+  if (categories.length === 0) {
+    return (
+      <nav className="mx-2 mt-2 hidden rounded-[1.5rem] border border-border/60 bg-white/70 backdrop-blur-xl lg:block md:mx-4">
+        <div className="container-main">
+          <div className="flex h-12 items-center text-sm font-medium text-secondary-text">
+            {hasFetchError ? 'Kategoriler şu anda yüklenemiyor.' : 'Şu anda görüntülenecek kategori bulunmuyor.'}
           </div>
         </div>
       </nav>

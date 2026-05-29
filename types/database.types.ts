@@ -374,6 +374,8 @@ export interface Database {
           variant_id: string | null
           supplier_sku: string | null
           price: number
+          shipping_cost: number | null
+          free_shipping_threshold: number | null
           currency: string
           vat_rate: number
           stock_quantity: number
@@ -391,6 +393,8 @@ export interface Database {
           variant_id?: string | null
           supplier_sku?: string | null
           price: number
+          shipping_cost?: number | null
+          free_shipping_threshold?: number | null
           currency: string
           vat_rate: number
           stock_quantity: number
@@ -408,6 +412,8 @@ export interface Database {
           variant_id?: string | null
           supplier_sku?: string | null
           price?: number
+          shipping_cost?: number | null
+          free_shipping_threshold?: number | null
           currency?: string
           vat_rate?: number
           stock_quantity?: number

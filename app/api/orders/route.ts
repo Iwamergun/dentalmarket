@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     // Her (product_id, variant_id) çifti için en ucuz teklifin fiyatını bul
     const offerMap = new Map<string, ActiveOfferRow>()
-    for (const offer of ((offersData ?? []) as ActiveOfferRow[])) {
+    for (const offer of offersData ?? []) {
       const key = `${offer.product_id}:${offer.variant_id ?? ''}`
       if (!offerMap.has(key)) {
         offerMap.set(key, offer)

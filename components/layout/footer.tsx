@@ -77,7 +77,7 @@ export async function Footer() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1fr]">
-          <div className="rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-primary via-secondary to-[#0f172a] px-6 py-7 text-slate-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
+          <div className="rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-secondary/90 via-primary/85 to-primary/95 px-6 py-7 text-slate-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
             <Link href="/" className="mb-5 flex items-center gap-3">
               <BrandLogo
                 variant="full"

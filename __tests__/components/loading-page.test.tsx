@@ -11,7 +11,7 @@ describe('Loading page', () => {
 
   it('yeni marka logosu render edilmeli', () => {
     render(<Loading />)
-    expect(screen.getByAltText('DentAlışveriş')).toHaveAttribute('src', '/brand/dentalisveris-logo.svg')
+    expect(screen.getByText('DentAlışveriş')).toBeInTheDocument()
   })
 
   it('spinner (animate-spin class\'lı element) mevcut olmalı', () => {

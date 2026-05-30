@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Sparkles, ShieldCheck, Stethoscope } from 'lucide-react'
+import { ShieldCheck, Stethoscope, Zap } from 'lucide-react'
 
 export function HeroSection() {
   return (
@@ -8,11 +8,6 @@ export function HeroSection() {
       <div className="container-main relative py-16 md:py-20 lg:py-24">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
           <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full border border-secondary/15 bg-white/80 px-4 py-2 text-sm font-semibold text-secondary shadow-subtle">
-              <Sparkles className="h-4 w-4" />
-              Spark seçkisi, daha sade bir ana sayfa deneyimi
-            </div>
-
             <h1 className="max-w-3xl text-4xl font-bold leading-tight text-foreground md:text-5xl lg:text-6xl">
               Diş hekimleri için daha temiz, daha hızlı ve daha güvenilir bir satın alma akışı.
             </h1>
@@ -54,7 +49,7 @@ export function HeroSection() {
               </div>
               <div className="rounded-2xl border border-border/60 bg-white/80 px-4 py-4 shadow-subtle">
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <Sparkles className="h-5 w-5" />
+                  <Zap className="h-5 w-5" />
                 </div>
                 <p className="mt-3 text-sm font-semibold text-foreground">Sade deneyim</p>
                 <p className="mt-1 text-sm text-secondary-text">Daha az gürültü, daha net karar alanı.</p>

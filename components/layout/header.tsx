@@ -156,7 +156,7 @@ export function Header() {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Ürün, marka veya kategori ara..."
-                  className="h-12 w-full rounded-2xl border border-white/50 bg-white/70 pl-5 pr-14 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white pl-5 pr-14 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
                 />
                 <button
                   type="submit"
@@ -361,7 +361,7 @@ export function Header() {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Ürün, marka veya kategori ara..."
-                  className="h-11 w-full rounded-2xl border border-white/50 bg-white/75 px-4 pr-12 text-body-text placeholder-secondary-text backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none"
+                  className="h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 pr-12 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
                   autoFocus
                 />
                 <button

@@ -315,7 +315,7 @@ export function Header() {
             </div>
           </div>
 
-          <div className={['relative hidden pb-3 transition-all duration-300 lg:block', isScrolled ? 'border-t border-border/60' : ''].join(' ')}>
+          <div className={`relative hidden pb-3 transition-all duration-300 lg:block ${isScrolled ? 'border-t border-border/60' : ''}`}>
             <nav
               aria-label="Ana navigasyon"
               className="mx-auto flex w-full max-w-3xl items-center justify-center rounded-full border border-border/70 bg-white/90 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"

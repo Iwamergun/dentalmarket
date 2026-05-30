@@ -17,6 +17,14 @@ type SupabaseErrorLike = {
   details?: string
 }
 
+function shouldRetryWithLegacySupplierRole(profileError: SupabaseErrorLike, role: string) {
+  return (
+    profileError.code === '22P02' &&
+    role === 'depo' &&
+    profileError.message?.toLowerCase().includes('user_role')
+  )
+}
+
 function getRegisterProfileErrorMessage(profileError: SupabaseErrorLike) {
   if (profileError.code === '23505') {
     return 'Bu firma bilgileriyle daha önce hesap oluşturulmuş olabilir. Lütfen bilgilerinizi kontrol edin.'
@@ -31,10 +39,9 @@ function getRegisterProfileErrorMessage(profileError: SupabaseErrorLike) {
 
 async function upsertProfile(
   adminSupabase: ReturnType<typeof createAdminClient>,
-  payload: Record<string, unknown>
+  payload: Database['public']['Tables']['profiles']['Insert']
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return ((adminSupabase as any).from('profiles') as any).upsert(payload, { onConflict: 'id' })
+  return adminSupabase.from('profiles').upsert(payload, { onConflict: 'id' })
 }
 
 async function resolveStoreSlug(adminSupabase: ReturnType<typeof createAdminClient>, companyName: string) {
@@ -131,15 +138,12 @@ export async function POST(request: NextRequest) {
     }
 
     let { error: profileError } = await upsertProfile(adminSupabase, profilePayload)
-    if (
-      profileError?.code === '22P02' &&
-      role === 'depo' &&
-      profileError.message?.toLowerCase().includes('user_role')
-    ) {
-      ;({ error: profileError } = await upsertProfile(adminSupabase, {
+    if (profileError && shouldRetryWithLegacySupplierRole(profileError, role)) {
+      const retryResult = await upsertProfile(adminSupabase, {
         ...profilePayload,
         role: 'supplier',
-      }))
+      })
+      profileError = retryResult.error
     }
 
     if (profileError) {

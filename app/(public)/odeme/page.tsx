@@ -22,7 +22,7 @@ import {
   type AddressFormData, 
   type PaymentMethod 
 } from '@/lib/validations/checkout'
-import { buildLoginRedirectPath } from '@/lib/auth/redirect'
+import { buildLoginUrlWithRedirect } from '@/lib/auth/redirect'
 
 // Kargo ücreti hesaplama
 const FREE_SHIPPING_THRESHOLD = 500
@@ -45,13 +45,14 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.replace(`/giris?redirect=${encodeURIComponent(buildLoginRedirectPath('/odeme'))}`)
+      router.replace(buildLoginUrlWithRedirect('/odeme'))
     }
   }, [authLoading, user, router])
 
   // Sepet boşsa sepet sayfasına yönlendir
   useEffect(() => {
-    if (!authLoading && user && !cartLoading && items.length === 0) {
+    const shouldRedirectToCart = !authLoading && user && !cartLoading && items.length === 0
+    if (shouldRedirectToCart) {
       router.push('/sepet')
     }
   }, [items, cartLoading, router, user, authLoading])

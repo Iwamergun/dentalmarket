@@ -27,6 +27,7 @@ describe('middleware config', () => {
     expect(config.matcher).toContain('/admin/:path*')
     expect(config.matcher).toContain('/supplier/:path*')
     expect(config.matcher).toContain('/dashboard/:path*')
+    expect(config.matcher).toContain('/odeme')
     expect(config.matcher).toContain('/odeme/:path*')
   })
 })

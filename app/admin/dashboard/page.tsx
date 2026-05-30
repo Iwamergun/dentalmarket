@@ -88,14 +88,14 @@ export default async function AdminDashboardPage() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-white/80">
               <Sparkles className="h-4 w-4" />
-              Spark Admin Experience
+              Yönetim Paneli
             </div>
             <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
               Yönetim paneliniz artık daha hızlı okunuyor.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-7 text-white/75 md:text-base">
-              Sipariş, gelir ve müşteri akışını tek bakışta takip edin. Spark görsel diliyle
-              metrikleri, aksiyon alanlarını ve son siparişleri daha belirgin hale getirdik.
+              Sipariş, gelir ve müşteri akışını tek bakışta takip edin. Metrikleri,
+              aksiyon alanlarını ve son siparişleri daha belirgin hale getirdik.
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default async function AdminDashboardPage() {
             <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-secondary/10 to-accent/10 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-secondary-text">Operasyon Notu</p>
               <p className="mt-3 text-sm leading-7 text-body-text">
-                Dashboard artık Spark stilinde daha kontrastlı kartlar, premium yüzeyler ve daha okunaklı
+                Dashboard daha kontrastlı kartlar, premium yüzeyler ve daha okunaklı
                 aksiyon alanları kullanıyor.
               </p>
             </div>

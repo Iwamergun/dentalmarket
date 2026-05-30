@@ -66,7 +66,7 @@ export default function AdminSidebar({ mobileOpen = false, onClose }: AdminSideb
             />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/45">
-                Spark Admin
+                Yönetim
               </p>
               <h1 className="mt-1 text-lg font-semibold text-white">DentAlışveriş</h1>
             </div>
@@ -136,7 +136,7 @@ export default function AdminSidebar({ mobileOpen = false, onClose }: AdminSideb
             Sistem Notu
           </p>
           <p className="mt-2 text-sm leading-6 text-white/65">
-            Yeni Spark yüzeyi daha yüksek kontrast ve daha net aksiyon odaklı navigasyon sunar.
+            Daha yüksek kontrast ve daha net aksiyon odaklı navigasyon sunar.
           </p>
         </div>
       </div>

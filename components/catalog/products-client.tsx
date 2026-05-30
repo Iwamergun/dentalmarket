@@ -29,7 +29,7 @@ export function ProductsClient({ products, categories, brands }: ProductsClientP
   }, [products, searchParams])
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr] xl:gap-10">
       {/* Desktop Sidebar - Hidden on mobile */}
       <aside className="hidden lg:block">
         <div className="sticky top-[160px]">

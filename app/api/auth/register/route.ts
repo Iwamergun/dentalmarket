@@ -11,6 +11,31 @@ import {
 } from '@/lib/auth/register-profile'
 
 type ExistingStoreSlug = { store_slug: string | null }
+type SupabaseErrorLike = {
+  message?: string
+  code?: string
+  details?: string
+}
+
+function getRegisterProfileErrorMessage(profileError: SupabaseErrorLike) {
+  if (profileError.code === '23505') {
+    return 'Bu firma bilgileriyle daha önce hesap oluşturulmuş olabilir. Lütfen bilgilerinizi kontrol edin.'
+  }
+
+  if (profileError.code === '22P02' && profileError.message?.toLowerCase().includes('role')) {
+    return 'Hesap türü sistemle uyumlu değil. Lütfen destek ekibiyle iletişime geçin.'
+  }
+
+  return 'Profil oluşturulurken bir hata oluştu'
+}
+
+async function upsertProfile(
+  adminSupabase: ReturnType<typeof createAdminClient>,
+  payload: Record<string, unknown>
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((adminSupabase as any).from('profiles') as any).upsert(payload, { onConflict: 'id' })
+}
 
 async function resolveStoreSlug(adminSupabase: ReturnType<typeof createAdminClient>, companyName: string) {
   const baseSlug = slugifyStoreName(companyName)
@@ -94,26 +119,37 @@ export async function POST(request: NextRequest) {
       ? await resolveStoreSlug(adminSupabase, validationResult.data.company_name)
       : null
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: profileError } = await ((adminSupabase as any).from('profiles') as any)
-      .upsert({
-        id: userId,
-        role,
-        company_name: validationResult.data.company_name,
-        tax_number: validationResult.data.tax_number || null,
-        phone: validationResult.data.phone,
-        store_description: validationResult.data.store_description || null,
-        store_slug: storeSlug,
-        ...buildProfileDefaults(role),
-      }, { onConflict: 'id' })
+    const profilePayload = {
+      id: userId,
+      role,
+      company_name: validationResult.data.company_name,
+      tax_number: validationResult.data.tax_number || null,
+      phone: validationResult.data.phone,
+      store_description: validationResult.data.store_description || null,
+      store_slug: storeSlug,
+      ...buildProfileDefaults(role),
+    }
+
+    let { error: profileError } = await upsertProfile(adminSupabase, profilePayload)
+    if (
+      profileError?.code === '22P02' &&
+      role === 'depo' &&
+      profileError.message?.toLowerCase().includes('user_role')
+    ) {
+      ;({ error: profileError } = await upsertProfile(adminSupabase, {
+        ...profilePayload,
+        role: 'supplier',
+      }))
+    }
 
     if (profileError) {
+      console.error('Profile upsert error:', profileError.message, profileError.code, profileError.details)
       const { error: deleteUserError } = await adminSupabase.auth.admin.deleteUser(userId)
       if (deleteUserError) {
         console.error('Orphan auth user cleanup error:', deleteUserError.message)
       }
       return NextResponse.json(
-        { error: 'Profil oluşturulurken bir hata oluştu' },
+        { error: getRegisterProfileErrorMessage(profileError) },
         { status: 500 }
       )
     }

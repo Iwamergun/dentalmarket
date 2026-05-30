@@ -53,8 +53,15 @@ export default function RegisterPage() {
       const result = await response.json()
 
       if (!response.ok) {
+        const fieldErrors = result?.details as Record<string, string[] | undefined> | undefined
+        const firstFieldError = fieldErrors
+          ? Object.values(fieldErrors).find((messages) => Array.isArray(messages) && messages.length > 0)?.[0]
+          : null
+
         if (result?.error?.includes('zaten kayıtlı')) {
           toast.error('Bu e-posta adresi zaten kayıtlı')
+        } else if (firstFieldError) {
+          toast.error(firstFieldError)
         } else {
           toast.error(result?.error || 'Kayıt olurken bir hata oluştu')
         }

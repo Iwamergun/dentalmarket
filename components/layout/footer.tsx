@@ -12,7 +12,7 @@ async function getFooterStats() {
       supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('role', 'supplier')
+        .in('role', ['depo', 'supplier'])
         .eq('is_active', true),
       supabase.from('catalog_products').select('*', { count: 'exact', head: true }).eq('is_active', true),
     ])

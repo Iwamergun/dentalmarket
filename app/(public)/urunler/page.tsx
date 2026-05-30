@@ -23,7 +23,7 @@ export default async function ProductsPage() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container-main py-8">
       <Breadcrumbs items={breadcrumbItems} />
       
       <div className="mt-8">

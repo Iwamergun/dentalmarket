@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -10,9 +10,11 @@ import { createClient } from '@/lib/supabase/client'
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { resolvePostLoginRedirect } from '@/lib/auth/redirect'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
 
@@ -49,7 +51,8 @@ export default function LoginPage() {
       }
 
       toast.success('Giriş başarılı!')
-      router.push('/profil')
+      const redirectPath = resolvePostLoginRedirect(searchParams.get('redirect'))
+      router.push(redirectPath)
       router.refresh()
     } catch (error) {
       console.error('Login error:', error)

@@ -55,6 +55,7 @@ export function hasAdminAccess(
 const CATALOG_ADMIN_ROLES = new Set(['admin', 'super_admin', 'superadmin'])
 const SUPPLIER_PANEL_TOKENS = new Set([
   'depo',
+  'supplier',
 ])
 
 function hasSupplierPanelToken(value: unknown): boolean {

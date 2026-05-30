@@ -232,7 +232,7 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
 
   return (
     <section className="bg-muted py-10 shadow-[inset_0_1px_0_rgba(84,48,165,0.04)]">
-      <div className="container mx-auto px-4">
+      <div className="container-main">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>
           {products.length > 0 && (
@@ -257,17 +257,17 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
       </div>
 
       {loading ? (
-        <div className="flex gap-4 px-4 overflow-hidden container mx-auto">
+        <div className="container-main flex gap-4 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="container mx-auto px-4 text-center py-8">
+        <div className="container-main py-8 text-center">
           <p className="text-secondary-text">Yakında yeni ürünler eklenecektir</p>
         </div>
       ) : (
-        <div className="container mx-auto px-4">
+        <div className="container-main">
           <div
             ref={scrollRef}
             onMouseEnter={stopAutoScroll}

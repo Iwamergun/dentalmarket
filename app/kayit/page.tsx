@@ -9,6 +9,25 @@ import { registerSchema, type RegisterFormData } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+type RegisterErrorResponse = {
+  error?: string
+  details?: Record<string, string[] | undefined>
+}
+
+function getFirstFieldError(details?: RegisterErrorResponse['details']) {
+  if (!details) {
+    return null
+  }
+
+  for (const messages of Object.values(details)) {
+    if (Array.isArray(messages) && messages.length > 0) {
+      return messages[0]
+    }
+  }
+
+  return null
+}
+
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -50,11 +69,15 @@ export default function RegisterPage() {
         }),
       })
 
-      const result = await response.json()
+      const result = (await response.json()) as RegisterErrorResponse
 
       if (!response.ok) {
+        const firstFieldError = getFirstFieldError(result.details)
+
         if (result?.error?.includes('zaten kayıtlı')) {
           toast.error('Bu e-posta adresi zaten kayıtlı')
+        } else if (firstFieldError) {
+          toast.error(firstFieldError)
         } else {
           toast.error(result?.error || 'Kayıt olurken bir hata oluştu')
         }

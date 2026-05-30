@@ -125,9 +125,9 @@ export function Header() {
       {/* Main Header - White */}
       <div
         className={[
-          'rounded-[1.75rem] border shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition-colors duration-300',
+          'rounded-[1.75rem] border shadow-[0_16px_40px_rgba(15,23,42,0.08)] transition-all duration-300',
           isScrolled
-            ? 'border-white/60 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.10)]'
+            ? 'border-border bg-white/95 shadow-[0_22px_52px_rgba(15,23,42,0.14)] backdrop-blur-xl'
             : 'border-border/60 bg-white',
         ].join(' ')}
       >
@@ -315,21 +315,21 @@ export function Header() {
             </div>
           </div>
 
-          <div className="relative hidden pb-3 lg:block">
+          <div className={`relative hidden pb-3 transition-all duration-300 lg:block ${isScrolled ? 'border-t border-border/60' : ''}`}>
             <nav
               aria-label="Ana navigasyon"
-              className="mx-auto flex w-fit items-center rounded-full border border-border/60 bg-white/80 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+              className="mx-auto flex w-full max-w-3xl items-center justify-center rounded-full border border-border/70 bg-white/90 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"
             >
               {desktopNavItems.map((item, index) => {
                 const isActive = isNavItemActive(item.href)
 
                 return (
-                  <div key={item.href} className="flex items-center">
+                  <div key={item.href} className="flex min-w-0 flex-1 items-center">
                     <Link
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
                       className={[
-                        'relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
+                        'relative inline-flex w-full items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
                         isActive
                           ? 'bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(118,59,255,0.16)]'
                           : 'text-secondary-text hover:bg-white hover:text-slate-900',

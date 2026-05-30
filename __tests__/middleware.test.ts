@@ -23,10 +23,12 @@ function makeRequest(pathname: string) {
 }
 
 describe('middleware config', () => {
-  it('matcher config\'de /admin/:path*, /supplier/:path*, /dashboard/:path* olmalı', () => {
+  it('matcher config\'de korumalı pathler olmalı', () => {
     expect(config.matcher).toContain('/admin/:path*')
     expect(config.matcher).toContain('/supplier/:path*')
     expect(config.matcher).toContain('/dashboard/:path*')
+    expect(config.matcher).toContain('/odeme')
+    expect(config.matcher).toContain('/odeme/:path*')
   })
 })
 
@@ -72,6 +74,19 @@ describe('middleware route koruması', () => {
     const res = await middleware(req)
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/giris')
+  })
+
+  it('auth olmadan /odeme → /giris?redirect=/odeme\'ye redirect etmeli', async () => {
+    const mockClient = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null } }) },
+      from: vi.fn(),
+    }
+    ;(createServerClient as ReturnType<typeof vi.fn>).mockReturnValue(mockClient)
+
+    const req = makeRequest('/odeme')
+    const res = await middleware(req)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/giris?redirect=%2Fodeme')
   })
 
   it('admin olmayan kullanıcı /admin → / e redirect etmeli', async () => {

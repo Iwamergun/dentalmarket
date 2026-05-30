@@ -48,9 +48,9 @@ describe('auth access helpers', () => {
     expect(hasCatalogAdminAccess('depo')).toBe(false)
   })
 
-  it('supplier panel access should allow only depo role', () => {
+  it('supplier panel access should allow depo and legacy supplier role', () => {
     expect(hasSupplierPanelAccess('depo')).toBe(true)
-    expect(hasSupplierPanelAccess('supplier')).toBe(false)
+    expect(hasSupplierPanelAccess('supplier')).toBe(true)
     expect(hasSupplierPanelAccess('admin')).toBe(false)
     expect(hasSupplierPanelAccess('clinic')).toBe(false)
   })

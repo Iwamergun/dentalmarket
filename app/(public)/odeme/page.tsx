@@ -16,11 +16,13 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/app/contexts/CartContext'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { AddressForm, PaymentMethodSelector, OrderSummary } from '@/components/checkout'
 import { 
   type AddressFormData, 
   type PaymentMethod 
 } from '@/lib/validations/checkout'
+import { buildLoginUrlWithRedirect } from '@/lib/auth/redirect'
 
 // Kargo ücreti hesaplama
 const FREE_SHIPPING_THRESHOLD = 500
@@ -28,6 +30,7 @@ const SHIPPING_COST = 49.90
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const { items, total, loading: cartLoading, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
   const [addressData, setAddressData] = useState<AddressFormData | null>(null)
@@ -40,12 +43,19 @@ export default function CheckoutPage() {
   const shipping = total >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
   const grandTotal = total + shipping
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace(buildLoginUrlWithRedirect('/odeme'))
+    }
+  }, [authLoading, user, router])
+
   // Sepet boşsa sepet sayfasına yönlendir
   useEffect(() => {
-    if (!cartLoading && items.length === 0) {
+    const shouldRedirectToCart = !authLoading && user && !cartLoading && items.length === 0
+    if (shouldRedirectToCart) {
       router.push('/sepet')
     }
-  }, [items, cartLoading, router])
+  }, [items, cartLoading, router, user, authLoading])
 
   // Adres formu submit handler
   const handleAddressSubmit = (data: AddressFormData) => {
@@ -124,7 +134,7 @@ export default function CheckoutPage() {
   }
 
   // Loading state
-  if (cartLoading) {
+  if (authLoading || !user || cartLoading) {
     return (
       <div className="container mx-auto px-4 py-16 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />

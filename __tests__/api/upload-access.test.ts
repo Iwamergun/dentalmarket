@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { canUploadMedia } from '@/lib/auth/upload-access'
 
 describe('upload access', () => {
-  it('yalnızca depo rolüne izin vermeli', () => {
-    expect(canUploadMedia('supplier', undefined)).toBe(false)
+  it('depo ve legacy supplier rolüne izin vermeli', () => {
+    expect(canUploadMedia('supplier', undefined)).toBe(true)
     expect(canUploadMedia('depo', undefined)).toBe(true)
   })
 

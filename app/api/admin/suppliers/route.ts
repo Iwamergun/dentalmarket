@@ -24,7 +24,7 @@ export async function GET() {
     const { data: pendingSuppliers, error } = await supabase
       .from('profiles')
       .select('id, company_name, tax_number, phone, store_slug, store_description, created_at, is_active')
-      .eq('role', 'depo')
+      .in('role', ['depo', 'supplier'])
       .eq('is_active', false)
       .order('created_at', { ascending: true })
 
@@ -74,7 +74,7 @@ export async function PATCH(request: NextRequest) {
       .from('profiles')
       .update({ is_active: nextIsActive })
       .eq('id', supplierId)
-      .eq('role', 'depo')
+      .in('role', ['depo', 'supplier'])
 
     if (updateError) {
       return NextResponse.json({ success: false, error: 'Onay durumu güncellenemedi' }, { status: 500 })

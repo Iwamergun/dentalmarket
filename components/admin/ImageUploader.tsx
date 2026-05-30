@@ -8,12 +8,13 @@ import { toast } from 'sonner'
 interface ImageUploaderProps {
   onUpload: (path: string) => void
   currentImage?: string | null
+  label?: string
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-export default function ImageUploader({ onUpload, currentImage }: ImageUploaderProps) {
+export default function ImageUploader({ onUpload, currentImage, label = 'Ürün Görseli' }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -91,14 +92,14 @@ export default function ImageUploader({ onUpload, currentImage }: ImageUploaderP
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">Ürün Görseli</label>
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
 
       {displayImage ? (
         <div className="relative w-48 h-48 rounded-lg border border-gray-200 overflow-hidden group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={displayImage}
-            alt="Ürün görseli"
+            alt={label}
             className="w-full h-full object-cover"
           />
           {uploading && (

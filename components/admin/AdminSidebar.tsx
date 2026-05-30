@@ -13,6 +13,7 @@ import {
   Settings,
   Warehouse,
   MessageSquarePlus,
+  Megaphone,
   UserCheck,
   X,
 } from 'lucide-react'
@@ -41,6 +42,7 @@ const menuGroups = [
       { href: '/admin/customers', label: 'Müşteriler', icon: Users },
       { href: '/admin/categories', label: 'Kategoriler', icon: FolderTree },
       { href: '/admin/brands', label: 'Markalar', icon: Tag },
+      { href: '/admin/campaigns', label: 'Kampanyalar', icon: Megaphone },
       { href: '/admin/product-suggestions', label: 'Ürün Önerileri', icon: MessageSquarePlus },
       { href: '/admin/settings', label: 'Ayarlar', icon: Settings },
     ],

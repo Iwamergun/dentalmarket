@@ -1,0 +1,47 @@
+import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { CampaignSidebar } from '@/components/home/campaign-sidebar'
+
+describe('CampaignSidebar', () => {
+  it('renders nothing when campaigns are empty', () => {
+    const { container } = render(<CampaignSidebar campaigns={[]} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders campaign image cards with links', () => {
+    render(
+      <CampaignSidebar
+        campaigns={[
+          {
+            id: '1',
+            title: 'Kampanya 1',
+            description: null,
+            image_path: 'products/a.jpg',
+            href: '/kampanyalar/a',
+            sort_order: 0,
+            is_active: true,
+            starts_at: null,
+            ends_at: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: '2',
+            title: 'Kampanya 2',
+            description: null,
+            image_path: 'products/b.jpg',
+            href: '/kampanyalar/b',
+            sort_order: 1,
+            is_active: true,
+            starts_at: null,
+            ends_at: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ]}
+      />
+    )
+
+    expect(screen.getAllByRole('link', { name: /kampanya/i }).length).toBe(4)
+  })
+})

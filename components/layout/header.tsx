@@ -318,7 +318,7 @@ export function Header() {
           <div className="relative hidden pb-3 lg:block">
             <nav
               aria-label="Ana navigasyon"
-              className="mx-auto flex w-fit items-center rounded-full border border-border/60 bg-white/78 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+              className="mx-auto flex w-fit items-center rounded-full border border-border/60 bg-white/80 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"
             >
               {desktopNavItems.map((item, index) => {
                 const isActive = isNavItemActive(item.href)
@@ -331,7 +331,7 @@ export function Header() {
                       className={[
                         'relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
                         isActive
-                          ? 'bg-primary/8 text-primary shadow-[inset_0_0_0_1px_rgba(118,59,255,0.16)]'
+                          ? 'bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(118,59,255,0.16)]'
                           : 'text-secondary-text hover:bg-white hover:text-slate-900',
                       ].join(' ')}
                     >

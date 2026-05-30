@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
 import { CartButton } from '@/components/cart/CartButton'
 import { useAuth } from '@/app/contexts/AuthContext'
@@ -9,6 +9,13 @@ import { createClient } from '@/lib/supabase/client'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { Shield, Phone, Mail, Menu, X, Search, Heart, Sparkles } from 'lucide-react'
+
+const desktopNavItems = [
+  { href: '/kategoriler', label: 'Kategoriler' },
+  { href: '/markalar', label: 'Markalar' },
+  { href: '/urunler', label: 'Tüm Ürünler' },
+  { href: '/kampanyalar', label: 'Kampanyalar' },
+]
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -18,6 +25,7 @@ export function Header() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
   const router = useRouter()
   const { user, loading } = useAuth()
 
@@ -83,6 +91,7 @@ export function Header() {
     setIsSearchOpen(false)
     setSearchQuery('')
   }
+  const isNavItemActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <header className="sticky top-0 z-50 px-2 pt-2 transition-all duration-300 md:px-4">
@@ -128,14 +137,15 @@ export function Header() {
           </div>
           <div className={['relative flex items-center justify-between gap-4 transition-all duration-300', headerHeight].join(' ')}>
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/"
+              aria-label="DentAlışveriş ana sayfa"
+              className="flex shrink-0 items-center rounded-2xl p-1.5 text-primary transition-colors duration-200 hover:bg-primary/5"
+            >
               <BrandLogo
                 variant="icon"
-                className="h-12 w-12 shrink-0 rounded-2xl md:h-14 md:w-14"
+                className="h-9 w-9 shrink-0 md:h-10 md:w-10"
               />
-              <span className="font-serif text-[1.3rem] font-semibold tracking-[0.01em] text-slate-900 sm:text-[1.45rem] md:text-[1.6rem]">
-                DentAlışveriş
-              </span>
             </Link>
 
             {/* Search Bar - Desktop */}
@@ -306,19 +316,39 @@ export function Header() {
           </div>
 
           <div className="relative hidden pb-3 lg:block">
-            <nav className="flex items-center gap-2 rounded-2xl border border-border/60 bg-white/80 px-3 py-2 backdrop-blur">
-              <Link href="/kategoriler" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
-                Kategoriler
-              </Link>
-              <Link href="/markalar" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
-                Markalar
-              </Link>
-              <Link href="/urunler" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
-                Tüm Ürünler
-              </Link>
-              <Link href="/kampanyalar" className="rounded-xl px-3 py-1.5 text-sm font-medium text-secondary-text transition-colors hover:bg-muted hover:text-primary">
-                Kampanyalar
-              </Link>
+            <nav
+              aria-label="Ana navigasyon"
+              className="mx-auto flex w-fit items-center rounded-full border border-border/60 bg-white/80 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+            >
+              {desktopNavItems.map((item, index) => {
+                const isActive = isNavItemActive(item.href)
+
+                return (
+                  <div key={item.href} className="flex items-center">
+                    <Link
+                      href={item.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={[
+                        'relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
+                        isActive
+                          ? 'bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgba(118,59,255,0.16)]'
+                          : 'text-secondary-text hover:bg-white hover:text-slate-900',
+                      ].join(' ')}
+                    >
+                      {item.label}
+                      {isActive ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-x-4 bottom-1 h-px rounded-full bg-primary/60"
+                        />
+                      ) : null}
+                    </Link>
+                    {index < desktopNavItems.length - 1 ? (
+                      <span aria-hidden="true" className="mx-1 h-4 w-px rounded-full bg-border/70" />
+                    ) : null}
+                  </div>
+                )
+              })}
             </nav>
           </div>
 

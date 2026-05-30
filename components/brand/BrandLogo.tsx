@@ -71,7 +71,7 @@ export function BrandLogo({
     )
   }
 
-  const logo = brandLogoSources.full
+  const logo = brandLogoSources[variant]
 
   return (
     <Image

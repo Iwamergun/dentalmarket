@@ -3,9 +3,10 @@ import { describe, it, expect } from 'vitest'
 import { CampaignSidebar } from '@/components/home/campaign-sidebar'
 
 describe('CampaignSidebar', () => {
-  it('renders nothing when campaigns are empty', () => {
-    const { container } = render(<CampaignSidebar campaigns={[]} />)
-    expect(container).toBeEmptyDOMElement()
+  it('renders fallback cards when campaigns are empty', () => {
+    render(<CampaignSidebar campaigns={[]} />)
+    expect(screen.getByRole('link', { name: 'Yaz Fırsatları' })).toHaveAttribute('href', '/kampanyalar')
+    expect(screen.getByRole('link', { name: 'Yeni Üye Avantajı' })).toHaveAttribute('href', '/kampanyalar')
   })
 
   it('renders campaign image cards with links', () => {
@@ -42,6 +43,7 @@ describe('CampaignSidebar', () => {
       />
     )
 
-    expect(screen.getAllByRole('link', { name: /kampanya/i }).length).toBe(4)
+    expect(screen.getByRole('link', { name: 'Kampanya 1' })).toHaveAttribute('href', '/kampanyalar/a')
+    expect(screen.getByRole('link', { name: 'Kampanya 2' })).toHaveAttribute('href', '/kampanyalar/b')
   })
 })

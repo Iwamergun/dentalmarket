@@ -7,8 +7,9 @@ describe('HeroSection campaign placement', () => {
     render(<HeroSection campaigns={[]} />)
 
     expect(screen.getByText('Öne çıkan kampanyalar')).toBeInTheDocument()
+    // Slide 0 is visible (active), slides 1+ are aria-hidden — use hidden:true to query all
     expect(screen.getByRole('link', { name: /Yaz Fırsatları/i })).toHaveAttribute('href', '/kampanyalar')
-    expect(screen.getByRole('link', { name: /Yeni Üye Avantajı/i })).toHaveAttribute('href', '/kampanyalar')
+    expect(screen.getByRole('link', { name: /Yeni Üye Avantajı/i, hidden: true })).toHaveAttribute('href', '/kampanyalar')
     expect(screen.getByText('Demo kartlar')).toBeInTheDocument()
   })
 

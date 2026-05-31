@@ -6,18 +6,21 @@ import { FeaturedProducts } from '@/components/home/featured-products'
 import { BrandLogos } from '@/components/home/brand-logos'
 import { TrustSection } from '@/components/home/trust-section'
 import { HomeCatalogFilter } from '@/components/home/home-catalog-filter'
+import { CampaignSidebar } from '@/components/home/campaign-sidebar'
 import { getRootCategories } from '@/lib/supabase/queries/categories'
 import { getProductsWithOffers } from '@/lib/supabase/queries/products'
 import { getBrands } from '@/lib/supabase/queries/brands'
+import { getActiveCampaigns } from '@/lib/supabase/queries/campaigns'
 
 const FEATURED_PRODUCTS_COUNT = 8
 
 export default async function HomePage() {
   // Fetch data from Supabase
-  const [categories, products, brands] = await Promise.all([
+  const [categories, products, brands, campaigns] = await Promise.all([
     getRootCategories(),
     getProductsWithOffers(FEATURED_PRODUCTS_COUNT, 0),
     getBrands(),
+    getActiveCampaigns(),
   ])
 
   return (
@@ -31,7 +34,10 @@ export default async function HomePage() {
       <main>
         <div className="container-main py-10 md:py-14">
           <div className="flex flex-col lg:flex-row gap-8">
-            <HomeCatalogFilter categories={categories} brands={brands} />
+            <div className="w-full lg:w-80 lg:flex-shrink-0 space-y-4">
+              <CampaignSidebar campaigns={campaigns} />
+              <HomeCatalogFilter categories={categories} brands={brands} />
+            </div>
             
             {/* Main Content */}
             <div className="flex-1 space-y-14 md:space-y-16">

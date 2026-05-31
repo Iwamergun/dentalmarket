@@ -60,18 +60,19 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
         <Badge className="absolute -top-2.5 left-4 bg-primary text-white text-xs">En İyi Fiyat</Badge>
       )}
 
-      <div className="flex items-start gap-4">
-        {/* Supplier logo / avatar */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-          {offer.supplier_logo ? (
-            <Image src={getImageUrl(offer.supplier_logo)} alt={offer.supplier_name ?? ''} width={48} height={48} className="w-full h-full object-cover" unoptimized />
-          ) : (
-            <Package className="w-6 h-6 text-muted-foreground" />
-          )}
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          {/* Supplier logo / avatar */}
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
+            {offer.supplier_logo ? (
+              <Image src={getImageUrl(offer.supplier_logo)} alt={offer.supplier_name ?? ''} width={48} height={48} className="h-full w-full object-cover" unoptimized />
+            ) : (
+              <Package className="h-6 w-6 text-muted-foreground" />
+            )}
+          </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
+          {/* Info */}
+          <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-foreground truncate">{offer.supplier_name ?? 'Satıcı'}</span>
             {offer.supplier_rating != null && offer.supplier_rating > 0 && (
@@ -86,7 +87,7 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
           </div>
 
           {/* Meta row */}
-          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
+          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             {offer.lead_time_days != null && (
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
@@ -120,16 +121,18 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
             <p className="text-xs text-muted-foreground mt-1 italic line-clamp-1">{offer.notes}</p>
           )}
         </div>
+        </div>
 
         {/* Price + CTA */}
-        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+        <div className="w-full flex-shrink-0 sm:w-auto">
+          <div className="flex flex-col gap-2 sm:items-end">
           {authLoading ? (
             <div className="h-7 w-24 animate-pulse rounded bg-muted" />
           ) : !user ? (
             <button
               type="button"
               onClick={() => router.push('/giris')}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+              className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15 sm:w-auto"
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -137,18 +140,18 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
               Fiyat için giriş yapın
             </button>
           ) : (
-            <span className="text-xl font-bold text-primary">{formatPrice(offer.price)}</span>
+            <span className="text-lg font-bold text-primary sm:text-xl">{formatPrice(offer.price)}</span>
           )}
 
           {!isInStock ? (
             <Badge variant="danger" className="text-xs">Stokta Yok</Badge>
           ) : (
-            <div className="flex items-center gap-2">
+           <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-row sm:justify-end">
               <Button
                 size="sm"
                 onClick={handleAddToCart}
                 disabled={isAdding || isAdded}
-                className="gap-1.5"
+               className="w-full gap-1.5 sm:w-auto"
               >
                 {isAdding ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -167,7 +170,7 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
               {offer.supplier_slug && (
                 <Link
                   href={`/satici/${offer.supplier_slug}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-md hover:bg-muted transition-colors"
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted sm:w-auto"
                 >
                   <Store className="w-4 h-4" />
                   Satıcıyı Gör
@@ -175,6 +178,7 @@ export function SupplierOfferCard({ offer, productId, productName, isBest }: Sup
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

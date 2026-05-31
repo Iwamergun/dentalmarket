@@ -24,9 +24,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
 
   return (
-    <Card className="relative flex h-full min-h-[420px] flex-col overflow-hidden transition-shadow hover:shadow-md group">
+    <Card className="group relative flex h-full min-h-[190px] flex-col overflow-hidden transition-shadow hover:shadow-md sm:min-h-[360px]">
       {/* Wishlist Button */}
-      <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute right-1.5 top-1.5 z-10 hidden opacity-0 transition-opacity group-hover:opacity-100 sm:block sm:right-3 sm:top-3">
         <WishlistButton 
           productId={product.id} 
           productName={product.name}
@@ -36,8 +36,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Satıcı sayısı badge - görselin üstünde sol üst */}
       {hasMultipleOffers && (
-        <div className="absolute top-3 left-3 z-10">
-          <span className="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
+        <div className="absolute left-1.5 top-1.5 z-10 sm:left-3 sm:top-3">
+          <span className="inline-flex items-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-sm sm:px-2.5 sm:py-1 sm:text-xs">
             {product.offer_count} satıcı
           </span>
         </div>
@@ -45,14 +45,14 @@ export function ProductCard({ product }: ProductCardProps) {
       
       <Link href={`/urunler/${product.slug}`} className="flex flex-1 flex-col">
         {/* Ürün Görseli */}
-        <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center">
+        <div className="relative flex aspect-square w-full items-center justify-center bg-gray-50">
           {product.primary_image ? (
             <Image
               src={getImageUrl(product.primary_image)}
               alt={product.name}
               fill
-              className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105 sm:p-3"
+              sizes="(max-width: 430px) 33vw, (max-width: 640px) 25vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-gray-300">
@@ -64,25 +64,25 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <CardHeader className="pb-1 pt-3">
+        <CardHeader className="pb-1 pt-2 px-2.5 sm:px-6 sm:pt-3">
           <div className="mb-1">
             {product.brand_name && (
-              <Badge variant="secondary" className="text-xs">{product.brand_name}</Badge>
+              <Badge variant="secondary" className="hidden text-xs sm:inline-flex">{product.brand_name}</Badge>
             )}
           </div>
-          <CardTitle className="line-clamp-2 text-sm font-semibold leading-tight">{product.name}</CardTitle>
+          <CardTitle className="line-clamp-2 text-xs font-semibold leading-tight sm:text-sm">{product.name}</CardTitle>
         </CardHeader>
 
-        <CardContent className="pb-2 pt-0 flex-1">
+        <CardContent className="flex-1 px-2.5 pb-1.5 pt-0 sm:px-6 sm:pb-2">
           {/* Fiyat */}
           <div className="mt-2">
             {authLoading ? (
-              <div className="h-6 w-24 animate-pulse rounded bg-muted" />
+              <div className="h-5 w-16 animate-pulse rounded bg-muted sm:h-6 sm:w-24" />
             ) : !user ? (
               <button
                 type="button"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/giris') }}
-                className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                className="inline-flex max-w-full items-center gap-1 rounded-lg bg-primary/8 px-1.5 py-1 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/15 sm:px-3 sm:py-1.5 sm:text-xs"
               >
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -92,17 +92,17 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : hasPrice ? (
               isRange ? (
                 <div>
-                  <span className="text-lg font-bold text-blue-600">
+                  <span className="text-xs font-bold text-blue-600 sm:text-lg">
                     {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
                   </span>
                 </div>
               ) : (
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-xs font-bold text-blue-600 sm:text-lg">
                   {formatPrice(product.min_price!)}
                 </span>
               )
             ) : (
-              <span className="text-sm text-muted-foreground italic">
+              <span className="text-[10px] italic text-muted-foreground sm:text-sm">
                 Fiyat bilgisi yok
               </span>
             )}
@@ -110,7 +110,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Satıcı etiketi */}
           {hasMultipleOffers && (
             <div className="mt-1">
-              <span className="text-xs text-green-700">
+              <span className="text-[10px] text-green-700 sm:text-xs">
                 {product.offer_count} satıcıdan
               </span>
             </div>
@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
       </Link>
 
-      <CardFooter className="mt-auto flex items-center px-4 pb-4 pt-0">
+      <CardFooter className="mt-auto flex items-center px-2.5 pb-2.5 pt-0 sm:px-4 sm:pb-4">
         <AddToCartButton 
           productId={product.id}
           productName={product.name}

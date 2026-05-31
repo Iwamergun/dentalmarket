@@ -32,7 +32,7 @@ describe('Header brand area', () => {
   it('should render icon-only homepage link and centered desktop nav links', () => {
     render(<Header />)
 
-    expect(screen.getByRole('link', { name: 'DENTALMARKETTR ana sayfa' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Dentalışveriş ana sayfa' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('img', { name: 'DentAlışveriş' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Kategoriler' })).toHaveAttribute('href', '/kategoriler')
     expect(screen.getByRole('link', { name: 'Anasayfa' })).toHaveAttribute('href', '/')

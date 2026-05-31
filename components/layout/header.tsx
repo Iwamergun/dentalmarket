@@ -103,11 +103,11 @@ export function Header() {
           <div className="flex items-center gap-2 px-3 py-2 md:px-4">
             <Link
               href="/"
-              aria-label="DENTALMARKETTR ana sayfa"
+              aria-label="Denalışveriş ana sayfa"
               className="flex shrink-0 items-center gap-2 rounded-full border border-primary/10 bg-white px-2.5 py-1.5 text-primary transition hover:border-secondary/35"
             >
               <BrandLogo variant="icon" className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
-              <span aria-hidden="true" className="hidden text-xs font-semibold tracking-[0.12em] sm:inline">DENTALMARKETTR</span>
+              <span aria-hidden="true" className="hidden text-xs font-semibold tracking-[0.12em] sm:inline">Dentalışveriş</span>
             </Link>
 
             <div className="hidden min-w-0 flex-1 justify-center px-2 lg:flex">

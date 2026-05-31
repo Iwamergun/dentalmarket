@@ -58,6 +58,7 @@ export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: Her
         {campaigns.map((campaign, index) => (
           <div
             key={campaign.id}
+            aria-hidden={index !== current}
             className={`absolute inset-0 transition-opacity duration-500 ${
               index === current ? 'z-10 opacity-100' : 'z-0 opacity-0 pointer-events-none'
             }`}
@@ -115,7 +116,7 @@ export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: Her
             <button
               key={index}
               onClick={() => setCurrent(index)}
-              aria-label={`Slayt ${index + 1}`}
+              aria-label={`${index === current ? 'Geçerli slayt' : 'Git'} ${index + 1} / ${campaigns.length}`}
               className={`h-2 rounded-full transition-all duration-300 ${
                 index === current ? 'w-6 bg-primary' : 'w-2 bg-border hover:bg-primary/40'
               }`}

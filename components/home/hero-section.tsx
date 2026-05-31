@@ -1,20 +1,85 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShieldCheck, Stethoscope, Zap } from 'lucide-react'
+import type { Campaign } from '@/lib/supabase/queries/campaigns'
+import { getImageUrl } from '@/lib/utils/imageHelper'
 
-export function HeroSection() {
+interface HeroSectionProps {
+  campaigns?: Campaign[]
+}
+
+const fallbackCampaigns: Campaign[] = [
+  {
+    id: 'hero-fallback-1',
+    title: 'Yaz Fırsatları',
+    description: 'Seçili ürünlerde avantajlı fiyatları keşfedin.',
+    image_path: '',
+    href: '/kampanyalar',
+    sort_order: 0,
+    is_active: true,
+    starts_at: null,
+    ends_at: null,
+    created_at: '',
+    updated_at: '',
+  },
+  {
+    id: 'hero-fallback-2',
+    title: 'Yeni Üye Avantajı',
+    description: 'İlk siparişe özel kampanyaları hemen inceleyin.',
+    image_path: '',
+    href: '/kampanyalar',
+    sort_order: 1,
+    is_active: true,
+    starts_at: null,
+    ends_at: null,
+    created_at: '',
+    updated_at: '',
+  },
+  {
+    id: 'hero-fallback-3',
+    title: 'Toplu Alım İndirimi',
+    description: 'Toplu siparişlerde ek indirim fırsatlarını kaçırmayın.',
+    image_path: '',
+    href: '/kampanyalar',
+    sort_order: 2,
+    is_active: true,
+    starts_at: null,
+    ends_at: null,
+    created_at: '',
+    updated_at: '',
+  },
+]
+
+export function HeroSection({ campaigns = [] }: HeroSectionProps) {
+  const displayCampaigns = (campaigns.length > 0 ? campaigns : fallbackCampaigns).slice(0, 4)
+  const showFallbackTag = campaigns.length === 0
+  const getFallbackGradientClass = (index: number) =>
+    index % 2 === 0
+      ? 'bg-gradient-to-br from-primary via-primary/85 to-secondary'
+      : 'bg-gradient-to-br from-secondary via-secondary/85 to-accent'
+
   return (
     <section className="relative overflow-hidden border-b border-border/40 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(245,245,250,0.96))]">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-secondary/40 to-transparent" />
-      <div className="container-main relative py-16 md:py-20 lg:py-24">
+      <div className="container-main relative py-12 md:py-16 lg:py-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-          <div className="space-y-8 text-center lg:text-left">
-            <h1 className="max-w-3xl text-4xl font-bold leading-tight text-foreground md:text-5xl lg:text-6xl">
+          <div className="space-y-6 text-center lg:text-left">
+            <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
+              <span className="inline-flex items-center rounded-full border border-secondary/15 bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-secondary">
+                DentalmarketTR
+              </span>
+              <span className="inline-flex items-center rounded-full border border-primary/10 bg-white px-3 py-1 text-xs font-medium text-secondary-text">
+                Gerçek kampanyalar ilk bakışta görünür
+              </span>
+            </div>
+
+            <h1 className="max-w-3xl text-3xl font-bold leading-tight text-foreground md:text-5xl lg:text-[3.25rem]">
               Diş hekimleri için daha temiz, daha hızlı ve daha güvenilir bir satın alma akışı.
             </h1>
 
-            <p className="max-w-2xl text-base leading-8 text-secondary-text md:text-lg">
-              Binlerce dental ürün, güvenilir tedarikçiler ve iş akışını yormayan sade bir arayüz.
-              İhtiyacınız olan ekipmana hızlıca ulaşın, teklifleri karşılaştırın ve siparişi güvenle tamamlayın.
+            <p className="max-w-2xl text-base leading-7 text-secondary-text md:text-lg">
+              Binlerce dental ürün, güvenilir tedarikçiler ve klinik satın alma ekipleri için sade bir keşif akışı.
+              Aşağıdaki kampanya kartlarıyla güncel fırsatları ilk ekranda görün.
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
@@ -30,6 +95,66 @@ export function HeroSection() {
               >
                 Kategoriler
               </Link>
+            </div>
+
+            <div className="rounded-[2rem] border border-primary/10 bg-white/80 p-4 shadow-card backdrop-blur-sm">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Öne çıkan kampanyalar</p>
+                  <p className="mt-1 text-sm text-secondary-text">İlk ekranda görünen fırsatlar</p>
+                </div>
+                {showFallbackTag && (
+                  <span className="rounded-full bg-secondary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-secondary">
+                    Demo kartlar
+                  </span>
+                )}
+              </div>
+
+              <div className="flex gap-3 overflow-x-auto pb-2 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0">
+                {displayCampaigns.map((campaign, index) => (
+                  <Link
+                    key={campaign.id}
+                    href={campaign.href || '/kampanyalar'}
+                    className="group min-w-[240px] overflow-hidden rounded-[1.5rem] border border-border/70 bg-white text-left shadow-subtle transition-transform duration-200 hover:-translate-y-1 hover:shadow-card lg:min-w-0"
+                  >
+                    <div className="relative aspect-[16/9] overflow-hidden">
+                      {campaign.image_path ? (
+                        <Image
+                          src={getImageUrl(campaign.image_path)}
+                          alt={campaign.title}
+                          width={640}
+                          height={360}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 1024px) 240px, 320px"
+                        />
+                      ) : (
+                        <div className={`flex h-full w-full items-end p-4 text-white ${getFallbackGradientClass(index)}`}>
+                          <span className="rounded-xl bg-black/15 px-3 py-1.5 text-sm font-semibold backdrop-blur">
+                            {campaign.title}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-primary/8 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+                          Kampanya
+                        </span>
+                        {showFallbackTag && (
+                          <span className="rounded-full bg-secondary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-secondary">
+                            Hazır
+                          </span>
+                        )}
+                      </div>
+                      <p className="line-clamp-1 text-sm font-semibold text-foreground">{campaign.title}</p>
+                      <p className="line-clamp-2 text-sm leading-6 text-secondary-text">
+                        {campaign.description || 'Aktif kampanyaları görüntüleyin ve teklif detaylarını inceleyin.'}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">

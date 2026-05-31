@@ -44,11 +44,11 @@ export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: Her
       <div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Öne çıkan kampanyalar</p>
-          <p className="mt-0.5 text-sm text-secondary-text">İlk ekranda görünen fırsatlar</p>
+        
         </div>
         {showFallbackTag && (
           <span className="rounded-full bg-secondary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-secondary">
-            Demo kartlar
+            
           </span>
         )}
       </div>

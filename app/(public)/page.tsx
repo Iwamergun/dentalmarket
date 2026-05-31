@@ -6,7 +6,6 @@ import { FeaturedProducts } from '@/components/home/featured-products'
 import { BrandLogos } from '@/components/home/brand-logos'
 import { TrustSection } from '@/components/home/trust-section'
 import { HomeCatalogFilter } from '@/components/home/home-catalog-filter'
-import { CampaignSidebar } from '@/components/home/campaign-sidebar'
 import { getRootCategories } from '@/lib/supabase/queries/categories'
 import { getProductsWithOffers } from '@/lib/supabase/queries/products'
 import { getBrands } from '@/lib/supabase/queries/brands'
@@ -26,7 +25,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(118,59,255,0.08),_transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,248,252,1))]">
       {/* Hero Section */}
-      <HeroSection />
+      <HeroSection campaigns={campaigns} />
 
       {/* Product Carousel */}
       <ProductCarousel fallbackProducts={products} />
@@ -34,8 +33,7 @@ export default async function HomePage() {
       <main>
         <div className="container-main py-10 md:py-14">
           <div className="flex flex-col lg:flex-row gap-8">
-            <div className="w-full lg:w-80 lg:flex-shrink-0 space-y-4">
-              <CampaignSidebar campaigns={campaigns} />
+            <div className="w-full lg:w-80 lg:flex-shrink-0">
               <HomeCatalogFilter categories={categories} brands={brands} />
             </div>
             

@@ -69,7 +69,7 @@ export function HeroSection({ campaigns = [] }: HeroSectionProps) {
                 DentalmarketTR
               </span>
               <span className="inline-flex items-center rounded-full border border-primary/10 bg-white px-3 py-1 text-xs font-medium text-secondary-text">
-                Gerçek kampanyalar ilk bakışta görünür
+                Gerçek kampanyalar ilk bakışta görünüyor
               </span>
             </div>
 
@@ -138,7 +138,7 @@ export function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
                     <div className="space-y-2 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-primary/8 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+                        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
                           Kampanya
                         </span>
                         {showFallbackTag && (

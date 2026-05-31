@@ -16,6 +16,10 @@ export default function KargoTakibiPage() {
           Sipariş numaranız ile kargonuzun hazırlık, dağıtım ve teslimat adımlarını bu sayfadan hızlıca takip
           edebilirsiniz.
         </p>
+        <p className="mt-2 text-xs text-text-muted">
+          Canlı kargo sorgulama ekranı yakında bu sayfada aktif olacaktır. Şimdilik güncel durum için Siparişlerim
+          sayfanızı kullanabilirsiniz.
+        </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-primary/10 bg-primary/[0.02] p-4">

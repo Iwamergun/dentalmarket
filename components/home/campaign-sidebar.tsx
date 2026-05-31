@@ -53,6 +53,10 @@ const fallbackCampaigns: Campaign[] = [
 export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
   const displayCampaigns = campaigns.length > 0 ? campaigns : fallbackCampaigns
   const showFallbackTag = campaigns.length === 0
+  const getFallbackGradientClass = (index: number) =>
+    index % 2 === 0
+      ? 'bg-gradient-to-br from-primary via-primary/80 to-secondary'
+      : 'bg-gradient-to-br from-secondary via-secondary/80 to-primary'
 
   return (
     <>
@@ -76,11 +80,7 @@ export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
                   />
                 ) : (
                   <div
-                    className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${
-                      index % 2 === 0
-                        ? 'bg-gradient-to-br from-primary via-primary/80 to-secondary'
-                        : 'bg-gradient-to-br from-secondary via-secondary/80 to-primary'
-                    }`}
+                    className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${getFallbackGradientClass(index)}`}
                   >
                     <span className="rounded-lg bg-black/15 px-2 py-1 backdrop-blur">{campaign.title}</span>
                   </div>
@@ -117,11 +117,7 @@ export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
                     />
                   ) : (
                     <div
-                      className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${
-                        index % 2 === 0
-                          ? 'bg-gradient-to-br from-primary via-primary/80 to-secondary'
-                          : 'bg-gradient-to-br from-secondary via-secondary/80 to-primary'
-                      }`}
+                      className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${getFallbackGradientClass(index)}`}
                     >
                       <span className="rounded-lg bg-black/15 px-2 py-1 backdrop-blur">{campaign.title}</span>
                     </div>

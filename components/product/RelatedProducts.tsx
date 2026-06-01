@@ -7,6 +7,7 @@ import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
 import { Badge } from '@/components/ui/badge'
 import { AddToCartButton } from '@/components/cart'
+import { WishlistButton } from '@/components/WishlistButton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
@@ -36,9 +37,9 @@ export function RelatedProducts({ products, currentProductId }: RelatedProductsP
               href={`/urunler/${product.slug}`}
               className="group block"
             >
-              <div className="bg-card border border-border/50 rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-300">
+              <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-premium">
                 {/* Ürün Resmi */}
-                <div className="relative aspect-square bg-white">
+                <div className="relative m-3 aspect-square overflow-hidden rounded-2xl bg-white">
                   <Image
                     src={getImageUrl(product.primary_image)}
                     alt={product.name}
@@ -83,12 +84,18 @@ export function RelatedProducts({ products, currentProductId }: RelatedProductsP
                     <p className="text-xs italic text-muted-foreground">Fiyat bilgisi yok</p>
                   )}
                   
-                  <div onClick={(e) => e.preventDefault()}>
-                    <AddToCartButton
+                  <div className="flex items-center gap-2 pt-1" onClick={(e) => e.preventDefault()}>
+                    <WishlistButton
                       productId={product.id}
                       productName={product.name}
                       size="sm"
-                      fullWidth
+                      className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50"
+                    />
+                    <AddToCartButton
+                      productId={product.id}
+                      productName={product.name}
+                      iconOnly
+                      className="!h-10 !w-auto flex-1"
                     />
                   </div>
                 </div>

@@ -88,20 +88,20 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
             return (
               <div
                 key={product.id}
-                className="group flex min-h-[420px] flex-col overflow-hidden rounded-3xl border border-border/60 bg-background/90 shadow-subtle transition-all duration-300 hover:-translate-y-1 hover:border-secondary/25 hover:shadow-premium"
+                className="group flex min-h-[420px] flex-col overflow-hidden rounded-3xl border border-border/70 bg-white shadow-subtle transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-premium"
               >
                 {/* Image */}
-                <div className="relative aspect-square bg-muted overflow-hidden">
-                  <Link href={`/urunler/${product.slug}`}>
+                <div className="relative m-3 aspect-square overflow-hidden rounded-[1.5rem] bg-muted">
+                  <Link href={`/urunler/${product.slug}`} className="block h-full w-full">
                     {product.primary_image ? (
                       <Image
                         src={getImageUrl(product.primary_image)}
                         alt={product.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="rounded-[1.35rem] object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                      <div className="flex h-full w-full items-center justify-center rounded-[1.35rem] bg-muted">
                         <ShoppingCart className="w-16 h-16 text-secondary-text" />
                       </div>
                     )}
@@ -114,17 +114,6 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     </div>
                   )}
                   
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={() => handleToggleWishlist(product.id)}
-                    className={`absolute top-3 right-3 rounded-2xl bg-white/95 p-2.5 shadow-md backdrop-blur transition-all duration-200 ${
-                      isInWishlist(product.id)
-                        ? 'text-destructive scale-110'
-                        : 'text-secondary-text hover:text-destructive hover:scale-110'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
-                  </button>
                 </div>
 
                 {/* Content */}
@@ -198,20 +187,32 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     )}
                   </div>
 
-                  {/* Add to Cart Button */}
-                  <div className="mt-auto pt-4">
+                  {/* Action Buttons */}
+                  <div className="mt-auto flex items-center gap-2 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleWishlist(product.id)}
+                      className={`flex h-12 flex-1 items-center justify-center rounded-2xl border bg-white shadow-sm transition-all duration-200 ${
+                        isInWishlist(product.id)
+                          ? 'border-destructive/25 text-destructive'
+                          : 'border-border text-secondary-text hover:border-destructive/25 hover:bg-destructive/5 hover:text-destructive'
+                      }`}
+                      aria-label={isInWishlist(product.id) ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                      title={isInWishlist(product.id) ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                    >
+                      <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                    </button>
                     <button
                       onClick={() => handleAddToCart(product)}
                       disabled={loadingStates[product.id]}
-                      className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-12 flex-1 items-center justify-center rounded-2xl bg-primary text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label="Sepete ekle"
+                      title="Sepete ekle"
                     >
                       {loadingStates[product.id] ? (
-                        <span>Ekleniyor...</span>
+                        <span className="h-5 w-5 animate-pulse rounded-full bg-white/70" />
                       ) : (
-                        <>
-                          <ShoppingCart className="w-5 h-5" />
-                          <span>Sepete Ekle</span>
-                        </>
+                        <ShoppingCart className="h-5 w-5" />
                       )}
                     </button>
                   </div>

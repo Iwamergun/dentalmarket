@@ -18,6 +18,7 @@ interface AddToCartButtonProps {
   variant?: 'default' | 'outline' | 'ghost'
   showIcon?: boolean
   fullWidth?: boolean
+  iconOnly?: boolean
 }
 
 export function AddToCartButton({
@@ -31,6 +32,7 @@ export function AddToCartButton({
   variant = 'default',
   showIcon = true,
   fullWidth = false,
+  iconOnly = false,
 }: AddToCartButtonProps) {
   const { addToCart } = useCart()
   const [loading, setLoading] = useState(false)
@@ -81,25 +83,35 @@ export function AddToCartButton({
       className={cn(
         'gap-2 transition-all duration-300',
         fullWidth && 'w-full',
-        variant === 'default' && !success && 'h-12 rounded-xl bg-accent text-white shadow-md hover:bg-accent/90 hover:shadow-lg',
-        success && 'h-12 rounded-xl bg-success text-white shadow-md hover:bg-success',
+        iconOnly
+          ? cn(
+              'h-9 w-9 shrink-0 rounded-xl p-0 sm:h-11 sm:w-11',
+              !success && 'bg-primary text-white shadow-sm hover:bg-primary/90 hover:shadow-md',
+              success && 'bg-success text-white hover:bg-success'
+            )
+          : cn(
+              variant === 'default' && !success && 'h-10 rounded-xl bg-primary text-white shadow-sm hover:bg-primary/90 hover:shadow-md sm:h-11',
+              success && 'h-10 rounded-xl bg-success text-white shadow-sm hover:bg-success sm:h-11'
+            ),
         className
       )}
+      aria-label={iconOnly ? 'Sepete ekle' : undefined}
+      title={iconOnly ? 'Sepete ekle' : undefined}
     >
       {loading ? (
         <>
-          <Loader2 className="w-4 h-4 animate-spin" />
-          <span>Ekleniyor...</span>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {!iconOnly && <span>Ekleniyor...</span>}
         </>
       ) : success ? (
         <>
-          <Check className="w-4 h-4" />
-          <span>Eklendi!</span>
+          <Check className="h-4 w-4" />
+          {!iconOnly && <span>Eklendi!</span>}
         </>
       ) : (
         <>
-          {showIcon && <ShoppingCart className="w-4 h-4" />}
-          <span>Sepete Ekle</span>
+          {showIcon && <ShoppingCart className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />}
+          {!iconOnly && <span>Sepete Ekle</span>}
         </>
       )}
     </Button>

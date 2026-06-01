@@ -24,16 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
 
   return (
-    <Card className="group relative flex h-full min-h-[190px] flex-col overflow-hidden transition-shadow hover:shadow-md sm:min-h-[360px]">
-      {/* Wishlist Button */}
-      <div className="absolute right-1.5 top-1.5 z-10 hidden opacity-0 transition-opacity group-hover:opacity-100 sm:block sm:right-3 sm:top-3">
-        <WishlistButton 
-          productId={product.id} 
-          productName={product.name}
-          size="sm"
-        />
-      </div>
-
+    <Card className="group relative flex h-full min-h-[190px] flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-premium sm:min-h-[360px]">
       {/* Satıcı sayısı badge - görselin üstünde sol üst */}
       {hasMultipleOffers && (
         <div className="absolute left-1.5 top-1.5 z-10 sm:left-3 sm:top-3">
@@ -45,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
       
       <Link href={`/urunler/${product.slug}`} className="flex flex-1 flex-col">
         {/* Ürün Görseli */}
-        <div className="relative flex aspect-square w-full items-center justify-center bg-gray-50">
+        <div className="relative mx-2 mt-2 flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-gray-50 sm:mx-3 sm:mt-3">
           {product.primary_image ? (
             <Image
               src={getImageUrl(product.primary_image)}
@@ -118,11 +109,18 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
       </Link>
 
-      <CardFooter className="mt-auto flex items-center px-2.5 pb-2.5 pt-0 sm:px-4 sm:pb-4">
-        <AddToCartButton 
+      <CardFooter className="mt-auto flex items-center gap-2 px-2.5 pb-2.5 pt-0 sm:px-3 sm:pb-4">
+        <WishlistButton
           productId={product.id}
           productName={product.name}
-          fullWidth
+          size="sm"
+          className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50 sm:!h-11"
+        />
+        <AddToCartButton
+          productId={product.id}
+          productName={product.name}
+          iconOnly
+          className="!w-auto flex-1"
         />
       </CardFooter>
     </Card>

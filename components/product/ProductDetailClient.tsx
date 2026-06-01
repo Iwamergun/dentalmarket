@@ -255,9 +255,9 @@ export function ProductDetailClient({ product, offers = [] }: ProductDetailClien
           </Badge>
         </div>
 
-        {/* Miktar Seçici ve Sepete Ekle */}
+        {/* Miktar Seçici ve Aksiyon Butonları */}
         {isInStock && (
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row">
             {/* Miktar Seçici (+/- butonlar, 1-10 arası, max=stok) */}
             <div className="flex items-center border border-border rounded-lg overflow-hidden">
               <button
@@ -281,38 +281,33 @@ export function ProductDetailClient({ product, offers = [] }: ProductDetailClien
               </button>
             </div>
 
-            {/* Sepete Ekle Butonu */}
-            <Button
-              onClick={handleAddToCart}
-              disabled={isAdding || isAdded}
-              size="lg"
-              className="flex-1 h-[54px] text-lg font-semibold"
-            >
-              {isAdding ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Ekleniyor...
-                </>
-              ) : isAdded ? (
-                <>
-                  <Check className="w-5 h-5 mr-2" />
-                  Sepete Eklendi!
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Sepete Ekle
-                </>
-              )}
-            </Button>
+            <div className="flex flex-1 items-center gap-2">
+              {/* Sepete Ekle Butonu */}
+              <Button
+                onClick={handleAddToCart}
+                disabled={isAdding || isAdded}
+                size="lg"
+                className="h-[54px] flex-1 rounded-2xl bg-primary text-white shadow-sm hover:bg-primary/90 hover:shadow-md"
+                aria-label="Sepete ekle"
+                title="Sepete ekle"
+              >
+                {isAdding ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isAdded ? (
+                  <Check className="h-5 w-5" />
+                ) : (
+                  <ShoppingCart className="h-5 w-5" />
+                )}
+              </Button>
 
-            {/* Favorilere Ekle Kalp Butonu */}
-            <WishlistButton
-              productId={product.id}
-              productName={product.name}
-              size="lg"
-              showLabel
-            />
+              {/* Favorilere Ekle Kalp Butonu */}
+              <WishlistButton
+                productId={product.id}
+                productName={product.name}
+                size="lg"
+                className="!h-[54px] !w-auto flex-1 !rounded-2xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50"
+              />
+            </div>
           </div>
         )}
 

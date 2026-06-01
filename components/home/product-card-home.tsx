@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { Product } from '@/types/catalog.types'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
+import { WishlistButton } from '@/components/WishlistButton'
 
 interface ProductCardHomeProps {
   product: Product
@@ -12,14 +13,14 @@ interface ProductCardHomeProps {
 export function ProductCardHome({ product, featured = false }: ProductCardHomeProps) {
   return (
     <div
-      className={`group card-base min-h-[420px] overflow-hidden flex flex-col ${
+      className={`group card-base min-h-[420px] overflow-hidden flex flex-col border border-border/70 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-premium ${
         featured ? 'md:col-span-2 md:row-span-2' : ''
       }`}
     >
       {/* Clickable area for product details */}
       <Link href={`/urunler/${product.slug}`} className="flex-1 flex flex-col">
         {/* Image Placeholder */}
-        <div className={`relative bg-background-elevated flex items-center justify-center ${
+        <div className={`relative m-3 flex items-center justify-center overflow-hidden rounded-2xl bg-background-elevated ${
           featured ? 'aspect-square md:aspect-auto md:h-64' : 'aspect-square'
         }`}>
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15">
@@ -58,12 +59,18 @@ export function ProductCardHome({ product, featured = false }: ProductCardHomePr
       </Link>
       
       {/* Add to Cart Button - Outside Link to prevent nesting issues */}
-      <div className="mt-auto px-4 pb-4">
-        <AddToCartButton 
+      <div className="mt-auto flex items-center gap-2 px-4 pb-4">
+        <WishlistButton
           productId={product.id}
           productName={product.name}
-          fullWidth
           size="sm"
+          className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50 sm:!h-11"
+        />
+        <AddToCartButton
+          productId={product.id}
+          productName={product.name}
+          iconOnly
+          className="!w-auto flex-1"
         />
       </div>
     </div>

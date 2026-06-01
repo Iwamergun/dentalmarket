@@ -8,6 +8,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
+import { WishlistButton } from '@/components/WishlistButton'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 interface CarouselProduct {
@@ -85,9 +87,9 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   return (
     <Link
       href={`/urunler/${product.slug}`}
-      className="w-56 flex-shrink-0 snap-start rounded-2xl border border-border bg-white shadow-lg overflow-hidden hover:shadow-xl hover:scale-[1.03] transition-all duration-300 group"
+      className="w-56 flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/30 hover:shadow-premium group"
     >
-      <div className="aspect-square relative overflow-hidden bg-background">
+      <div className="relative m-3 aspect-square overflow-hidden rounded-2xl bg-background">
         <Image
           src={imgSrc}
           alt={product.name}
@@ -157,6 +159,20 @@ function ProductCard({ product }: { product: CarouselProduct }) {
             {product.offer_count} satıcıdan
           </p>
         )}
+        <div className="flex items-center gap-2 pt-2" onClick={(e) => e.preventDefault()}>
+          <WishlistButton
+            productId={product.id}
+            productName={product.name}
+            size="sm"
+            className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50"
+          />
+          <AddToCartButton
+            productId={product.id}
+            productName={product.name}
+            iconOnly
+            className="!h-10 !w-auto flex-1"
+          />
+        </div>
       </div>
     </Link>
   )

@@ -7,10 +7,10 @@ import { useCart } from '@/app/contexts/CartContext'
 import { useAuth } from '@/app/contexts/AuthContext'
 
 const navItems = [
-  { href: '/', label: 'Home', icon: House },
-  { href: '/kategoriler', label: 'Categories', icon: Grid2x2 },
-  { href: '/profil/favorilerim', label: 'Favorites', icon: Heart },
-  { href: '/sepet', label: 'Cart', icon: ShoppingCart },
+  { href: '/', label: 'Ana Sayfa', icon: House },
+  { href: '/kategoriler', label: 'Kategoriler', icon: Grid2x2 },
+  { href: '/profil/favorilerim', label: 'Favoriler', icon: Heart },
+  { href: '/sepet', label: 'Sepet', icon: ShoppingCart },
 ]
 
 export function MobileBottomNav() {
@@ -57,7 +57,7 @@ export function MobileBottomNav() {
           ].join(' ')}
         >
           <UserRound className="h-4 w-4" />
-          <span>Profile</span>
+          <span>Profil</span>
         </Link>
       </div>
     </nav>

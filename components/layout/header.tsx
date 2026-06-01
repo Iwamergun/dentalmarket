@@ -8,7 +8,7 @@ import { useAuth } from '@/app/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 import { BrandLogo } from '@/components/brand/BrandLogo'
-import { Shield, Menu, X, Search, Heart } from 'lucide-react'
+import { Shield, Menu, X, Search, Heart, ChevronDown, Home, Grid2X2, PackageSearch, Megaphone, PhoneCall, Truck } from 'lucide-react'
 
 const desktopNavItems = [
   { href: '/', label: 'Anasayfa' },
@@ -19,14 +19,46 @@ const desktopNavItems = [
   { href: '/kargo-takibi', label: 'Kargo Takibi' },
 ]
 
+const navMetaByHref = {
+  '/': {
+    description: 'Dental tedarikte öne çıkan ürünler ve güncel fırsatlar.',
+    icon: Home,
+  },
+  '/kategoriler': {
+    description: 'Uzmanlık alanına göre kategorileri hızlıca keşfedin.',
+    icon: Grid2X2,
+  },
+  '/urunler': {
+    description: 'Klinik ve laboratuvar ihtiyaçları için kapsamlı ürün listesi.',
+    icon: PackageSearch,
+  },
+  '/kampanyalar': {
+    description: 'B2B alıma özel kampanya ve teklifleri yakalayın.',
+    icon: Megaphone,
+  },
+  '/iletisim': {
+    description: 'Ekibimizle iletişime geçin, teklif ve destek alın.',
+    icon: PhoneCall,
+  },
+  '/kargo-takibi': {
+    description: 'Siparişlerinizi tek ekrandan canlı takip edin.',
+    icon: Truck,
+  },
+} as const
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isTabletNavOpen, setIsTabletNavOpen] = useState(false)
+  const [activeMegaHref, setActiveMegaHref] = useState<string | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const tabletNavRef = useRef<HTMLDivElement>(null)
+  const desktopNavRef = useRef<HTMLDivElement>(null)
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()
   const { user, loading } = useAuth()
@@ -65,6 +97,14 @@ export function Header() {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false)
       }
+
+      if (tabletNavRef.current && !tabletNavRef.current.contains(event.target as Node)) {
+        setIsTabletNavOpen(false)
+      }
+
+      if (desktopNavRef.current && !desktopNavRef.current.contains(event.target as Node)) {
+        setActiveMegaHref(null)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -90,28 +130,51 @@ export function Header() {
     setSearchQuery('')
   }
   const isNavItemActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+  const activeMegaItem = activeMegaHref ? desktopNavItems.find((item) => item.href === activeMegaHref) : undefined
+  const megaCards = desktopNavItems
+    .filter((item) => item.href !== activeMegaHref)
+    .map((item) => {
+      const meta = navMetaByHref[item.href as keyof typeof navMetaByHref]
+      return {
+        href: item.href,
+        label: item.label,
+        description: meta?.description ?? 'Dental marketplace içeriğine hızlı erişim.',
+        icon: meta?.icon ?? Grid2X2,
+      }
+    })
+
+  useEffect(() => {
+    setIsMenuOpen(false)
+    setIsTabletNavOpen(false)
+    setActiveMegaHref(null)
+    setIsSearchOpen(false)
+  }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-primary/10 bg-white/75 backdrop-blur">
-      <div className="container-main py-3">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur">
+      <div className="container-main py-3 md:py-4">
         <div
           className={[
-            'rounded-full border border-primary/10 bg-white/95 shadow-[0_20px_42px_-30px_rgba(15,23,42,0.6)] transition-all duration-300',
-            isScrolled ? 'shadow-[0_24px_48px_-32px_rgba(15,23,42,0.62)]' : '',
+            'rounded-[20px] border border-slate-200/80 bg-white/90 shadow-[0_14px_40px_-24px_rgba(15,23,42,0.3)] transition-all duration-300',
+            isScrolled ? 'border-slate-200 shadow-[0_24px_52px_-30px_rgba(15,23,42,0.34)]' : '',
           ].join(' ')}
         >
-          <div className="flex items-center gap-2 px-3 py-2 md:px-4">
+          <div className="relative flex min-h-[68px] items-center gap-2 px-3 py-2 md:min-h-[76px] md:px-5">
             <Link
               href="/"
-              aria-label="Denalışveriş ana sayfa"
-              className="flex shrink-0 items-center gap-2 rounded-full border border-primary/10 bg-white px-2.5 py-1.5 text-primary transition hover:border-secondary/35"
+              aria-label="Dentalışveriş ana sayfa"
+              className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-primary transition duration-200 hover:border-primary/30 hover:bg-primary/[0.03]"
             >
-              <BrandLogo variant="icon" className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
-              <span aria-hidden="true" className="hidden text-xs font-semibold tracking-[0.12em] sm:inline">Dentalışveriş</span>
+              <BrandLogo variant="icon" className="h-8 w-8 shrink-0" />
+              <span aria-hidden="true" className="hidden text-xs font-semibold tracking-[0.1em] text-slate-800 sm:inline">Dentalışveriş</span>
             </Link>
 
-            <div className="hidden min-w-0 flex-1 justify-center px-2 lg:flex">
-              <nav className="flex max-w-full items-center gap-1 overflow-x-auto whitespace-nowrap rounded-full border border-primary/10 bg-primary/[0.03] p-1 text-[13px] font-semibold text-primary [scrollbar-width:none]">
+            <div
+              ref={desktopNavRef}
+              className="relative hidden min-w-0 flex-1 justify-center px-2 lg:flex"
+              onMouseLeave={() => setActiveMegaHref(null)}
+            >
+              <nav className="flex max-w-full items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/80 px-1.5 py-1.5 text-[13px] font-semibold text-slate-700">
                 {desktopNavItems.map((item) => {
                   const isActive = isNavItemActive(item.href)
 
@@ -120,28 +183,120 @@ export function Header() {
                       key={item.href}
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
+                      onMouseEnter={() => setActiveMegaHref(item.href)}
+                      onFocus={() => setActiveMegaHref(item.href)}
                       className={[
-                        'rounded-full px-3 py-1.5 transition-colors',
-                        isActive ? 'bg-primary text-white shadow-sm' : 'hover:bg-primary/10',
+                        'group relative rounded-xl px-3.5 py-2 transition-all duration-200',
+                        isActive
+                          ? 'bg-white text-primary shadow-[0_8px_20px_-12px_rgba(37,99,235,0.55)]'
+                          : 'text-slate-700 hover:bg-white hover:text-primary',
                       ].join(' ')}
                     >
                       {item.label}
+                      <span
+                        aria-hidden="true"
+                        className={[
+                          'absolute inset-x-3 -bottom-[2px] h-0.5 rounded-full bg-primary transition-opacity duration-200',
+                          isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60',
+                        ].join(' ')}
+                      />
                     </Link>
                   )
                 })}
               </nav>
+
+              {activeMegaItem && (
+                <div
+                  className="pointer-events-none absolute left-1/2 top-[calc(100%+14px)] z-50 w-[min(92vw,860px)] -translate-x-1/2 translate-y-0 opacity-100 transition-all duration-250"
+                  onMouseEnter={() => {
+                    if (activeMegaHref) setActiveMegaHref(activeMegaHref)
+                  }}
+                >
+                  <div className="pointer-events-auto grid grid-cols-1 gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-[0_34px_72px_-34px_rgba(15,23,42,0.35)] xl:grid-cols-[260px_1fr]">
+                    <div className="rounded-2xl border border-primary/10 bg-gradient-to-b from-primary/10 to-primary/5 p-5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">One Cikan Alan</p>
+                      <h3 className="mt-2 text-lg font-semibold text-slate-900">{activeMegaItem.label}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                        {navMetaByHref[activeMegaItem.href as keyof typeof navMetaByHref]?.description}
+                      </p>
+                      <Link
+                        href={activeMegaItem.href}
+                        className="mt-4 inline-flex items-center rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+                      >
+                        {activeMegaItem.label} sayfasina git
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+                      {megaCards.map((card) => {
+                        const Icon = card.icon
+
+                        return (
+                          <Link
+                            key={card.href}
+                            href={card.href}
+                            className="group rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-primary/[0.05]"
+                          >
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-primary shadow-sm ring-1 ring-slate-200/80">
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <p className="mt-2 text-sm font-semibold text-slate-900">{card.label}</p>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-600">{card.description}</p>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="relative ml-2 hidden md:block lg:hidden" ref={tabletNavRef}>
+              <button
+                type="button"
+                onClick={() => setIsTabletNavOpen((prev) => !prev)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition duration-200 hover:border-primary/30 hover:text-primary"
+              >
+                Menü
+                <ChevronDown className={['h-4 w-4 transition-transform duration-200', isTabletNavOpen ? 'rotate-180' : ''].join(' ')} />
+              </button>
+
+              {isTabletNavOpen && (
+                <div className="absolute left-0 top-[calc(100%+10px)] z-50 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_24px_50px_-30px_rgba(15,23,42,0.32)]">
+                  {desktopNavItems.map((item) => {
+                    const isActive = isNavItemActive(item.href)
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsTabletNavOpen(false)}
+                        className={[
+                          'mb-1 block rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors last:mb-0',
+                          isActive ? 'bg-primary text-white' : 'text-slate-700 hover:bg-primary/10 hover:text-primary',
+                        ].join(' ')}
+                      >
+                        {item.label}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="ml-auto flex items-center gap-2">
               <button 
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="rounded-full border border-primary/10 p-2 text-secondary-text transition hover:border-secondary/35 hover:text-primary md:hidden"
+                onClick={() => {
+                  setIsSearchOpen((prev) => !prev)
+                  mobileSearchInputRef.current?.focus()
+                }}
+                className="rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:hidden"
+                aria-label="Mobil arama"
               >
                 <Search className="h-5 w-5" />
               </button>
 
               <form onSubmit={submitSearch} className="hidden xl:flex">
-                <label className="relative flex h-10 w-64 items-center rounded-full border border-primary/10 bg-white pl-9 pr-3 shadow-sm transition focus-within:border-secondary/45">
+                <label className="relative flex h-10 w-64 items-center rounded-full border border-slate-200 bg-white pl-9 pr-3 shadow-sm transition duration-200 focus-within:border-primary/40">
                   <Search className="pointer-events-none absolute left-3 h-4 w-4 text-text-muted" />
                   <input
                     type="search"
@@ -154,9 +309,21 @@ export function Header() {
                 </label>
               </form>
 
-              <Link href="/profil/favorilerim" className="hidden rounded-full border border-primary/10 p-2 text-secondary-text transition hover:border-secondary/35 hover:text-primary sm:flex">
+              <Link
+                href="/profil/favorilerim"
+                className="hidden rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary sm:flex"
+              >
                 <Heart className="h-5 w-5" />
               </Link>
+
+              {!user && !loading && (
+                <Link
+                  href="/kayit"
+                  className="hidden h-10 items-center rounded-full border border-primary/30 bg-white px-4 text-sm font-semibold text-primary transition duration-200 hover:bg-primary/[0.06] lg:inline-flex"
+                >
+                  Kayit Ol
+                </Link>
+              )}
 
               <CartButton />
 
@@ -166,7 +333,7 @@ export function Header() {
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 rounded-full border border-primary/10 p-1.5 text-secondary-text transition hover:border-secondary/35 hover:text-primary"
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary shadow-md">
                       <span className="text-white text-sm font-semibold">
@@ -270,7 +437,7 @@ export function Header() {
               ) : (
                 <Link 
                   href="/giris" 
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-primary/90"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -281,40 +448,52 @@ export function Header() {
 
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="rounded-full border border-primary/10 p-2 text-secondary-text transition hover:border-secondary/35 hover:text-primary lg:hidden"
+                className="rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:hidden"
+                aria-label="Mobil menü"
               >
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Search */}
-          {isSearchOpen && (
-            <div className="md:hidden pb-4 animate-fade-in">
-              <form onSubmit={submitSearch} className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Ürün, marka veya kategori ara..."
-                  className="h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 pr-12 text-body-text placeholder-secondary-text shadow-sm backdrop-blur-md transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
-                  autoFocus
-                />
+          {/* Mobile Search Card */}
+          <div className="sticky top-[74px] z-40 border-t border-slate-200/70 bg-slate-50/90 p-3 md:hidden">
+            <form onSubmit={submitSearch} className="relative rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.35)]">
+              <input
+                ref={mobileSearchInputRef}
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Ürün, marka veya kategori ara..."
+                className="h-11 w-full rounded-2xl bg-transparent px-4 pr-24 text-sm text-body-text placeholder-secondary-text focus:outline-none"
+                autoFocus={isSearchOpen}
+              />
+              <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+                {searchQuery && (
+                  <button
+                    type="button"
+                    aria-label="Aramayı temizle"
+                    onClick={() => setSearchQuery('')}
+                    className="inline-flex h-8 items-center rounded-xl border border-slate-200 px-2 text-xs font-semibold text-slate-600"
+                  >
+                    Temizle
+                  </button>
+                )}
                 <button
                   type="submit"
                   aria-label="Ara"
-                  className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl bg-primary text-white shadow-sm"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm"
                 >
                   <Search className="h-4 w-4" />
                 </button>
-              </form>
-            </div>
-          )}
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
       {isMenuOpen && (
-        <div className="animate-fade-in lg:hidden">
+        <div className="animate-fade-in md:hidden">
           <nav className="mx-2 mt-2 rounded-[1.75rem] border border-border/60 bg-white/95 px-4 py-4 shadow-xl backdrop-blur-xl md:mx-4">
             <div className="space-y-2">
               {desktopNavItems.map((item) => {

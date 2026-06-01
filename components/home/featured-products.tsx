@@ -79,7 +79,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           <p className="mt-3 text-base text-secondary-text md:text-lg">En çok tercih edilen ürünleri daha sade bir kart sistemiyle keşfedin.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {displayProducts.map((product, index) => {
             const { price, discount, stock } = getProductData(index)
             const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price

@@ -87,7 +87,7 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   return (
     <Link
       href={`/urunler/${product.slug}`}
-      className="w-56 flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/30 hover:shadow-premium group"
+      className="flex h-[414px] w-56 flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/30 hover:shadow-premium group"
     >
       <div className="relative m-3 aspect-square overflow-hidden rounded-2xl bg-background">
         <Image
@@ -104,16 +104,17 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           </span>
         )}
       </div>
-      <div className="p-4 space-y-1">
+      <div className="flex flex-1 flex-col p-4">
         {brandName && (
-          <p className="text-[11px] text-secondary-text font-medium uppercase tracking-wide truncate">
+          <p className="h-4 truncate text-[11px] font-medium uppercase tracking-wide text-secondary-text">
             {brandName}
           </p>
         )}
-        <h3 className="text-sm font-bold text-body-text line-clamp-2 leading-snug">
+        {!brandName && <div className="h-4" />}
+        <h3 className="mt-1 min-h-[40px] text-sm font-bold leading-snug text-body-text line-clamp-2">
           {product.name}
         </h3>
-        <div className="flex items-center gap-2 pt-1">
+        <div className="mt-2 flex min-h-[22px] items-center gap-2">
           {authLoading ? (
             <div className="h-5 w-24 animate-pulse rounded bg-muted" />
           ) : !user ? (
@@ -155,16 +156,17 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           )}
         </div>
         {hasMultipleOffers && (
-          <p className="text-[11px] text-secondary-text">
+          <p className="mt-1 min-h-[16px] text-[11px] text-secondary-text">
             {product.offer_count} satıcıdan
           </p>
         )}
-        <div className="flex items-center gap-2 pt-2" onClick={(e) => e.preventDefault()}>
+        {!hasMultipleOffers && <div className="mt-1 min-h-[16px]" />}
+        <div className="mt-auto flex items-center gap-2 pt-3" onClick={(e) => e.preventDefault()}>
           <WishlistButton
             productId={product.id}
             productName={product.name}
             size="sm"
-            className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50"
+            className="!h-10 !w-auto flex-1 !rounded-xl !border !border-slate-200 bg-white shadow-sm hover:!border-red-200 hover:bg-red-50"
           />
           <AddToCartButton
             productId={product.id}

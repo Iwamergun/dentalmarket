@@ -20,6 +20,15 @@ function isCampaignDateWindowValid(campaign: Campaign, now = new Date()) {
   return startsAtValid && endsAtValid
 }
 
+function isMissingCampaignsTableError(error: { code?: string; message?: string }) {
+  return (
+    error.code === 'PGRST205' ||
+    error.code === '42P01' ||
+    error.message?.includes("Could not find the table 'public.campaigns'") ||
+    error.message?.includes('relation "public.campaigns" does not exist')
+  )
+}
+
 export async function getActiveCampaigns(): Promise<Campaign[]> {
   const supabase = await createClient()
 
@@ -34,6 +43,10 @@ export async function getActiveCampaigns(): Promise<Campaign[]> {
   const { data, error } = await query
 
   if (error) {
+    if (isMissingCampaignsTableError(error)) {
+      return []
+    }
+
     console.error('Error fetching active campaigns:', error.message)
     return []
   }
@@ -53,6 +66,10 @@ export async function getAllCampaignsForAdmin(): Promise<Campaign[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
+    if (isMissingCampaignsTableError(error)) {
+      return []
+    }
+
     console.error('Error fetching campaigns for admin:', error.message)
     return []
   }

@@ -1,13 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
 import ImageUploader from '@/components/admin/ImageUploader'
-import CatalogProductNameSelect from '@/components/supplier/CatalogProductNameSelect'
-import type { CatalogProductSelection } from '@/lib/products/supplierProductForm'
 
 function slugify(text: string) {
   return text
@@ -31,11 +29,11 @@ export default function AdminNewProductPage() {
 
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
   const [brands, setBrands] = useState<{ id: string; name: string }[]>([])
-  const [nameSearch, setNameSearch] = useState('')
-  const [results, setResults] = useState<CatalogProductSelection[]>([])
-  const [searching, setSearching] = useState(false)
-  const [selectedCatalogProductId, setSelectedCatalogProductId] = useState<string | null>(null)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [newBrandName, setNewBrandName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [creatingCategory, setCreatingCategory] = useState(false)
+  const [creatingBrand, setCreatingBrand] = useState(false)
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -47,37 +45,7 @@ export default function AdminNewProductPage() {
     brand_id: '',
     is_active: true,
     primary_image: '',
-    // Offer fields
-    price: '',
-    vat_rate: '20',
-    stock_quantity: '',
-    min_order_quantity: '1',
   })
-
-  const searchProducts = useCallback(async (query: string) => {
-    if (query.trim().length < 2) {
-      setResults([])
-      return
-    }
-
-    setSearching(true)
-    try {
-      const { data } = await supabase
-        .from('catalog_products')
-        .select('id, name, slug, sku, barcode, short_description, description, primary_category_id, brand_id, primary_image, compare_at_price')
-        .eq('is_active', true)
-        .or(`name.ilike.%${query}%,sku.ilike.%${query}%`)
-        .order('name')
-        .limit(20)
-
-      setResults((data ?? []) as CatalogProductSelection[])
-    } catch (error) {
-      console.error('Catalog product search error:', error)
-      setResults([])
-    } finally {
-      setSearching(false)
-    }
-  }, [supabase])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,40 +60,9 @@ export default function AdminNewProductPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      searchProducts(nameSearch)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [nameSearch, searchProducts])
-
-  const handleCatalogSearchChange = (value: string) => {
-    setNameSearch(value)
-    setSelectedCatalogProductId(null)
-  }
-
-  const handleCatalogSelect = (productId: string) => {
-    const selectedProduct = results.find((product) => product.id === productId)
-    if (!selectedProduct) {
-      return
-    }
-
-    setSelectedCatalogProductId(selectedProduct.id)
-    setNameSearch(selectedProduct.name)
-    setResults([])
-    setForm((prev) => ({
-      ...prev,
-      name: selectedProduct.name,
-      slug: selectedProduct.slug || slugify(selectedProduct.name),
-      sku: selectedProduct.sku ?? '',
-      barcode: selectedProduct.barcode ?? '',
-      short_description: selectedProduct.short_description ?? '',
-      description: selectedProduct.description ?? '',
-      primary_category_id: selectedProduct.primary_category_id ?? '',
-      brand_id: selectedProduct.brand_id ?? '',
-      primary_image: selectedProduct.primary_image ?? '',
-    }))
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value
+    setForm((prev) => ({ ...prev, name, slug: prev.slug ? prev.slug : slugify(name) }))
   }
 
   const handleChange = (
@@ -139,15 +76,80 @@ export default function AdminNewProductPage() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCatalogProductId) {
-      toast.error('Ürün adı için katalogdan seçim yapın')
+  const handleCreateCategory = async () => {
+    const name = newCategoryName.trim()
+    if (!name) {
+      toast.error('Kategori adı girin')
       return
     }
 
-    if (!form.name || !form.sku || !form.price) {
-      toast.error('Ürün adı, SKU ve fiyat zorunludur')
+    setCreatingCategory(true)
+    try {
+      const slug = slugify(name)
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name,
+          slug,
+          path: slug,
+          depth: 0,
+          sort_order: 0,
+          is_active: true,
+        })
+        .select('id, name')
+        .single()
+
+      if (error || !data) throw error
+
+      setCategories((current) => [...current, data].sort((left, right) => left.name.localeCompare(right.name, 'tr')))
+      setForm((current) => ({ ...current, primary_category_id: data.id }))
+      setNewCategoryName('')
+      toast.success('Kategori eklendi')
+    } catch (error) {
+      console.error('Category create error:', error)
+      toast.error('Kategori eklenemedi')
+    } finally {
+      setCreatingCategory(false)
+    }
+  }
+
+  const handleCreateBrand = async () => {
+    const name = newBrandName.trim()
+    if (!name) {
+      toast.error('Marka adı girin')
+      return
+    }
+
+    setCreatingBrand(true)
+    try {
+      const { data, error } = await supabase
+        .from('brands')
+        .insert({
+          name,
+          slug: slugify(name),
+          is_active: true,
+        })
+        .select('id, name')
+        .single()
+
+      if (error || !data) throw error
+
+      setBrands((current) => [...current, data].sort((left, right) => left.name.localeCompare(right.name, 'tr')))
+      setForm((current) => ({ ...current, brand_id: data.id }))
+      setNewBrandName('')
+      toast.success('Marka eklendi')
+    } catch (error) {
+      console.error('Brand create error:', error)
+      toast.error('Marka eklenemedi')
+    } finally {
+      setCreatingBrand(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.name || !form.sku) {
+      toast.error('Ürün adı ve SKU zorunludur')
       return
     }
 
@@ -159,7 +161,6 @@ export default function AdminNewProductPage() {
         return
       }
 
-      // 1. Insert product into catalog_products
       const { data: product, error: productError } = await supabase
         .from('catalog_products')
         .insert({
@@ -179,32 +180,6 @@ export default function AdminNewProductPage() {
 
       if (productError || !product) throw productError
 
-      // 2. Insert offer
-      const { data: offer, error: offerError } = await supabase
-        .from('offers')
-        .insert({
-          supplier_id: user.id,
-          product_id: product.id,
-          price: parseFloat(form.price),
-          vat_rate: parseInt(form.vat_rate) || 20,
-          stock_quantity: parseInt(form.stock_quantity) || 0,
-          min_order_quantity: parseInt(form.min_order_quantity) || 1,
-          currency: 'TRY',
-          lead_time_days: 0,
-          is_active: true,
-        })
-        .select('id')
-        .single()
-
-      if (offerError || !offer) throw offerError
-
-      // 3. Update product with default_offer_id
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
-        .from('catalog_products')
-        .update({ default_offer_id: offer.id })
-        .eq('id', product.id)
-
       toast.success('Ürün başarıyla eklendi')
       router.push('/admin/products')
     } catch (error) {
@@ -223,18 +198,20 @@ export default function AdminNewProductPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CatalogProductNameSelect
-              value={nameSearch}
-              searching={searching}
-              results={results.map((product) => ({
-                id: product.id,
-                name: product.name,
-                sku: product.sku,
-              }))}
-              selectedProductId={selectedCatalogProductId}
-              onValueChange={handleCatalogSearchChange}
-              onSelect={handleCatalogSelect}
-            />
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Ürün Adı <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleNameChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
               <input
@@ -281,6 +258,23 @@ export default function AdminNewProductPage() {
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(event) => setNewCategoryName(event.target.value)}
+                  placeholder="Yeni kategori adı"
+                  className="min-w-0 flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateCategory}
+                  disabled={creatingCategory}
+                  className="shrink-0 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm font-medium"
+                >
+                  {creatingCategory ? 'Ekleniyor' : 'Ekle'}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Marka</label>
@@ -295,6 +289,23 @@ export default function AdminNewProductPage() {
                   <option key={brand.id} value={brand.id}>{brand.name}</option>
                 ))}
               </select>
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="text"
+                  value={newBrandName}
+                  onChange={(event) => setNewBrandName(event.target.value)}
+                  placeholder="Yeni marka adı"
+                  className="min-w-0 flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateBrand}
+                  disabled={creatingBrand}
+                  className="shrink-0 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm font-medium"
+                >
+                  {creatingBrand ? 'Ekleniyor' : 'Ekle'}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -325,62 +336,6 @@ export default function AdminNewProductPage() {
             currentImage={form.primary_image || null}
             onUpload={(path) => setForm((prev) => ({ ...prev, primary_image: path }))}
           />
-
-          {/* Pricing & Stock */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 border-t pt-6">Fiyat & Stok</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fiyat (₺) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={form.price}
-                  onChange={handleChange}
-                  step="0.01"
-                  min="0"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">KDV Oranı (%)</label>
-                <input
-                  type="number"
-                  name="vat_rate"
-                  value={form.vat_rate}
-                  onChange={handleChange}
-                  min="0"
-                  max="100"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stok Miktarı</label>
-                <input
-                  type="number"
-                  name="stock_quantity"
-                  value={form.stock_quantity}
-                  onChange={handleChange}
-                  min="0"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Min. Sipariş Adedi</label>
-                <input
-                  type="number"
-                  name="min_order_quantity"
-                  value={form.min_order_quantity}
-                  onChange={handleChange}
-                  min="1"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Active */}
           <div className="flex items-center gap-3">

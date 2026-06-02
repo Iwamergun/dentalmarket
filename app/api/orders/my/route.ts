@@ -65,6 +65,31 @@ async function getPendingOrdersByEmail(normalizedUserEmail: string | undefined, 
   }
 }
 
+async function getOwnedOrdersWithAdmin(userId: string, selectClause: string) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return [] as OrderRow[]
+  }
+
+  try {
+    const adminSupabase = createAdminClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (adminSupabase as any)
+      .from('orders')
+      .select(selectClause)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Owned orders admin lookup error:', error.message)
+      return []
+    }
+
+    return (data ?? []) as OrderRow[]
+  } catch (error) {
+    console.error('Owned orders admin lookup failed:', error)
+    return []
+  }
+}
+
 export async function GET() {
   try {
     const supabase = await createClient()
@@ -95,15 +120,18 @@ export async function GET() {
       .eq('user_id', user.id)
 
     if (ownedOrdersError) {
-      throw ownedOrdersError
+      console.error('Owned orders lookup error:', ownedOrdersError.message)
     }
 
     const normalizedUserEmail = user.email?.trim().toLowerCase()
-    const pendingOrdersByEmail = await getPendingOrdersByEmail(normalizedUserEmail, selectClause)
+    const [ownedOrdersFallback, pendingOrdersByEmail] = await Promise.all([
+      ownedOrdersError ? getOwnedOrdersWithAdmin(user.id, selectClause) : Promise.resolve([] as OrderRow[]),
+      getPendingOrdersByEmail(normalizedUserEmail, selectClause),
+    ])
 
     const orderMap = new Map<string, OrderRow>()
 
-    ;((ownedOrdersData ?? []) as OrderRow[]).forEach((order) => {
+    ;((ownedOrdersError ? ownedOrdersFallback : ownedOrdersData ?? []) as OrderRow[]).forEach((order) => {
       orderMap.set(order.id, order)
     })
 
@@ -129,12 +157,12 @@ export async function GET() {
           .eq('order_id', order.id)
 
         if (error) {
-          throw error
+          console.error('Order item count lookup error:', error.message)
         }
 
         return {
           ...normalizeOrderForList(order),
-          items_count: count || 0,
+          items_count: error ? 0 : count || 0,
         }
       })
     )

@@ -31,7 +31,7 @@ function createQueryResult(data: unknown) {
 }
 
 describe('AdminNewProductPage', () => {
-  it('eski alanları korurken ürün adını katalog combobox olarak göstermeli', async () => {
+  it('eski alanları korurken ürün adını doğrudan girilebilir göstermeli', async () => {
     ;(createBrowserClient as ReturnType<typeof vi.fn>).mockReturnValue({
       from: vi.fn((table: string) => {
         if (table === 'categories') {
@@ -52,19 +52,18 @@ describe('AdminNewProductPage', () => {
     render(<AdminNewProductPage />)
     await screen.findByText('Marka seçin')
 
-    expect(screen.getByRole('combobox', { name: 'Ürün Adı' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: /Ürün Adı/ })).toBeInTheDocument()
     expect(screen.getByText('Slug')).toBeInTheDocument()
     expect(screen.getByText(/SKU/)).toBeInTheDocument()
     expect(screen.getByText('Barkod')).toBeInTheDocument()
     expect(screen.getByText('Kategori')).toBeInTheDocument()
     expect(screen.getByText('Marka')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Yeni kategori adı')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Yeni marka adı')).toBeInTheDocument()
     expect(screen.getByText('Kısa Açıklama')).toBeInTheDocument()
     expect(screen.getByText('Açıklama')).toBeInTheDocument()
-    expect(screen.getByText('Fiyat & Stok')).toBeInTheDocument()
-    expect(screen.getByText(/^Fiyat \(₺\)$/)).toBeInTheDocument()
-    expect(screen.getByText('KDV Oranı (%)')).toBeInTheDocument()
-    expect(screen.getByText('Stok Miktarı')).toBeInTheDocument()
-    expect(screen.getByText('Min. Sipariş Adedi')).toBeInTheDocument()
+    expect(screen.queryByText('Fiyat & Stok')).not.toBeInTheDocument()
+    expect(screen.queryByText('Stok Miktarı')).not.toBeInTheDocument()
     expect(screen.getByText('ImageUploader')).toBeInTheDocument()
   })
 })

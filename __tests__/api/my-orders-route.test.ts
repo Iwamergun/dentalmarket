@@ -89,4 +89,38 @@ describe('my orders route', () => {
       }),
     ])
   })
+
+  it('returns an empty list when owned order lookup fails', async () => {
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '')
+
+    mocks.getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          email: 'clinic@example.com',
+        },
+      },
+    })
+
+    mocks.serverFrom.mockImplementation((table: string) => {
+      if (table === 'orders') {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => Promise.resolve({
+              data: null,
+              error: { message: 'RLS policy rejected the query' },
+            })),
+          })),
+        }
+      }
+
+      throw new Error(`Unexpected table: ${table}`)
+    })
+
+    const response = await GET()
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.orders).toEqual([])
+  })
 })

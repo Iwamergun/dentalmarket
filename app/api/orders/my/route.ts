@@ -40,6 +40,31 @@ function normalizeOrderForList(order: OrderRow) {
   }
 }
 
+async function getPendingOrdersByEmail(normalizedUserEmail: string | undefined, selectClause: string) {
+  if (!normalizedUserEmail || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return [] as OrderRow[]
+  }
+
+  try {
+    const adminSupabase = createAdminClient()
+    const { data, error } = await adminSupabase
+      .from('orders')
+      .select(selectClause)
+      .eq('status', 'pending')
+      .filter('shipping_address->>email', 'eq', normalizedUserEmail)
+
+    if (error) {
+      console.error('Pending orders email lookup error:', error.message)
+      return []
+    }
+
+    return (data ?? []) as OrderRow[]
+  } catch (error) {
+    console.error('Pending orders email lookup failed:', error)
+    return []
+  }
+}
+
 export async function GET() {
   try {
     const supabase = await createClient()
@@ -51,7 +76,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Oturum açmanız gerekiyor' }, { status: 401 })
     }
 
-    const adminSupabase = createAdminClient()
     const selectClause = `
       id,
       order_number,
@@ -65,40 +89,25 @@ export async function GET() {
       shipping_address
     `
 
-    const ownedOrdersPromise = adminSupabase
+    const { data: ownedOrdersData, error: ownedOrdersError } = await supabase
       .from('orders')
       .select(selectClause)
       .eq('user_id', user.id)
 
+    if (ownedOrdersError) {
+      throw ownedOrdersError
+    }
+
     const normalizedUserEmail = user.email?.trim().toLowerCase()
-    const pendingOrdersByEmailPromise = normalizedUserEmail
-      ? adminSupabase
-          .from('orders')
-          .select(selectClause)
-          .eq('status', 'pending')
-          .filter('shipping_address->>email', 'eq', normalizedUserEmail)
-      : Promise.resolve({ data: [], error: null })
-
-    const [ownedOrdersResult, pendingOrdersResult] = await Promise.all([
-      ownedOrdersPromise,
-      pendingOrdersByEmailPromise,
-    ])
-
-    if (ownedOrdersResult.error) {
-      throw ownedOrdersResult.error
-    }
-
-    if (pendingOrdersResult.error) {
-      console.error('Pending orders email lookup error:', pendingOrdersResult.error.message)
-    }
+    const pendingOrdersByEmail = await getPendingOrdersByEmail(normalizedUserEmail, selectClause)
 
     const orderMap = new Map<string, OrderRow>()
 
-    ;((ownedOrdersResult.data ?? []) as OrderRow[]).forEach((order) => {
+    ;((ownedOrdersData ?? []) as OrderRow[]).forEach((order) => {
       orderMap.set(order.id, order)
     })
 
-    ;((pendingOrdersResult.error ? [] : pendingOrdersResult.data ?? []) as OrderRow[]).forEach((order) => {
+    pendingOrdersByEmail.forEach((order) => {
       if (!normalizedUserEmail) return
 
       const shippingEmail = getShippingEmail(order.shipping_address)
@@ -114,7 +123,7 @@ export async function GET() {
 
     const ordersWithCount = await Promise.all(
       orders.map(async (order) => {
-        const { count, error } = await adminSupabase
+        const { count, error } = await supabase
           .from('order_items')
           .select('*', { count: 'exact', head: true })
           .eq('order_id', order.id)

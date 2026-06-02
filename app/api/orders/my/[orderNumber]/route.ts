@@ -63,6 +63,32 @@ function normalizeOrderForDetail(order: OrderRow) {
   }
 }
 
+async function getOrderByNumberWithAdmin(orderNumber: string) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { order: null, adminSupabase: null }
+  }
+
+  try {
+    const adminSupabase = createAdminClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (adminSupabase as any)
+      .from('orders')
+      .select('*')
+      .eq('order_number', orderNumber)
+      .maybeSingle()
+
+    if (error) {
+      console.error('My order detail admin lookup error:', error.message)
+      return { order: null, adminSupabase: null }
+    }
+
+    return { order: data as OrderRow | null, adminSupabase }
+  } catch (error) {
+    console.error('My order detail admin lookup failed:', error)
+    return { order: null, adminSupabase: null }
+  }
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ orderNumber: string }> }
@@ -78,9 +104,8 @@ export async function GET(
       return NextResponse.json({ error: 'Oturum açmanız gerekiyor' }, { status: 401 })
     }
 
-    const adminSupabase = createAdminClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: orderData, error: orderError } = await (adminSupabase as any)
+    const { data: orderData, error: orderError } = await (supabase as any)
       .from('orders')
       .select('*')
       .eq('order_number', orderNumber)
@@ -90,7 +115,14 @@ export async function GET(
       throw orderError
     }
 
-    const order = orderData as OrderRow | null
+    let order = orderData as OrderRow | null
+    let orderItemsClient: unknown = supabase
+
+    if (!order) {
+      const adminLookup = await getOrderByNumberWithAdmin(orderNumber)
+      order = adminLookup.order
+      orderItemsClient = adminLookup.adminSupabase || supabase
+    }
 
     if (!order) {
       return NextResponse.json({ error: 'Sipariş bulunamadı' }, { status: 404 })
@@ -111,7 +143,7 @@ export async function GET(
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: itemsData, error: itemsError } = await (adminSupabase as any)
+    const { data: itemsData, error: itemsError } = await (orderItemsClient as any)
       .from('order_items')
       .select('id, product_id, variant_id, quantity, unit_price, total_price')
       .eq('order_id', order.id)
@@ -129,7 +161,7 @@ export async function GET(
 
     if (orderItems.length > 0) {
       const productIds = orderItems.map((item) => item.product_id)
-      const { data: productsData, error: productsError } = await adminSupabase
+      const { data: productsData, error: productsError } = await supabase
         .from('catalog_products')
         .select('id, name, slug, primary_image')
         .in('id', productIds)

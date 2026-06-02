@@ -58,7 +58,7 @@ async function getPendingOrdersByEmail(normalizedUserEmail: string | undefined, 
       return []
     }
 
-    return (data ?? []) as OrderRow[]
+    return (data ?? []) as unknown as OrderRow[]
   } catch (error) {
     console.error('Pending orders email lookup failed:', error)
     return []

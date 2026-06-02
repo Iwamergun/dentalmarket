@@ -17,6 +17,16 @@ type SupabaseErrorLike = {
   details?: string
 }
 
+const REQUIRED_REGISTER_ENV_VARS = [
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
+] as const
+
+function getMissingRegisterEnvVars() {
+  return REQUIRED_REGISTER_ENV_VARS.filter((name) => !process.env[name])
+}
+
 function shouldRetryWithLegacySupplierRole(profileError: SupabaseErrorLike, role: string) {
   return (
     profileError.code === '22P02' &&
@@ -78,6 +88,21 @@ export async function POST(request: NextRequest) {
           details: validationResult.error.flatten().fieldErrors,
         },
         { status: 400 }
+      )
+    }
+
+    const missingEnvVars = getMissingRegisterEnvVars()
+    if (missingEnvVars.length > 0) {
+      console.error(
+        'Register API configuration error. Missing env vars:',
+        missingEnvVars.join(', ')
+      )
+      return NextResponse.json(
+        {
+          error: 'Kayıt servisi yapılandırması eksik. Lütfen site yöneticisiyle iletişime geçin.',
+          code: 'REGISTER_SERVICE_MISCONFIGURED',
+        },
+        { status: 503 }
       )
     }
 

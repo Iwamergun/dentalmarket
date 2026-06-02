@@ -15,7 +15,7 @@ type OrderRow = {
   shipping_address: unknown
   notes: string | null
   created_at: string
-  updated_at: string
+  updated_at?: string | null
 }
 
 type OrderItemRow = {
@@ -54,6 +54,13 @@ function getShippingEmail(shippingAddress: unknown) {
   }
 
   return null
+}
+
+function normalizeOrderForDetail(order: OrderRow) {
+  return {
+    ...order,
+    updated_at: order.updated_at || order.created_at,
+  }
 }
 
 export async function GET(
@@ -141,7 +148,10 @@ export async function GET(
       }))
     }
 
-    return NextResponse.json({ order, orderItems: itemsWithProducts })
+    return NextResponse.json({
+      order: normalizeOrderForDetail(order),
+      orderItems: itemsWithProducts,
+    })
   } catch (error) {
     console.error('My order detail API error:', error)
     return NextResponse.json(

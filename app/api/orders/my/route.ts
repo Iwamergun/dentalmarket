@@ -12,7 +12,7 @@ type OrderRow = {
   shipping_cost: number
   total: number
   created_at: string
-  updated_at: string
+  updated_at?: string | null
   shipping_address?: { email?: string | null } | string | null
 }
 
@@ -31,6 +31,13 @@ function getShippingEmail(shippingAddress: OrderRow['shipping_address']) {
   return typeof shippingAddress.email === 'string'
     ? shippingAddress.email.trim().toLowerCase()
     : null
+}
+
+function normalizeOrderForList(order: OrderRow) {
+  return {
+    ...order,
+    updated_at: order.updated_at || order.created_at,
+  }
 }
 
 export async function GET() {
@@ -55,7 +62,6 @@ export async function GET() {
       shipping_cost,
       total,
       created_at,
-      updated_at,
       shipping_address
     `
 
@@ -83,7 +89,7 @@ export async function GET() {
     }
 
     if (pendingOrdersResult.error) {
-      throw pendingOrdersResult.error
+      console.error('Pending orders email lookup error:', pendingOrdersResult.error.message)
     }
 
     const orderMap = new Map<string, OrderRow>()
@@ -92,7 +98,7 @@ export async function GET() {
       orderMap.set(order.id, order)
     })
 
-    ;((pendingOrdersResult.data ?? []) as OrderRow[]).forEach((order) => {
+    ;((pendingOrdersResult.error ? [] : pendingOrdersResult.data ?? []) as OrderRow[]).forEach((order) => {
       if (!normalizedUserEmail) return
 
       const shippingEmail = getShippingEmail(order.shipping_address)
@@ -118,7 +124,7 @@ export async function GET() {
         }
 
         return {
-          ...order,
+          ...normalizeOrderForList(order),
           items_count: count || 0,
         }
       })

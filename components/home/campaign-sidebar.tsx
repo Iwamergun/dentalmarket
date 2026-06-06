@@ -55,8 +55,8 @@ export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
   const showFallbackTag = campaigns.length === 0
   const getFallbackGradientClass = (index: number) =>
     index % 2 === 0
-      ? 'bg-gradient-to-br from-primary via-primary/80 to-secondary'
-      : 'bg-gradient-to-br from-secondary via-secondary/80 to-primary'
+      ? 'border-slate-200 bg-slate-50 text-slate-800'
+      : 'border-slate-200 bg-white text-slate-800'
 
   return (
     <>
@@ -80,9 +80,9 @@ export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
                   />
                 ) : (
                   <div
-                    className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${getFallbackGradientClass(index)}`}
+                    className={`flex h-full w-full items-end border p-3 text-sm font-semibold ${getFallbackGradientClass(index)}`}
                   >
-                    <span className="rounded-lg bg-black/15 px-2 py-1 backdrop-blur">{campaign.title}</span>
+                    <span className="rounded-lg bg-white px-2 py-1 shadow-sm">{campaign.title}</span>
                   </div>
                 )}
               </Link>
@@ -117,9 +117,9 @@ export function CampaignSidebar({ campaigns }: CampaignSidebarProps) {
                     />
                   ) : (
                     <div
-                      className={`flex h-full w-full items-end p-3 text-sm font-semibold text-white ${getFallbackGradientClass(index)}`}
+                      className={`flex h-full w-full items-end border p-3 text-sm font-semibold ${getFallbackGradientClass(index)}`}
                     >
-                      <span className="rounded-lg bg-black/15 px-2 py-1 backdrop-blur">{campaign.title}</span>
+                      <span className="rounded-lg bg-white px-2 py-1 shadow-sm">{campaign.title}</span>
                     </div>
                   )}
                 </div>

@@ -40,28 +40,28 @@ export function CampaignBanner() {
 
   return (
     <section>
-      <div className="rounded-[2rem] border border-border/60 bg-[linear-gradient(135deg,rgba(84,48,165,0.92),rgba(111,76,182,0.92))] p-8 shadow-premium md:p-10">
-        <div className="flex flex-col items-center justify-between gap-8 text-white lg:flex-row">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_18px_45px_-36px_rgba(15,23,42,0.45)] md:p-10">
+        <div className="flex flex-col items-center justify-between gap-8 lg:flex-row">
             {/* Content */}
             <div className="space-y-4 text-center lg:text-left flex-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-600">
                 <Clock className="w-4 h-4" />
                 <span>SINIRLI SÜRE</span>
               </div>
               
-              <h2 className="text-3xl font-bold leading-tight md:text-4xl lg:text-[2.8rem]">
+              <h2 className="text-3xl font-bold leading-tight text-slate-950 md:text-4xl lg:text-[2.8rem]">
                 Özel Kampanya
-                <span className="block text-accent mt-2">%20&apos;ye Varan İndirim!</span>
+                <span className="mt-2 block text-slate-700">%20&apos;ye Varan İndirim!</span>
               </h2>
               
-              <p className="max-w-lg text-base text-white/82 md:text-lg">
+              <p className="max-w-lg text-base text-slate-600 md:text-lg">
                 Seçili diş hekimliği ürünlerinde kaçırılmayacak fırsatlar. 
                 Hemen inceleyin!
               </p>
 
               <Link
                 href="/kampanyalar"
-                className="mt-4 inline-flex h-11 items-center justify-center rounded-2xl bg-white px-8 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-white/90"
+                className="mt-4 inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-950 px-8 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-800"
               >
                 Kampanyaları Gör →
               </Link>
@@ -76,12 +76,12 @@ export function CampaignBanner() {
                 { label: 'Saniye', value: timeLeft.seconds },
               ].map((item) => (
                 <div key={item.label} className="text-center">
-                  <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/15 bg-white/10 backdrop-blur md:h-24 md:w-24">
-                    <span className="text-2xl font-bold md:text-4xl">
+                  <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 md:h-24 md:w-24">
+                    <span className="text-2xl font-bold text-slate-950 md:text-4xl">
                       {item.value.toString().padStart(2, '0')}
                     </span>
                   </div>
-                  <p className="text-xs md:text-sm text-white/80 font-medium">{item.label}</p>
+                  <p className="text-xs font-medium text-slate-500 md:text-sm">{item.label}</p>
                 </div>
               ))}
             </div>

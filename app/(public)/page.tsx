@@ -38,7 +38,7 @@ export default async function HomePage() {
       <div className="md:hidden min-h-screen bg-[#F8FAFC] pb-24">
         <div className="space-y-5 px-4 pb-8 pt-4">
           <section className="overflow-hidden rounded-[24px] border border-[#E5E7EB] bg-white shadow-[0_18px_35px_-24px_rgba(15,23,42,0.35)]">
-            <HeroSection campaigns={campaigns} />
+            <HeroSection campaigns={campaigns} products={products} />
           </section>
 
           <section className="rounded-[22px] border border-[#E5E7EB] bg-white p-4 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
@@ -98,7 +98,7 @@ export default async function HomePage() {
                         sizes="(max-width: 768px) 90vw, 320px"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/20 to-slate-100" />
+                      <div className="absolute inset-0 bg-slate-100" />
                     )}
                   </div>
                   <div className="p-4">
@@ -122,15 +122,18 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div className="hidden min-h-screen bg-[radial-gradient(circle_at_top,_rgba(118,59,255,0.08),_transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,248,252,1))] md:block">
+      <div className="hidden min-h-screen bg-white md:block">
         {/* Hero Section */}
-        <HeroSection campaigns={campaigns} />
+        <HeroSection campaigns={campaigns} products={products} />
 
         {/* Product Carousel */}
-        <ProductCarousel fallbackProducts={products} />
+        <div className="border-y border-slate-300 bg-[#F4F7FB] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+          <ProductCarousel fallbackProducts={products} />
+        </div>
         
-        <main>
-          <div className="container-main py-10 md:py-14">
+        <main className="bg-white">
+          <div className="border-b border-slate-300 bg-white">
+            <div className="container-main py-10 md:py-14">
             <div className="flex flex-col lg:flex-row gap-8">
               <div className="w-full lg:w-80 lg:flex-shrink-0">
                 <HomeCatalogFilter categories={categories} brands={brands} />
@@ -148,13 +151,18 @@ export default async function HomePage() {
                 <FeaturedProducts products={products} />
               </div>
             </div>
+            </div>
           </div>
           
           {/* Brand Logos */}
-          <BrandLogos brands={brands} />
+          <div className="border-b border-slate-300 bg-[#F6F8FB]">
+            <BrandLogos brands={brands} />
+          </div>
           
           {/* Trust Section */}
-          <TrustSection />
+          <div className="border-b border-slate-300 bg-white">
+            <TrustSection />
+          </div>
         </main>
       </div>
     </>

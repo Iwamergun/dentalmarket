@@ -54,9 +54,10 @@ const products: FilterableBestOfferProduct[] = [
 
 describe('parseCatalogFilters', () => {
   it('URL parametrelerini filtre nesnesine cevirir', () => {
-    const params = new URLSearchParams('category=cat-root,cat-child&brand=brand-a&minPrice=50&maxPrice=150&minRating=4&inStock=true&sort=price-asc')
+    const params = new URLSearchParams('q=ayna&category=cat-root,cat-child&brand=brand-a&minPrice=50&maxPrice=150&minRating=4&inStock=true&sort=price-asc')
 
     expect(parseCatalogFilters(params)).toEqual({
+      query: 'ayna',
       categoryIds: ['cat-root', 'cat-child'],
       brandIds: ['brand-a'],
       minPrice: 50,
@@ -71,6 +72,7 @@ describe('parseCatalogFilters', () => {
 describe('filterAndSortProducts', () => {
   it('kategori, marka, fiyat, rating ve stok filtrelerini birlikte uygular', () => {
     const filtered = filterAndSortProducts(products, {
+      query: '',
       categoryIds: ['cat-child'],
       brandIds: ['brand-a'],
       minPrice: 90,
@@ -86,6 +88,7 @@ describe('filterAndSortProducts', () => {
 
   it('alfabetik siralamayi uygular', () => {
     const filtered = filterAndSortProducts(products, {
+      query: '',
       categoryIds: [],
       brandIds: [],
       minPrice: null,
@@ -96,5 +99,20 @@ describe('filterAndSortProducts', () => {
     })
 
     expect(filtered.map((product) => product.name)).toEqual(['Bonding Kit', 'Ayna Seti'])
+  })
+
+  it('q parametresi ile urun, marka ve kategori metninde arama yapar', () => {
+    const filtered = filterAndSortProducts(products, {
+      query: 'kok kategori',
+      categoryIds: [],
+      brandIds: [],
+      minPrice: null,
+      maxPrice: null,
+      minRating: null,
+      inStockOnly: false,
+      sort: 'newest',
+    })
+
+    expect(filtered.map((product) => product.id)).toEqual(['p-1'])
   })
 })

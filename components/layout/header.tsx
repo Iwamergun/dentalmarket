@@ -17,7 +17,14 @@ const desktopNavItems = [
   { href: '/kampanyalar', label: 'Kampanyalar' },
   { href: '/iletisim', label: 'İletişim' },
   { href: '/kargo-takibi', label: 'Kargo Takibi' },
-]
+] as const
+
+type MegaMenuLink = {
+  href: string
+  label: string
+  description: string
+  icon: typeof Home
+}
 
 const navMetaByHref = {
   '/': {
@@ -46,6 +53,57 @@ const navMetaByHref = {
   },
 } as const
 
+const megaMenuLinksByHref: Record<(typeof desktopNavItems)[number]['href'], MegaMenuLink[]> = {
+  '/': [
+    { href: '/urunler', label: 'Ürün kataloğu', description: 'Tüm dental ürünleri filtreleyerek inceleyin.', icon: PackageSearch },
+    { href: '/kampanyalar', label: 'Kampanyalar', description: 'Güncel fırsatları ve avantajlı teklifleri görün.', icon: Megaphone },
+    { href: '/markalar', label: 'Markalar', description: 'Tedarik edilen markaları tek ekranda karşılaştırın.', icon: Grid2X2 },
+    { href: '/kategoriler', label: 'Kategoriler', description: 'Klinik ve laboratuvar ihtiyaçlarına göre gezinin.', icon: Grid2X2 },
+    { href: '/sss', label: 'Yardım merkezi', description: 'Satın alma ve üyelik sorularına hızlı yanıt alın.', icon: PhoneCall },
+    { href: '/hakkimizda', label: 'Hakkımızda', description: 'DentAlışveriş yaklaşımını ve hizmet modelini okuyun.', icon: Home },
+  ],
+  '/kategoriler': [
+    { href: '/kategoriler', label: 'Tüm kategoriler', description: 'Ana kategori ağacını ve alt başlıkları keşfedin.', icon: Grid2X2 },
+    { href: '/urunler?sort=name-asc', label: 'A-Z ürün listesi', description: 'Katalogdaki ürünleri ada göre sıralayın.', icon: PackageSearch },
+    { href: '/urunler?inStock=true', label: 'Stoktakiler', description: 'Hemen temin edilebilen ürünleri listeleyin.', icon: Truck },
+    { href: '/markalar', label: 'Markaya göre gez', description: 'Kategori seçmeden marka sayfalarına geçin.', icon: Grid2X2 },
+    { href: '/kampanyalar', label: 'Kategori fırsatları', description: 'İhtiyaç alanlarına göre kampanyaları yakalayın.', icon: Megaphone },
+    { href: '/iletisim', label: 'Teklif desteği', description: 'Aradığınız kategori için ekiple iletişime geçin.', icon: PhoneCall },
+  ],
+  '/urunler': [
+    { href: '/urunler', label: 'Tüm ürünler', description: 'Katalogdaki tüm ürünleri ve teklifleri görüntüleyin.', icon: PackageSearch },
+    { href: '/urunler?sort=price-asc', label: 'En uygun fiyat', description: 'Ürünleri düşük fiyattan yükseğe sıralayın.', icon: Megaphone },
+    { href: '/urunler?sort=price-desc', label: 'Premium seçenekler', description: 'Yüksek fiyatlı ürünleri önce inceleyin.', icon: Shield },
+    { href: '/urunler?inStock=true', label: 'Stokta olanlar', description: 'Satın almaya hazır tekliflere hızlıca ulaşın.', icon: Truck },
+    { href: '/markalar', label: 'Markalar', description: 'Ürünleri tedarikçi markalar üzerinden keşfedin.', icon: Grid2X2 },
+    { href: '/kategoriler', label: 'Kategori filtresi', description: 'Ürün aramasına kategori ağacından başlayın.', icon: Grid2X2 },
+  ],
+  '/kampanyalar': [
+    { href: '/kampanyalar', label: 'Tüm kampanyalar', description: 'Güncel kampanya vitrinine geçin.', icon: Megaphone },
+    { href: '/urunler?sort=price-asc', label: 'Fiyat avantajı', description: 'Uygun fiyatlı ürünleri katalogda sıralayın.', icon: PackageSearch },
+    { href: '/urunler?inStock=true', label: 'Hemen gönderim', description: 'Stoklu ürün fırsatlarına odaklanın.', icon: Truck },
+    { href: '/markalar', label: 'Marka fırsatları', description: 'Marka sayfalarından teklifleri değerlendirin.', icon: Grid2X2 },
+    { href: '/odeme', label: 'Ödeme seçenekleri', description: 'Satın alma öncesi ödeme akışını inceleyin.', icon: Shield },
+    { href: '/iletisim', label: 'Toplu alım', description: 'Klinik ve kurum alımları için destek isteyin.', icon: PhoneCall },
+  ],
+  '/iletisim': [
+    { href: '/iletisim', label: 'İletişim formu', description: 'Satış, destek ve teklif taleplerinizi iletin.', icon: PhoneCall },
+    { href: '/sss', label: 'Sık sorulanlar', description: 'En yaygın sorulara hızlı yanıt bulun.', icon: Grid2X2 },
+    { href: '/hakkimizda', label: 'Hakkımızda', description: 'Platform ve hizmet kapsamı hakkında bilgi alın.', icon: Home },
+    { href: '/kargo-takibi', label: 'Kargo takibi', description: 'Siparişinizin teslimat durumunu sorgulayın.', icon: Truck },
+    { href: '/iade-politikasi', label: 'İade politikası', description: 'İade ve değişim koşullarını okuyun.', icon: Shield },
+    { href: '/gizlilik-politikasi', label: 'Gizlilik', description: 'Kişisel veri ve gizlilik esaslarını inceleyin.', icon: Shield },
+  ],
+  '/kargo-takibi': [
+    { href: '/kargo-takibi', label: 'Kargo sorgula', description: 'Gönderi durumunu takip numarasıyla kontrol edin.', icon: Truck },
+    { href: '/profil/siparislerim', label: 'Siparişlerim', description: 'Hesabınızdaki sipariş geçmişine gidin.', icon: PackageSearch },
+    { href: '/sss', label: 'Teslimat yardımı', description: 'Kargo ve teslimat sorularına yanıt alın.', icon: Grid2X2 },
+    { href: '/iletisim', label: 'Destek al', description: 'Teslimat sorunları için ekibe ulaşın.', icon: PhoneCall },
+    { href: '/iade-politikasi', label: 'İade süreci', description: 'Teslimat sonrası iade adımlarını inceleyin.', icon: Shield },
+    { href: '/odeme', label: 'Ödeme bilgileri', description: 'Sipariş öncesi ödeme seçeneklerini görün.', icon: Shield },
+  ],
+}
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isTabletNavOpen, setIsTabletNavOpen] = useState(false)
@@ -59,6 +117,7 @@ export function Header() {
   const tabletNavRef = useRef<HTMLDivElement>(null)
   const desktopNavRef = useRef<HTMLDivElement>(null)
   const mobileSearchInputRef = useRef<HTMLInputElement>(null)
+  const searchPanelInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()
   const { user, loading } = useAuth()
@@ -112,14 +171,22 @@ export function Header() {
 
   useEffect(() => {
     function handleScroll() {
-      const nextScrollOffset = Math.min(window.scrollY, 180)
-      setIsScrolled(nextScrollOffset > 24)
+      setIsScrolled(window.scrollY > 24)
     }
 
-    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (!isSearchOpen) return
+
+    window.requestAnimationFrame(() => {
+      searchPanelInputRef.current?.focus()
+      mobileSearchInputRef.current?.focus()
+    })
+  }, [isSearchOpen])
 
   const submitSearch = (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault()
@@ -131,17 +198,7 @@ export function Header() {
   }
   const isNavItemActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
   const activeMegaItem = activeMegaHref ? desktopNavItems.find((item) => item.href === activeMegaHref) : undefined
-  const megaCards = desktopNavItems
-    .filter((item) => item.href !== activeMegaHref)
-    .map((item) => {
-      const meta = navMetaByHref[item.href as keyof typeof navMetaByHref]
-      return {
-        href: item.href,
-        label: item.label,
-        description: meta?.description ?? 'Dental marketplace içeriğine hızlı erişim.',
-        icon: meta?.icon ?? Grid2X2,
-      }
-    })
+  const activeMegaLinks = activeMegaItem ? megaMenuLinksByHref[activeMegaItem.href] : []
 
   useEffect(() => {
     setIsMenuOpen(false)
@@ -228,20 +285,20 @@ export function Header() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
-                      {megaCards.map((card) => {
-                        const Icon = card.icon
+                      {activeMegaLinks.map((link) => {
+                        const Icon = link.icon
 
                         return (
                           <Link
-                            key={card.href}
-                            href={card.href}
+                            key={`${activeMegaItem.href}-${link.href}`}
+                            href={link.href}
                             className="group rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-primary/[0.05]"
                           >
                             <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-primary shadow-sm ring-1 ring-slate-200/80">
                               <Icon className="h-4 w-4" />
                             </span>
-                            <p className="mt-2 text-sm font-semibold text-slate-900">{card.label}</p>
-                            <p className="mt-1 text-xs leading-relaxed text-slate-600">{card.description}</p>
+                            <p className="mt-2 text-sm font-semibold text-slate-900">{link.label}</p>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-600">{link.description}</p>
                           </Link>
                         )
                       })}
@@ -287,15 +344,18 @@ export function Header() {
               <button 
                 onClick={() => {
                   setIsSearchOpen((prev) => !prev)
-                  mobileSearchInputRef.current?.focus()
                 }}
-                className="rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:hidden"
-                aria-label="Mobil arama"
+                className={[
+                  'rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary',
+                  isScrolled ? 'inline-flex' : 'xl:hidden',
+                ].join(' ')}
+                aria-label="Arama panelini aç"
+                aria-expanded={isSearchOpen}
               >
                 <Search className="h-5 w-5" />
               </button>
 
-              <form onSubmit={submitSearch} className="hidden xl:flex">
+              <form onSubmit={submitSearch} className={isScrolled ? 'hidden xl:hidden' : 'hidden xl:flex'}>
                 <label className="relative flex h-10 w-64 items-center rounded-full border border-slate-200 bg-white pl-9 pr-3 shadow-sm transition duration-200 focus-within:border-primary/40">
                   <Search className="pointer-events-none absolute left-3 h-4 w-4 text-text-muted" />
                   <input
@@ -456,8 +516,9 @@ export function Header() {
             </div>
           </div>
 
-          {/* Mobile Search Card */}
-          <div className="sticky top-[74px] z-40 border-t border-slate-200/70 bg-slate-50/90 p-3 md:hidden">
+          {/* Search Card */}
+          {(!isScrolled || isSearchOpen) && (
+          <div className="border-t border-slate-200/70 bg-slate-50/90 p-3 md:hidden">
             <form onSubmit={submitSearch} className="relative rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.35)]">
               <input
                 ref={mobileSearchInputRef}
@@ -489,6 +550,45 @@ export function Header() {
               </div>
             </form>
           </div>
+          )}
+
+          {isScrolled && isSearchOpen && (
+            <div className="hidden border-t border-slate-200/70 bg-slate-50/90 p-3 md:block">
+              <form onSubmit={submitSearch} className="mx-auto max-w-xl">
+                <label className="relative flex h-12 items-center rounded-2xl border border-slate-200 bg-white pl-10 pr-3 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.35)] transition duration-200 focus-within:border-primary/40">
+                  <Search className="pointer-events-none absolute left-4 h-4 w-4 text-text-muted" />
+                  <input
+                    ref={searchPanelInputRef}
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Ürün, marka veya kategori ara..."
+                    aria-label="Ürün ara"
+                    className="h-full w-full bg-transparent pr-24 text-sm text-body-text placeholder-secondary-text focus:outline-none"
+                  />
+                  <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        aria-label="Aramayı temizle"
+                        onClick={() => setSearchQuery('')}
+                        className="inline-flex h-8 items-center rounded-xl border border-slate-200 px-2 text-xs font-semibold text-slate-600"
+                      >
+                        Temizle
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      aria-label="Ara"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm"
+                    >
+                      <Search className="h-4 w-4" />
+                    </button>
+                  </div>
+                </label>
+              </form>
+            </div>
+          )}
         </div>
       </div>
 

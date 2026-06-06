@@ -291,8 +291,8 @@ export function FilterSidebar({
       <div className="space-y-3">
         <Button
           onClick={applyFilters}
-          className="w-full bg-secondary hover:bg-secondary-dark"
-          size="lg"
+          className="h-11 w-full rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
+          size="md"
         >
           Filtreleri Uygula
         </Button>
@@ -300,8 +300,8 @@ export function FilterSidebar({
           <Button
             onClick={clearFilters}
             variant="outline"
-            className="w-full"
-            size="lg"
+            className="h-11 w-full rounded-xl border-border bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+            size="md"
           >
             <X className="mr-2 h-4 w-4" />
             Filtreleri Temizle

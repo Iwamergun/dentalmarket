@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { Header } from '@/components/layout/header'
 
@@ -29,26 +29,32 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('Header brand area', () => {
-  it('should render icon-only homepage link and centered desktop nav links', () => {
-    render(<Header />)
+  beforeEach(() => {
+    pushMock.mockClear()
+    pathnameMock.mockReturnValue('/')
+    Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true })
+  })
 
-    expect(screen.getByRole('link', { name: 'Dentalışveriş ana sayfa' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('img', { name: 'DentAlışveriş' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Kategoriler' })).toHaveAttribute('href', '/kategoriler')
-    expect(screen.getByRole('link', { name: 'Anasayfa' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: 'Tüm Ürünler' })).toHaveAttribute('href', '/urunler')
-    expect(screen.getByRole('link', { name: 'Kampanyalar' })).toHaveAttribute('href', '/kampanyalar')
-    expect(screen.getByRole('link', { name: 'İletişim' })).toHaveAttribute('href', '/iletisim')
-    expect(screen.getByRole('link', { name: 'Kargo Takibi' })).toHaveAttribute('href', '/kargo-takibi')
+  it('should render icon-only homepage link and centered desktop nav links', () => {
+    const { container } = render(<Header />)
+
+    expect(container.querySelector('a[aria-label="Dentalışveriş ana sayfa"]')).toHaveAttribute('href', '/')
+    expect(container.querySelector('[role="img"][aria-label="DentAlışveriş"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/kategoriler"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/urunler"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/kampanyalar"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/iletisim"]')).toBeInTheDocument()
+    expect(container.querySelector('nav a[href="/kargo-takibi"]')).toBeInTheDocument()
   })
 
   it('should mark the active desktop nav item with aria-current', () => {
     pathnameMock.mockReturnValue('/kampanyalar/yerli-uretim')
 
-    render(<Header />)
+    const { container } = render(<Header />)
 
-    expect(screen.getByRole('link', { name: 'Kampanyalar' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: 'Kategoriler' })).not.toHaveAttribute('aria-current')
+    expect(container.querySelector('nav a[href="/kampanyalar"]')).toHaveAttribute('aria-current', 'page')
+    expect(container.querySelector('nav a[href="/kategoriler"]')).not.toHaveAttribute('aria-current')
   })
 
   it('should route search queries to /urunler?q=', () => {
@@ -59,5 +65,34 @@ describe('Header brand area', () => {
     fireEvent.submit(searchInput.closest('form')!)
 
     expect(pushMock).toHaveBeenCalledWith('/urunler?q=anestezi')
+  })
+
+  it('should show contextual mega menu links for each desktop item', () => {
+    const { container } = render(<Header />)
+
+    fireEvent.mouseEnter(container.querySelector('nav a[href="/kategoriler"]')!)
+
+    expect(container.querySelector('a[href="/kategoriler"]')).toBeInTheDocument()
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+    expect(container.querySelector('a[href="/urunler?inStock=true"]')).toBeInTheDocument()
+  })
+
+  it('should hide the search card on scroll and reopen it from the search icon', () => {
+    render(<Header />)
+
+    expect(screen.getByPlaceholderText('Ürün, marka veya kategori ara...')).toBeInTheDocument()
+
+    Object.defineProperty(window, 'scrollY', { value: 80, writable: true, configurable: true })
+    fireEvent.scroll(window)
+
+    expect(screen.queryByPlaceholderText('Ürün, marka veya kategori ara...')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arama panelini aç' }))
+
+    expect(screen.getAllByPlaceholderText('Ürün, marka veya kategori ara...').length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arama panelini aç' }))
+
+    expect(screen.queryByPlaceholderText('Ürün, marka veya kategori ara...')).not.toBeInTheDocument()
   })
 })

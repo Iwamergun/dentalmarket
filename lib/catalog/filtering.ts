@@ -3,6 +3,7 @@ import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 export type CatalogSortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc'
 
 export interface CatalogFilters {
+  query: string
   categoryIds: string[]
   brandIds: string[]
   minPrice: number | null
@@ -38,6 +39,7 @@ export function parseCatalogFilters(searchParams: SearchParamsLike): CatalogFilt
   const sort = (searchParams.get('sort') as CatalogSortOption | null) || 'newest'
 
   return {
+    query: (searchParams.get('q') || '').trim(),
     categoryIds: parseIds(searchParams.get('category')),
     brandIds: parseIds(searchParams.get('brand')),
     minPrice: parseNumber(searchParams.get('minPrice')),
@@ -52,8 +54,25 @@ export function filterAndSortProducts(
   products: FilterableBestOfferProduct[],
   filters: CatalogFilters
 ): FilterableBestOfferProduct[] {
+  const normalizedQuery = filters.query.toLocaleLowerCase('tr')
+
   const filteredProducts = products.filter((product) => {
     const categoryIds = new Set(product.category_ids || [])
+
+    if (normalizedQuery) {
+      const searchableText = [
+        product.name,
+        product.sku,
+        product.brand_name,
+        product.category_name,
+        product.short_description,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLocaleLowerCase('tr')
+
+      if (!searchableText.includes(normalizedQuery)) return false
+    }
 
     if (product.primary_category_id) {
       categoryIds.add(product.primary_category_id)

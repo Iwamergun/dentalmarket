@@ -12,10 +12,6 @@ export default function AdminMockSection({ section }: AdminMockSectionProps) {
         <p className="mt-1 text-sm text-gray-500">{section.description}</p>
       </div>
 
-      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        {section.apiTodo}
-      </div>
-
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

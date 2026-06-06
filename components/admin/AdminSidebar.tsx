@@ -131,17 +131,6 @@ export default function AdminSidebar({ mobileOpen = false, onClose }: AdminSideb
           </div>
         ))}
       </nav>
-
-      <div className="border-t border-white/10 px-6 py-5">
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/8 to-white/4 px-4 py-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-            Sistem Notu
-          </p>
-          <p className="mt-2 text-sm leading-6 text-white/65">
-            Daha yüksek kontrast ve daha net aksiyon odaklı navigasyon sunar.
-          </p>
-        </div>
-      </div>
     </div>
   )
 

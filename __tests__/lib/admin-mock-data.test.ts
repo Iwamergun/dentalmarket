@@ -24,16 +24,13 @@ describe('admin mock sections', () => {
     })
   })
 
-  it('tüm bölümlerde gerçek API entegrasyonu için TODO bilgisi olmalı', () => {
-    sections.forEach((section) => {
-      expect(section.apiTodo).toContain('TODO:')
-      expect(section.apiTodo).toContain('/api/admin/')
-    })
+  it('bölüm açıklamalarında geçici test metni olmamalı', () => {
+    const blockedTerms = ['TODO:', 'geçici']
 
-    expect(customersSection.apiTodo).toContain('/api/admin/customers')
-    expect(categoriesSection.apiTodo).toContain('/api/admin/categories')
-    expect(brandsSection.apiTodo).toContain('/api/admin/brands')
-    expect(reportsSection.apiTodo).toContain('/api/admin/reports')
-    expect(settingsSection.apiTodo).toContain('/api/admin/settings')
+    sections.forEach((section) => {
+      blockedTerms.forEach((term) => {
+        expect(section.description).not.toContain(term)
+      })
+    })
   })
 })

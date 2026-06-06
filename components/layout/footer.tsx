@@ -51,29 +51,29 @@ export async function Footer() {
 
   return (
     <footer className="relative overflow-hidden border-t border-slate-300 bg-[#F4F7FB] text-slate-700">
-      <div className="container-main relative py-12 md:py-16">
-        <div className="mb-8 rounded-[2rem] border border-slate-300 bg-white p-6 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:p-8">
+      <div className="container-main relative py-8 md:py-16">
+        <div className="mb-5 rounded-[1.5rem] border border-slate-300 bg-white p-5 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:mb-8 md:rounded-[2rem] md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Dental procurement, simplified</p>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Kliniklerin satın alma akışını hızlandıran daha modern bir tedarik katmanı.</h2>
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 md:text-3xl">Kliniklerin satın alma akışını hızlandıran daha modern bir tedarik katmanı.</h2>
               <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600 md:text-base">
                 Tedarikçileri, kampanyaları ve ürün keşfini tek bir daha temiz deneyimde bir araya getiriyoruz. Hızlı karar, net görünürlük, daha az operasyon yükü.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[26rem]">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[26rem]">
               {stats.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-slate-300 bg-[#F8FAFC] px-4 py-4 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{stat.value}</p>
+                <div key={stat.label} className="rounded-2xl border border-slate-300 bg-[#F8FAFC] px-3 py-3 shadow-sm sm:px-4 sm:py-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:text-xs sm:tracking-[0.22em]">{stat.label}</p>
+                  <p className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">{stat.value}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1fr]">
-          <div className="rounded-[1.75rem] border border-slate-300 bg-white px-6 py-7 text-slate-700 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)]">
+        <div className="grid grid-cols-1 gap-3 md:gap-6 lg:grid-cols-[1.35fr_0.8fr_0.8fr_1fr]">
+          <div className="rounded-[1.5rem] border border-slate-300 bg-white px-5 py-5 text-slate-700 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:rounded-[1.75rem] md:px-6 md:py-7">
             <Link href="/" className="mb-5 flex items-center gap-3">
               <BrandLogo
                 variant="full"
@@ -107,9 +107,12 @@ export async function Footer() {
             </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-slate-300 bg-white px-6 py-7 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)]">
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500">Ürünler</h4>
-            <ul className="space-y-3 text-sm">
+          <details className="group rounded-[1.5rem] border border-slate-300 bg-white px-5 py-4 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:rounded-[1.75rem] md:px-6 md:py-7">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500 [&::-webkit-details-marker]:hidden md:cursor-default">
+              Ürünler
+              <span className="text-lg leading-none text-slate-400 transition-transform group-open:rotate-45 md:hidden">+</span>
+            </summary>
+            <ul className="mt-4 hidden space-y-3 text-sm group-open:block md:block">
               <li>
                 <Link href="/urunler" className="text-slate-600 transition-colors hover:text-primary">
                   Tüm Ürünler
@@ -131,11 +134,14 @@ export async function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </details>
 
-          <div className="rounded-[1.75rem] border border-slate-300 bg-white px-6 py-7 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)]">
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500">Kurumsal</h4>
-            <ul className="space-y-3 text-sm">
+          <details className="group rounded-[1.5rem] border border-slate-300 bg-white px-5 py-4 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:rounded-[1.75rem] md:px-6 md:py-7">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500 [&::-webkit-details-marker]:hidden md:cursor-default">
+              Kurumsal
+              <span className="text-lg leading-none text-slate-400 transition-transform group-open:rotate-45 md:hidden">+</span>
+            </summary>
+            <ul className="mt-4 hidden space-y-3 text-sm group-open:block md:block">
               <li>
                 <Link href="/hakkimizda" className="text-slate-600 transition-colors hover:text-primary">
                   Hakkımızda
@@ -162,11 +168,14 @@ export async function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </details>
 
-          <div className="rounded-[1.75rem] border border-slate-300 bg-white px-6 py-7 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)]">
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500">İletişim</h4>
-            <ul className="space-y-4 text-sm text-slate-600">
+          <details className="group rounded-[1.5rem] border border-slate-300 bg-white px-5 py-4 shadow-[0_18px_42px_-34px_rgba(15,23,42,0.45)] md:rounded-[1.75rem] md:px-6 md:py-7">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-500 [&::-webkit-details-marker]:hidden md:cursor-default">
+              İletişim
+              <span className="text-lg leading-none text-slate-400 transition-transform group-open:rotate-45 md:hidden">+</span>
+            </summary>
+            <ul className="mt-4 hidden space-y-4 text-sm text-slate-600 group-open:block md:block">
               <li className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <Mail className="h-4 w-4" />
@@ -186,12 +195,12 @@ export async function Footer() {
                 <span>İstanbul, Türkiye</span>
               </li>
             </ul>
-          </div>
+          </details>
         </div>
       </div>
 
       <div className="border-t border-slate-300 bg-white">
-        <div className="container-main flex flex-col items-center justify-between gap-4 py-6 text-sm text-slate-500 md:flex-row">
+        <div className="container-main flex flex-col items-center justify-between gap-3 py-5 text-xs text-slate-500 md:flex-row md:text-sm">
           <p>© {new Date().getFullYear()} DentAlışveriş. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-6">
             <Link href="/gizlilik-politikasi" className="transition-colors hover:text-primary">

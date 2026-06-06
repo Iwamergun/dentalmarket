@@ -23,17 +23,19 @@ export default async function ProductsPage() {
   ]
 
   return (
-    <div className="container-main py-8">
-      <Breadcrumbs items={breadcrumbItems} />
+    <div className="container-main bg-background py-4 sm:py-8">
+      <div className="hidden sm:block">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
       
-      <div className="mt-8">
-        <h1 className="text-4xl font-bold text-primary">Ürünler</h1>
-        <p className="mt-2 text-text-secondary">
+      <div className="mt-2 sm:mt-8">
+        <h1 className="text-2xl font-bold text-primary sm:text-4xl">Ürünler</h1>
+        <p className="mt-1 text-sm text-text-secondary sm:mt-2 sm:text-base">
           Diş hekimliği için ihtiyacınız olan tüm ürünleri keşfedin
         </p>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-4 sm:mt-8">
         <ProductsClient products={products} categories={categories} brands={brands} />
       </div>
     </div>

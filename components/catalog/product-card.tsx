@@ -22,13 +22,15 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasMultipleOffers = product.offer_count > 1
   const hasPrice = product.min_price != null && product.min_price > 0
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
+  const stockLabel = product.best_stock != null && product.best_stock > 0 ? 'Stokta' : 'Stok sorunuz'
+  const stockClass = product.best_stock != null && product.best_stock > 0 ? 'text-green-700' : 'text-secondary-text'
 
   return (
-    <Card className="group relative flex h-full min-h-[190px] flex-col overflow-hidden border-border/70 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-premium sm:min-h-[360px]">
+    <Card className="group relative flex h-full min-h-[330px] flex-col overflow-hidden rounded-2xl border-border/70 bg-white shadow-sm transition-all active:scale-[0.985] hover:border-primary/30 hover:shadow-premium sm:min-h-[390px]">
       {/* Satıcı sayısı badge - görselin üstünde sol üst */}
       {hasMultipleOffers && (
-        <div className="absolute left-1.5 top-1.5 z-10 sm:left-3 sm:top-3">
-          <span className="inline-flex items-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-sm sm:px-2.5 sm:py-1 sm:text-xs">
+        <div className="absolute left-2 top-2 z-10 sm:left-3 sm:top-3">
+          <span className="inline-flex items-center rounded-full bg-blue-600 px-2 py-1 text-[10px] font-semibold text-white shadow-sm sm:px-2.5 sm:text-xs">
             {product.offer_count} satıcı
           </span>
         </div>
@@ -42,8 +44,8 @@ export function ProductCard({ product }: ProductCardProps) {
               src={getImageUrl(product.primary_image)}
               alt={product.name}
               fill
-              className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105 sm:p-3"
-              sizes="(max-width: 430px) 33vw, (max-width: 640px) 25vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-contain p-2 transition-transform duration-300 group-hover:scale-105 sm:p-3"
+              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-gray-300">
@@ -55,25 +57,25 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        <CardHeader className="pb-1 pt-2 px-2.5 sm:px-6 sm:pt-3">
+        <CardHeader className="px-2.5 pb-1 pt-2 sm:px-5 sm:pt-3">
           <div className="mb-1">
             {product.brand_name && (
               <Badge variant="secondary" className="hidden text-xs sm:inline-flex">{product.brand_name}</Badge>
             )}
           </div>
-          <CardTitle className="line-clamp-2 text-xs font-semibold leading-tight sm:text-sm">{product.name}</CardTitle>
+          <CardTitle className="min-h-[2.5rem] line-clamp-2 text-xs font-semibold leading-5 text-body-text sm:min-h-[2.75rem] sm:text-sm">{product.name}</CardTitle>
         </CardHeader>
 
-        <CardContent className="flex-1 px-2.5 pb-1.5 pt-0 sm:px-6 sm:pb-2">
+        <CardContent className="flex-1 px-2.5 pb-2 pt-0 sm:px-5">
           {/* Fiyat */}
-          <div className="mt-2">
+          <div className="mt-1 min-h-[2.2rem]">
             {authLoading ? (
               <div className="h-5 w-16 animate-pulse rounded bg-muted sm:h-6 sm:w-24" />
             ) : !user ? (
               <button
                 type="button"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/giris') }}
-                className="inline-flex max-w-full items-center gap-1 rounded-lg bg-primary/8 px-1.5 py-1 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/15 sm:px-3 sm:py-1.5 sm:text-xs"
+                className="inline-flex max-w-full items-center gap-1 rounded-lg bg-primary/8 px-2 py-1.5 text-[10px] font-semibold leading-tight text-primary transition-colors hover:bg-primary/15 sm:px-3 sm:text-xs"
               >
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -83,12 +85,12 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : hasPrice ? (
               isRange ? (
                 <div>
-                  <span className="text-xs font-bold text-blue-600 sm:text-lg">
+                  <span className="text-sm font-bold text-blue-600 sm:text-lg">
                     {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
                   </span>
                 </div>
               ) : (
-                <span className="text-xs font-bold text-blue-600 sm:text-lg">
+                <span className="text-sm font-bold text-blue-600 sm:text-lg">
                   {formatPrice(product.min_price!)}
                 </span>
               )
@@ -98,14 +100,14 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-          {/* Satıcı etiketi */}
-          {hasMultipleOffers && (
-            <div className="mt-1">
-              <span className="text-[10px] text-green-700 sm:text-xs">
+          <div className="mt-1 flex min-h-[1.1rem] flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs">
+            <span className={stockClass}>{stockLabel}</span>
+            {hasMultipleOffers && (
+              <span className="text-green-700">
                 {product.offer_count} satıcıdan
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </CardContent>
       </Link>
 
@@ -114,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
           productId={product.id}
           productName={product.name}
           size="sm"
-          className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50 sm:!h-11"
+          className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm active:scale-[0.98] hover:border-red-200 hover:bg-red-50 sm:!h-11"
         />
         <AddToCartButton
           productId={product.id}

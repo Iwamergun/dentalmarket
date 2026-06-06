@@ -4,7 +4,7 @@ import type { Database } from '@/types/database.types'
 import StatsCard from '@/components/admin/StatsCard'
 import RecentOrders from '@/components/admin/RecentOrders'
 import type { RecentOrder } from '@/components/admin/RecentOrders'
-import { ArrowUpRight, Sparkles, ShieldCheck, Layers3 } from 'lucide-react'
+import { ArrowUpRight, Banknote, ReceiptText, ShoppingBag, TrendingUp } from 'lucide-react'
 
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies()
@@ -40,7 +40,7 @@ export default async function AdminDashboardPage() {
     supabase.from('orders').select('*', { count: 'exact', head: true }),
     supabase.from('catalog_products').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'clinic'),
-    supabase.from('orders').select('total'),
+    supabase.from('orders').select('total, status, created_at'),
     supabase
       .from('orders')
       .select('id, order_number, total, status, created_at, profiles(company_name)')
@@ -55,6 +55,44 @@ export default async function AdminDashboardPage() {
 
   const averageOrderValue =
     (ordersCount ?? 0) > 0 ? totalRevenue / Number(ordersCount ?? 1) : 0
+
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  const todayRevenue = (allOrders ?? []).reduce((sum, order) => {
+    if (!order.created_at || new Date(order.created_at) < todayStart) return sum
+    return sum + Number(order.total ?? 0)
+  }, 0)
+
+  const completedOrdersCount = (allOrders ?? []).filter((order) => order.status === 'confirmed').length
+  const pendingOrdersCount = (allOrders ?? []).filter((order) => order.status === 'pending').length
+
+  const heroSalesStats = [
+    {
+      label: 'Toplam Ciro',
+      value: `₺${totalRevenue.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`,
+      helper: `${Number(ordersCount ?? 0).toLocaleString('tr-TR')} sipariş`,
+      icon: Banknote,
+    },
+    {
+      label: 'Bugünkü Ciro',
+      value: `₺${todayRevenue.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`,
+      helper: 'Gün içi satış toplamı',
+      icon: TrendingUp,
+    },
+    {
+      label: 'Ortalama Sepet',
+      value: `₺${averageOrderValue.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}`,
+      helper: 'Sipariş başına gelir',
+      icon: ShoppingBag,
+    },
+    {
+      label: 'Sipariş Durumu',
+      value: `${completedOrdersCount}/${Number(ordersCount ?? 0)}`,
+      helper: `${pendingOrdersCount} bekleyen sipariş`,
+      icon: ReceiptText,
+    },
+  ]
 
   const normalizedRecentOrders: RecentOrder[] = (recentOrders ?? []).map((order) => {
     const rawProfile: unknown = order.profiles
@@ -84,43 +122,25 @@ export default async function AdminDashboardPage() {
         <div className="absolute -left-10 top-10 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-0 right-10 h-40 w-40 rounded-full bg-accent/20 blur-3xl" />
 
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-white/80">
-              <Sparkles className="h-4 w-4" />
-              Yönetim Paneli
-            </div>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
-              Yönetim paneliniz artık daha hızlı okunuyor.
-            </h1>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-white/75 md:text-base">
-              Sipariş, gelir ve müşteri akışını tek bakışta takip edin. Metrikleri,
-              aksiyon alanlarını ve son siparişleri daha belirgin hale getirdik.
-            </p>
-          </div>
+        <div className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {heroSalesStats.map((stat) => {
+            const Icon = stat.icon
 
-          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.18em] text-white/60">Ortalama Sepet</p>
-              <p className="mt-2 text-2xl font-semibold">
-                ₺{averageOrderValue.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.18em] text-white/60">Sipariş Sağlığı</p>
-              <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-emerald-300">
-                <ShieldCheck className="h-4 w-4" />
-                Akış aktif
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.18em] text-white/60">Odak</p>
-              <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-white">
-                <Layers3 className="h-4 w-4" />
-                Dashboard görünümü
-              </p>
-            </div>
-          </div>
+            return (
+              <div key={stat.label} className="rounded-2xl border border-white/15 bg-white/10 px-5 py-5 backdrop-blur-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">{stat.label}</p>
+                    <p className="mt-3 text-2xl font-bold tracking-tight text-white md:text-3xl">{stat.value}</p>
+                  </div>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                </div>
+                <p className="mt-4 text-sm font-medium text-white/70">{stat.helper}</p>
+              </div>
+            )
+          })}
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { getBrandBySlug } from '@/lib/supabase/queries/brands'
 import { getProductsByBrandWithOffers } from '@/lib/supabase/queries/products'
@@ -60,12 +61,18 @@ export default async function BrandPage({ params }: BrandPageProps) {
       </div>
 
       <div className="mt-8">
-        <BrandProductsClient 
-          products={products}
-          categories={categories}
-          brands={brands}
-          currentBrandId={brand.id}
-        />
+        <Suspense
+          fallback={
+            <div className="py-12 text-center text-sm text-text-secondary">Ürünler yükleniyor…</div>
+          }
+        >
+          <BrandProductsClient 
+            products={products}
+            categories={categories}
+            brands={brands}
+            currentBrandId={brand.id}
+          />
+        </Suspense>
       </div>
     </div>
   )

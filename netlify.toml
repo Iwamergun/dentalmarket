@@ -1,0 +1,14 @@
+# Netlify yapılandırması — Next.js (App Router)
+# Resmi Next.js Runtime eklentisi App Router, SSR, dinamik route'lar ve
+# Image Optimization'ı otomatik yönetir. Ayrıca publish/komut ayarlarını da
+# kendisi tanımladığından genellikle elle "publish" vermeye gerek yoktur.
+
+[build]
+  command = "npm run build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Node sürümü: proje React 19 + Next 15 kullanıyor, bu yüzden Node 20 öneriliyor.
+[build.environment]
+  NODE_VERSION = "20"

@@ -2,11 +2,11 @@
 
 import * as React from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Filter, Minus, Plus, Star, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Star, X } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import type { Category, Brand } from '@/types/catalog.types'
 
@@ -21,6 +21,120 @@ interface FilterSidebarProps {
   applyPath?: string
 }
 
+/**
+ * Açılır-kapanır filtre bölümü (Tailwind Disclosure tasarımının
+ * lucide-react ile yeniden yazılmış hâli).
+ */
+interface FilterSectionProps {
+  title: string
+  defaultOpen?: boolean
+  children: React.ReactNode
+  className?: string
+}
+
+function FilterSection({ title, defaultOpen = true, children, className }: FilterSectionProps) {
+  const [open, setOpen] = React.useState(defaultOpen)
+
+  return (
+    <div className={cn('border-b border-border py-6', className)}>
+      <h3 className="-my-3 flow-root">
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="group flex w-full items-center justify-between py-3 text-sm text-text-secondary transition-colors hover:text-primary"
+          aria-expanded={open}
+        >
+          <span className="text-sm font-bold text-primary">{title}</span>
+          <span className="ml-6 flex items-center">
+            {open ? (
+              <Minus className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Plus className="h-5 w-5" aria-hidden="true" />
+            )}
+          </span>
+        </button>
+      </h3>
+      {open && <div className="pt-6">{children}</div>}
+    </div>
+  )
+}
+
+/**
+ * Mobil filtre dialog'u (Tailwind Dialog/DialogPanel tasarımının
+ * Headless UI olmadan, kendi state'imizle yeniden yazılmış hâli).
+ * Sağdan kayarak açılan tam yükseklikli panel.
+ */
+interface MobileFilterDialogProps {
+  open: boolean
+  onClose: () => void
+  children: React.ReactNode
+}
+
+function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps) {
+  React.useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [open])
+
+  // ESC ile kapatma
+  React.useEffect(() => {
+    if (!open) return
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [open, onClose])
+
+  return (
+    <div
+      className={cn('relative z-40 lg:hidden', !open && 'pointer-events-none')}
+      aria-hidden={!open}
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* Backdrop */}
+      <div
+        className={cn(
+          'fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear',
+          open ? 'opacity-100' : 'opacity-0'
+        )}
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-0 z-40 flex">
+        {/* Panel */}
+        <div
+          className={cn(
+            'relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white pb-6 shadow-xl transition duration-300 ease-in-out',
+            open ? 'translate-x-0' : 'translate-x-full'
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-border px-4 py-4">
+            <h2 className="text-lg font-bold text-primary">Filtreler</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-text-secondary transition-colors hover:bg-background-deep hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+            >
+              <span className="sr-only">Menüyü kapat</span>
+              <X className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="px-4 pt-2">{children}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function FilterSidebar({
   categories = [],
   brands = [],
@@ -32,6 +146,8 @@ export function FilterSidebar({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] = React.useState(false)
 
   const selectedCategoryDefaults = React.useMemo(() => {
     const categoryParam = searchParams.get('category')
@@ -72,7 +188,7 @@ export function FilterSidebar({
   const applyFilters = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString())
     const targetPath = applyPath || pathname
-    
+
     // Remove old filters
     params.delete('category')
     params.delete('brand')
@@ -95,6 +211,7 @@ export function FilterSidebar({
 
     const query = params.toString()
     router.push(query ? `${targetPath}?${query}` : targetPath, { scroll: false })
+    setMobileFiltersOpen(false)
   }, [applyPath, inStockOnly, maxPrice, minPrice, minRating, pathname, router, searchParams, selectedBrands, selectedCategories])
 
   // Clear all filters
@@ -108,20 +225,20 @@ export function FilterSidebar({
     router.push(applyPath || pathname, { scroll: false })
   }
 
-  const hasActiveFilters = 
-    selectedCategories.length > 0 || 
-    selectedBrands.length > 0 || 
-    minPrice || 
-    maxPrice || 
-    minRating || 
+  const hasActiveFilters =
+    selectedCategories.length > 0 ||
+    selectedBrands.length > 0 ||
+    minPrice ||
+    maxPrice ||
+    minRating ||
     inStockOnly
 
-  return (
-    <div className={cn('space-y-6', className)}>
+  // Asıl filtre içeriği (hem masaüstü sidebar'da hem mobil dialog'da kullanılır)
+  const filterContent = (
+    <>
       {/* Categories */}
       {categories.length > 0 && (
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
-          <h3 className="mb-4 text-sm font-bold text-primary">Kategoriler</h3>
+        <FilterSection title="Kategoriler">
           <div className="space-y-3">
             {[...categories]
               .sort((a, b) => a.name.localeCompare(b.name, 'tr'))
@@ -156,7 +273,7 @@ export function FilterSidebar({
             <button
               type="button"
               onClick={() => setShowAllCategories((prev) => !prev)}
-              className="mt-3 flex items-center gap-1 text-xs font-semibold text-secondary hover:text-secondary-dark transition-colors"
+              className="mt-3 flex items-center gap-1 text-xs font-semibold text-secondary transition-colors hover:text-secondary-dark"
             >
               {showAllCategories ? (
                 <>
@@ -168,54 +285,46 @@ export function FilterSidebar({
               ) : (
                 <>
                   <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                   {categories.length - CATEGORY_INITIAL_COUNT} kategori daha göster
                 </>
               )}
             </button>
           )}
-        </div>
+        </FilterSection>
       )}
 
       {/* Price Range */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
-        <h3 className="mb-4 text-sm font-bold text-primary">Fiyat Aralığı</h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary">
-                ₺
-              </span>
-              <Input
-                type="number"
-                placeholder="Min"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-                className="pl-8 bg-white text-text-primary"
-              />
-            </div>
-            <span className="text-text-secondary">-</span>
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary">
-                ₺
-              </span>
-              <Input
-                type="number"
-                placeholder="Max"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-                className="pl-8 bg-white text-text-primary"
-              />
-            </div>
+      <FilterSection title="Fiyat Aralığı">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary">₺</span>
+            <Input
+              type="number"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="bg-white pl-8 text-text-primary"
+            />
+          </div>
+          <span className="text-text-secondary">-</span>
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-secondary">₺</span>
+            <Input
+              type="number"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="bg-white pl-8 text-text-primary"
+            />
           </div>
         </div>
-      </div>
+      </FilterSection>
 
       {/* Brands */}
       {brands.length > 0 && (
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
-          <h3 className="mb-4 text-sm font-bold text-primary">Markalar</h3>
+        <FilterSection title="Markalar">
           <div className="max-h-64 space-y-3 overflow-y-auto">
             {brands.map((brand) => (
               <div key={brand.id} className="flex items-center space-x-2">
@@ -242,12 +351,11 @@ export function FilterSidebar({
               </div>
             ))}
           </div>
-        </div>
+        </FilterSection>
       )}
 
       {/* Rating Filter */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
-        <h3 className="mb-4 text-sm font-bold text-primary">Değerlendirme</h3>
+      <FilterSection title="Değerlendirme">
         <div className="space-y-3">
           {[4, 3, 2, 1].map((rating) => (
             <button
@@ -271,24 +379,20 @@ export function FilterSidebar({
             </button>
           ))}
         </div>
-      </div>
+      </FilterSection>
 
       {/* Stock Status */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-card">
+      <FilterSection title="Stok Durumu" defaultOpen={false}>
         <div className="flex items-center space-x-2">
-          <Checkbox
-            id="in-stock"
-            checked={inStockOnly}
-            onCheckedChange={setInStockOnly}
-          />
+          <Checkbox id="in-stock" checked={inStockOnly} onCheckedChange={setInStockOnly} />
           <Label htmlFor="in-stock" className="cursor-pointer text-text-secondary">
             Sadece stokta olanlar
           </Label>
         </div>
-      </div>
+      </FilterSection>
 
       {/* Action Buttons */}
-      <div className="space-y-3">
+      <div className="space-y-3 py-6">
         <Button
           onClick={applyFilters}
           className="h-11 w-full rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
@@ -308,6 +412,35 @@ export function FilterSidebar({
           </Button>
         )}
       </div>
-    </div>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobil filtre butonu (yalnızca küçük ekranlarda görünür) */}
+      <div className="lg:hidden">
+        <Button
+          type="button"
+          onClick={() => setMobileFiltersOpen(true)}
+          variant="outline"
+          className="h-11 w-full rounded-xl border-border bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+          size="md"
+        >
+          <Filter className="mr-2 h-4 w-4" />
+          Filtreler
+          {hasActiveFilters && <span className="ml-2 h-2 w-2 rounded-full bg-secondary" aria-hidden="true" />}
+        </Button>
+      </div>
+
+      {/* Mobil filtre dialog'u */}
+      <MobileFilterDialog open={mobileFiltersOpen} onClose={() => setMobileFiltersOpen(false)}>
+        {filterContent}
+      </MobileFilterDialog>
+
+      {/* Masaüstü sidebar (büyük ekranlarda görünür) */}
+      <div className={cn('hidden rounded-2xl border border-border bg-white px-6 shadow-card lg:block', className)}>
+        {filterContent}
+      </div>
+    </>
   )
 }

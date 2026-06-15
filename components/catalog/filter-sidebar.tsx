@@ -36,7 +36,7 @@ function FilterSection({ title, defaultOpen = true, children, className }: Filte
   const [open, setOpen] = React.useState(defaultOpen)
 
   return (
-    <div className={cn('border-b border-border py-6', className)}>
+    <div className={cn('border-b border-border py-4 lg:py-6', className)}>
       <h3 className="-my-3 flow-root">
         <button
           type="button"
@@ -54,7 +54,7 @@ function FilterSection({ title, defaultOpen = true, children, className }: Filte
           </span>
         </button>
       </h3>
-      {open && <div className="pt-6">{children}</div>}
+      {open && <div className="pt-4 lg:pt-6">{children}</div>}
     </div>
   )
 }
@@ -94,7 +94,7 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
 
   return (
     <div
-      className={cn('relative z-40 lg:hidden', !open && 'pointer-events-none')}
+      className={cn('fixed inset-0 z-[80] overflow-x-hidden lg:hidden', !open && 'pointer-events-none')}
       aria-hidden={!open}
       role="dialog"
       aria-modal="true"
@@ -102,33 +102,33 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear',
+          'fixed inset-0 z-[80] bg-black/35 transition-opacity duration-300 ease-linear',
           open ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
       />
 
-      <div className="fixed inset-0 z-40 flex">
+      <div className="fixed inset-0 z-[90] flex justify-end">
         {/* Panel */}
         <div
           className={cn(
-            'relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white pb-6 shadow-xl transition duration-300 ease-in-out',
+            'relative flex h-dvh w-[88vw] max-w-sm transform flex-col overflow-hidden bg-white shadow-2xl transition duration-300 ease-in-out',
             open ? 'translate-x-0' : 'translate-x-full'
           )}
         >
-          <div className="flex items-center justify-between border-b border-border px-4 py-4">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
             <h2 className="text-lg font-bold text-primary">Filtreler</h2>
             <button
               type="button"
               onClick={onClose}
-              className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-text-secondary transition-colors hover:bg-background-deep hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              className="-mr-2 flex h-9 w-9 items-center justify-center rounded-md bg-white p-2 text-text-secondary transition-colors hover:bg-background-deep hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
             >
               <span className="sr-only">Menüyü kapat</span>
               <X className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="px-4 pt-2">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4 pt-1.5">{children}</div>
         </div>
       </div>
     </div>
@@ -392,7 +392,7 @@ export function FilterSidebar({
       </FilterSection>
 
       {/* Action Buttons */}
-      <div className="space-y-3 py-6">
+      <div className="sticky bottom-0 -mx-4 space-y-3 border-t border-border bg-white px-4 pb-4 pt-3 lg:static lg:mx-0 lg:border-0 lg:px-0 lg:pb-6 lg:pt-6">
         <Button
           onClick={applyFilters}
           className="h-11 w-full rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"

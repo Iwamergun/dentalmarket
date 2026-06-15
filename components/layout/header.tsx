@@ -209,20 +209,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur">
-      <div className="container-main py-3 md:py-4">
+      <div className="container-main px-2 py-2 sm:px-3 md:px-6 md:py-4 lg:px-8">
         <div
           className={[
-            'rounded-[20px] border border-slate-200/80 bg-white/90 shadow-[0_14px_40px_-24px_rgba(15,23,42,0.3)] transition-all duration-300',
-            isScrolled ? 'border-slate-200 shadow-[0_24px_52px_-30px_rgba(15,23,42,0.34)]' : '',
+            'rounded-xl border border-slate-200/70 bg-white/95 shadow-sm transition-all duration-300 md:rounded-[20px] md:border-slate-200/80 md:bg-white/90 md:shadow-[0_14px_40px_-24px_rgba(15,23,42,0.3)]',
+            isScrolled ? 'shadow-md md:border-slate-200 md:shadow-[0_24px_52px_-30px_rgba(15,23,42,0.34)]' : '',
           ].join(' ')}
         >
-          <div className="relative flex min-h-[68px] items-center gap-2 px-3 py-2 md:min-h-[76px] md:px-5">
+          <div className="relative flex min-h-[52px] items-center gap-1.5 px-2 py-1.5 md:min-h-[76px] md:gap-2 md:px-5 md:py-2">
             <Link
               href="/"
               aria-label="Dentalışveriş ana sayfa"
-              className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-primary transition duration-200 hover:border-primary/30 hover:bg-primary/[0.03]"
+              className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-primary transition duration-200 hover:border-primary/30 hover:bg-primary/[0.03] md:gap-2 md:rounded-2xl md:px-3 md:py-2"
             >
-              <BrandLogo variant="icon" className="h-8 w-8 shrink-0" />
+              <BrandLogo variant="icon" className="h-7 w-7 shrink-0 md:h-8 md:w-8" />
               <span aria-hidden="true" className="hidden text-xs font-semibold tracking-[0.1em] text-slate-800 sm:inline">Dentalışveriş</span>
             </Link>
 
@@ -340,13 +340,13 @@ export function Header() {
               )}
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex items-center gap-1.5 md:gap-2">
               <button 
                 onClick={() => {
                   setIsSearchOpen((prev) => !prev)
                 }}
                 className={[
-                  'rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary',
+                  'rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:p-2',
                   isScrolled ? 'inline-flex' : 'xl:hidden',
                 ].join(' ')}
                 aria-label="Arama panelini aç"
@@ -371,7 +371,7 @@ export function Header() {
 
               <Link
                 href="/profil/favorilerim"
-                className="hidden rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary sm:flex"
+                className="hidden rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary sm:flex md:p-2"
               >
                 <Heart className="h-5 w-5" />
               </Link>
@@ -388,20 +388,20 @@ export function Header() {
               <CartButton />
 
               {loading ? (
-                <div className="w-10 h-10 rounded-xl bg-muted animate-pulse" />
+                <div className="h-8 w-8 animate-pulse rounded-xl bg-muted md:h-10 md:w-10" />
               ) : user ? (
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary"
+                    className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:gap-2 md:p-1.5"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary shadow-md">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary shadow-md md:h-10 md:w-10">
                       <span className="text-white text-sm font-semibold">
                         {user.email?.charAt(0).toUpperCase() || 'U'}
                       </span>
                     </div>
                     <svg 
-                      className={`w-4 h-4 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} 
+                      className={`h-3.5 w-3.5 transition-transform duration-200 md:h-4 md:w-4 ${isProfileOpen ? 'rotate-180' : ''}`} 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -497,9 +497,9 @@ export function Header() {
               ) : (
                 <Link 
                   href="/giris" 
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-primary/90"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-3 text-xs font-semibold text-white shadow-sm transition duration-200 hover:bg-primary/90 sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                   </svg>
                   <span className="hidden sm:inline">Giriş Yap</span>
@@ -508,7 +508,7 @@ export function Header() {
 
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="rounded-full border border-slate-200 bg-white p-2 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:hidden"
+                className="rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:hidden"
                 aria-label="Mobil menü"
               >
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -518,24 +518,24 @@ export function Header() {
 
           {/* Search Card */}
           {(!isScrolled || isSearchOpen) && (
-          <div className="border-t border-slate-200/70 bg-slate-50/90 p-3 md:hidden">
-            <form onSubmit={submitSearch} className="relative rounded-[22px] border border-slate-200 bg-white p-2 shadow-[0_12px_28px_-18px_rgba(15,23,42,0.35)]">
+          <div className="border-t border-slate-200/70 bg-slate-50/90 p-2 md:hidden">
+            <form onSubmit={submitSearch} className="relative rounded-xl border border-slate-200/90 bg-white px-2.5 py-1.5 shadow-sm">
               <input
                 ref={mobileSearchInputRef}
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Ürün, marka veya kategori ara..."
-                className="h-11 w-full rounded-2xl bg-transparent px-4 pr-24 text-sm text-body-text placeholder-secondary-text focus:outline-none"
+                className="h-10 w-full rounded-xl bg-transparent px-3 pr-20 text-[13px] text-body-text placeholder-secondary-text focus:outline-none"
                 autoFocus={isSearchOpen}
               />
-              <div className="absolute inset-y-0 right-3 flex items-center gap-2">
+              <div className="absolute inset-y-0 right-2.5 flex items-center gap-1.5">
                 {searchQuery && (
                   <button
                     type="button"
                     aria-label="Aramayı temizle"
                     onClick={() => setSearchQuery('')}
-                    className="inline-flex h-8 items-center rounded-xl border border-slate-200 px-2 text-xs font-semibold text-slate-600"
+                    className="inline-flex h-7 items-center rounded-lg border border-slate-200 px-2 text-[11px] font-semibold text-slate-600"
                   >
                     Temizle
                   </button>
@@ -543,7 +543,7 @@ export function Header() {
                 <button
                   type="submit"
                   aria-label="Ara"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-sm"
                 >
                   <Search className="h-4 w-4" />
                 </button>

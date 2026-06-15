@@ -12,14 +12,14 @@ export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps
   return (
     <div className="w-full lg:w-80 lg:flex-shrink-0">
       <div className="lg:hidden">
-        <div className="rounded-[28px] border border-border bg-white/90 p-5 shadow-card backdrop-blur">
+        <div className="rounded-2xl border border-border bg-white/90 p-4 shadow-sm backdrop-blur">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Hizli Katalog</p>
-          <h2 className="mt-2 text-2xl font-bold text-primary">Filtreleyip urun listesine gecin</h2>
-          <p className="mt-2 text-sm text-text-secondary">
+          <h2 className="mt-1.5 text-xl font-bold text-primary">Filtreleyip urun listesine gecin</h2>
+          <p className="mt-1.5 text-sm text-text-secondary">
             Kategori, marka ve fiyat secip dogrudan urunler sayfasinda sonuclari gorun.
           </p>
 
-          <div className="mt-4">
+          <div className="mt-3">
             <FilterSidebar categories={categories} brands={brands} applyPath="/urunler" />
           </div>
         </div>

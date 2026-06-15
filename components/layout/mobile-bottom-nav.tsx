@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { House, Grid2x2, Heart, ShoppingCart, UserRound } from 'lucide-react'
+import { House, Package, Heart, ShoppingCart, UserRound } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
 import { useAuth } from '@/app/contexts/AuthContext'
 
 const navItems = [
   { href: '/', label: 'Ana Sayfa', icon: House },
-  { href: '/kategoriler', label: 'Kategoriler', icon: Grid2x2 },
+  { href: '/urunler', label: 'Ürünler', icon: Package },
   { href: '/profil/favorilerim', label: 'Favoriler', icon: Heart },
   { href: '/sepet', label: 'Sepet', icon: ShoppingCart },
 ]

@@ -52,6 +52,26 @@ const PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000
 const SCROLL_STEP = 300
 const AUTO_SCROLL_INTERVAL = 3000
 
+function getUserFirstName(user: ReturnType<typeof useAuth>['user']) {
+  if (!user) return null
+
+  const fullName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name.trim() : ''
+  const fullNameFirst = fullName.split(/\s+/).find(Boolean)
+
+  if (fullNameFirst) {
+    return fullNameFirst.charAt(0).toLocaleUpperCase('tr-TR') + fullNameFirst.slice(1)
+  }
+
+  const emailPrefix = typeof user.email === 'string' ? user.email.split('@')[0]?.trim() : ''
+  const emailFirst = emailPrefix
+    ?.replace(/[._-]+/g, ' ')
+    .split(/\s+/)
+    .find(Boolean)
+
+  if (!emailFirst) return null
+  return emailFirst.charAt(0).toLocaleUpperCase('tr-TR') + emailFirst.slice(1)
+}
+
 function SkeletonCard() {
   return (
     <div className="w-56 flex-shrink-0 rounded-2xl border border-border bg-white shadow-lg overflow-hidden animate-pulse">
@@ -248,11 +268,14 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
     }
   }
 
+  const firstName = getUserFirstName(user)
+  const displayTitle = user ? (firstName ? `${firstName}, Sana Özel Ürünler` : 'Sana Özel Ürünler') : title
+
   return (
     <section className="bg-muted py-10 shadow-[inset_0_1px_0_rgba(84,48,165,0.04)]">
       <div className="container-main">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-extrabold text-foreground">{title}</h2>
+          <h2 className="text-2xl font-extrabold text-foreground">{displayTitle}</h2>
           {products.length > 0 && (
             <div className="flex gap-2">
               <button

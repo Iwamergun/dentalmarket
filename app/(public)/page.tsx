@@ -36,19 +36,19 @@ export default async function HomePage() {
   return (
     <>
       <div className="md:hidden min-h-screen bg-[#F8FAFC] pb-24">
-        <div className="space-y-5 px-4 pb-8 pt-4">
-          <section className="overflow-hidden rounded-[24px] border border-[#E5E7EB] bg-white shadow-[0_18px_35px_-24px_rgba(15,23,42,0.35)]">
+        <div className="space-y-4 px-2.5 pb-7 pt-3 sm:px-3">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.28)]">
             <HeroSection campaigns={campaigns} products={products} />
           </section>
 
-          <section className="rounded-[22px] border border-[#E5E7EB] bg-white p-4 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
-            <div className="mb-3 flex items-center justify-between">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+            <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kategoriler</h2>
               <Link href="/kategoriler" className="text-xs font-semibold text-[#2563EB]">
                 Tümünü Gör
               </Link>
             </div>
-            <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
+            <div className="-mx-0.5 flex gap-2.5 overflow-x-auto px-0.5 pb-0.5">
               {categories.slice(0, 12).map((category) => {
                 const icon = mobileCategoryEmoji[category.slug] ?? '🛍️'
 
@@ -56,7 +56,7 @@ export default async function HomePage() {
                   <Link
                     key={category.id}
                     href={`/kategoriler/${category.slug}`}
-                    className="min-w-[124px] rounded-2xl border border-[#E5E7EB] bg-[#F8FAFC] px-3 py-3.5 transition-colors hover:border-[#2563EB]/35"
+                    className="min-w-[118px] rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-3 transition-colors hover:border-[#2563EB]/35"
                   >
                     <span className="text-xl leading-none">{icon}</span>
                     <p className="mt-2 line-clamp-2 text-xs font-semibold text-slate-800">{category.name}</p>
@@ -66,27 +66,27 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-[22px] border border-[#E5E7EB] bg-white shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
             <ProductCarousel fallbackProducts={products} />
           </section>
 
-          <section className="rounded-[22px] border border-[#E5E7EB] bg-white p-1 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-0.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
             <FeaturedProducts products={products} />
           </section>
 
-          <section className="rounded-[22px] border border-[#E5E7EB] bg-white p-4 shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
-            <div className="mb-3 flex items-center justify-between">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+            <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kampanyalar</h2>
               <Link href="/kampanyalar" className="text-xs font-semibold text-[#2563EB]">
                 Tümü
               </Link>
             </div>
-            <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1">
+            <div className="-mx-0.5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-0.5 pb-0.5">
               {(campaigns.length > 0 ? campaigns : []).slice(0, 8).map((campaign) => (
                 <Link
                   key={campaign.id}
                   href={campaign.href || '/kampanyalar'}
-                  className="w-[86%] shrink-0 snap-start overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white"
+                  className="w-[84%] shrink-0 snap-start overflow-hidden rounded-xl border border-[#E5E7EB] bg-white"
                 >
                   <div className="relative aspect-[16/9] bg-slate-100">
                     {campaign.image_path ? (
@@ -101,7 +101,7 @@ export default async function HomePage() {
                       <div className="absolute inset-0 bg-slate-100" />
                     )}
                   </div>
-                  <div className="p-4">
+                  <div className="p-3">
                     <p className="text-sm font-semibold text-slate-900">{campaign.title}</p>
                     <p className="mt-1 line-clamp-2 text-xs text-slate-600">
                       {campaign.description ?? 'Özel kampanyayı inceleyin.'}
@@ -112,11 +112,11 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-[22px] border border-[#E5E7EB] bg-white shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
             <BrandLogos brands={brands} />
           </section>
 
-          <section className="overflow-hidden rounded-[22px] border border-[#E5E7EB] bg-white shadow-[0_14px_30px_-22px_rgba(15,23,42,0.3)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
             <TrustSection />
           </section>
         </div>

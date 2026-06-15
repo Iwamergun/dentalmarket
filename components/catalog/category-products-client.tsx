@@ -45,9 +45,9 @@ export function CategoryProductsClient({
       {/* Main Content */}
       <div className="space-y-6">
         {/* Mobile Filter Button and Sorting */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
           {/* Mobile Filter Button (FilterSidebar ships its own dialog) */}
-          <div className="w-40 lg:hidden">
+          <div className="w-full sm:w-40 lg:hidden">
             <FilterSidebar 
               categories={categories} 
               brands={brands}
@@ -56,7 +56,7 @@ export function CategoryProductsClient({
           </div>
 
           {/* Results Count */}
-          <div className="text-sm text-text-secondary">
+          <div className="text-xs text-text-secondary sm:text-sm">
             <span className="font-semibold text-primary">{filteredProducts.length}</span> ürün bulundu
           </div>
 

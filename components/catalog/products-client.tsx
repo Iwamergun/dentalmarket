@@ -64,14 +64,14 @@ export function ProductsClient({ products, categories, brands }: ProductsClientP
         )}
 
         {/* Mobile Filter Button and Sorting */}
-        <div className="sticky top-[132px] z-30 -mx-4 border-y border-border/70 bg-background/95 px-4 py-3 backdrop-blur lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-0">
+        <div className="sticky top-[124px] z-30 -mx-4 border-y border-border/70 bg-background/95 px-4 py-2.5 backdrop-blur lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-0">
           <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-nowrap">
             {/* Mobile Filter Button (FilterSidebar ships its own dialog) */}
             <div className="order-2 grid w-full grid-cols-2 gap-2 lg:hidden">
               <FilterSidebar categories={categories} brands={brands} />
 
               <div>
-                <SortSelect className="h-11 w-full rounded-2xl border-border bg-white text-xs font-semibold shadow-sm" />
+                <SortSelect className="h-10 w-full rounded-xl border-border bg-white text-xs font-semibold shadow-sm" />
               </div>
             </div>
 

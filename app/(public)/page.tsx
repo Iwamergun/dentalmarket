@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { HeroSection } from '@/components/home/hero-section'
 import { ProductCarousel } from '@/components/home/product-carousel'
+import { ProductGroupBand } from '@/components/home/product-group-band'
 import { CategoryGrid } from '@/components/home/category-grid'
 import { CampaignBanner } from '@/components/home/campaign-banner'
 import { FeaturedProducts } from '@/components/home/featured-products'
@@ -14,7 +15,7 @@ import { getBrands } from '@/lib/supabase/queries/brands'
 import { getActiveCampaigns } from '@/lib/supabase/queries/campaigns'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 
-const FEATURED_PRODUCTS_COUNT = 8
+const FEATURED_PRODUCTS_COUNT = 18
 
 export default async function HomePage() {
   // Fetch data from Supabase
@@ -33,12 +34,44 @@ export default async function HomePage() {
     laboratuvar: '🧪',
   }
 
+  const productsByPrice = [...products].sort((a, b) => {
+    const aPrice = a.price_min ?? a.min_price ?? Number.MAX_SAFE_INTEGER
+    const bPrice = b.price_min ?? b.min_price ?? Number.MAX_SAFE_INTEGER
+    return aPrice - bPrice
+  })
+
+  const productGroups = [
+    {
+      title: 'Çok Satanlar',
+      href: '/urunler',
+      products: products.slice(0, 3),
+    },
+    {
+      title: 'Yeni Gelenler',
+      href: '/urunler?sort=newest',
+      products: [...products].reverse().slice(0, 3),
+    },
+    {
+      title: 'Fiyat Avantajlı',
+      href: '/urunler?sort=price-asc',
+      products: productsByPrice.slice(0, 3),
+    },
+  ]
+
   return (
     <>
       <div className="md:hidden min-h-screen bg-[#F8FAFC] pb-24">
         <div className="space-y-4 px-2.5 pb-7 pt-3 sm:px-3">
           <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.28)]">
             <HeroSection campaigns={campaigns} products={products} />
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+            <ProductCarousel fallbackProducts={products} />
+          </section>
+
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+            <ProductGroupBand groups={productGroups} />
           </section>
 
           <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
@@ -64,10 +97,6 @@ export default async function HomePage() {
                 )
               })}
             </div>
-          </section>
-
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
-            <ProductCarousel fallbackProducts={products} />
           </section>
 
           <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-0.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
@@ -129,6 +158,12 @@ export default async function HomePage() {
         {/* Product Carousel */}
         <div className="border-y border-slate-300 bg-[#F4F7FB] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
           <ProductCarousel fallbackProducts={products} />
+        </div>
+
+        <div className="border-b border-slate-300 bg-[#F8FAFC]">
+          <div className="container-main">
+            <ProductGroupBand groups={productGroups} />
+          </div>
         </div>
         
         <main className="bg-white">

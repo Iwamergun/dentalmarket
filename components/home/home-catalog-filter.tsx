@@ -1,10 +1,6 @@
 'use client'
 
-import * as React from 'react'
-import { ArrowRight, Filter } from 'lucide-react'
 import { FilterSidebar } from '@/components/catalog/filter-sidebar'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import type { Brand, Category } from '@/types/catalog.types'
 
 interface HomeCatalogFilterProps {
@@ -13,8 +9,6 @@ interface HomeCatalogFilterProps {
 }
 
 export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-
   return (
     <div className="w-full lg:w-80 lg:flex-shrink-0">
       <div className="lg:hidden">
@@ -25,24 +19,9 @@ export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps
             Kategori, marka ve fiyat secip dogrudan urunler sayfasinda sonuclari gorun.
           </p>
 
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button className="mt-4 w-full bg-secondary hover:bg-secondary-dark" size="lg">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtreleri Ac
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[320px] overflow-y-auto p-0 sm:w-[380px]">
-              <SheetHeader className="px-6 py-5">
-                <SheetTitle>Urun Arama</SheetTitle>
-                <SheetDescription>Secimlerini yap, sonucu urunler sayfasinda ac.</SheetDescription>
-              </SheetHeader>
-              <div className="px-6 pb-6">
-                <FilterSidebar categories={categories} brands={brands} applyPath="/urunler" />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="mt-4">
+            <FilterSidebar categories={categories} brands={brands} applyPath="/urunler" />
+          </div>
         </div>
       </div>
 

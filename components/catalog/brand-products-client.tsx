@@ -1,14 +1,10 @@
 'use client'
 
 import * as React from 'react'
-import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Filter } from 'lucide-react'
 import { FilterSidebar } from '@/components/catalog/filter-sidebar'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { SortSelect } from '@/components/catalog/sort-select'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { filterAndSortProducts, parseCatalogFilters } from '@/lib/catalog/filtering'
 import type { Category, Brand } from '@/types/catalog.types'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
@@ -26,7 +22,6 @@ export function BrandProductsClient({
   brands, 
   currentBrandId 
 }: BrandProductsClientProps) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const searchParams = useSearchParams()
 
   const filteredProducts = React.useMemo(() => {
@@ -50,29 +45,14 @@ export function BrandProductsClient({
       {/* Main Content */}
       <div className="space-y-6">
         {/* Mobile Filter Button and Sorting */}
-        <div className="flex items-center justify-between">
-          {/* Mobile Filter Button */}
-          <div className="lg:hidden">
-            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="md">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filtrele
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] overflow-y-auto p-0">
-                <SheetHeader className="px-6 py-4">
-                  <SheetTitle>Filtreler</SheetTitle>
-                </SheetHeader>
-                <div className="px-6 pb-6">
-                  <FilterSidebar 
-                    categories={categories} 
-                    brands={brands}
-                    selectedBrandId={currentBrandId}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+        <div className="flex items-center justify-between gap-3">
+          {/* Mobile Filter Button (FilterSidebar ships its own dialog) */}
+          <div className="w-40 lg:hidden">
+            <FilterSidebar 
+              categories={categories} 
+              brands={brands}
+              selectedBrandId={currentBrandId}
+            />
           </div>
 
           {/* Results Count */}

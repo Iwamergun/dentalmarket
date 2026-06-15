@@ -1,15 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { Filter } from 'lucide-react'
 import { FilterSidebar } from '@/components/catalog/filter-sidebar'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { SortSelect } from '@/components/catalog/sort-select'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { filterAndSortProducts, parseCatalogFilters } from '@/lib/catalog/filtering'
 import type { Category, Brand } from '@/types/catalog.types'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
@@ -21,7 +17,6 @@ interface ProductsClientProps {
 }
 
 export function ProductsClient({ products, categories, brands }: ProductsClientProps) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const searchParams = useSearchParams()
   const categoryChips = React.useMemo(
     () => categories.filter((category) => !category.parent_id).slice(0, 12),
@@ -71,39 +66,24 @@ export function ProductsClient({ products, categories, brands }: ProductsClientP
         {/* Mobile Filter Button and Sorting */}
         <div className="sticky top-[132px] z-30 -mx-4 border-y border-border/70 bg-background/95 px-4 py-3 backdrop-blur lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-0">
           <div className="flex flex-wrap items-center justify-between gap-3 lg:flex-nowrap">
-            {/* Mobile Filter Button */}
+            {/* Mobile Filter Button (FilterSidebar ships its own dialog) */}
             <div className="order-2 grid w-full grid-cols-2 gap-2 lg:hidden">
-            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="md" className="h-11 w-full rounded-2xl border-border bg-white shadow-sm active:scale-[0.98]">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filtrele
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="bottom" className="h-[86dvh] overflow-hidden rounded-t-[2rem] p-0">
-                <SheetHeader className="px-5 py-4">
-                  <SheetTitle>Filtreler</SheetTitle>
-                </SheetHeader>
-                <div className="overflow-y-auto px-4 pb-6 pt-4">
-                  <FilterSidebar categories={categories} brands={brands} />
-                </div>
-              </SheetContent>
-            </Sheet>
+              <FilterSidebar categories={categories} brands={brands} />
 
-            <div>
-              <SortSelect className="h-11 w-full rounded-2xl border-border bg-white text-xs font-semibold shadow-sm" />
+              <div>
+                <SortSelect className="h-11 w-full rounded-2xl border-border bg-white text-xs font-semibold shadow-sm" />
+              </div>
             </div>
-          </div>
 
-          {/* Results Count */}
-          <div className="order-1 w-full shrink-0 text-xs font-medium text-text-secondary sm:text-sm lg:order-none lg:w-auto">
-            <span className="font-semibold text-primary">{filteredProducts.length}</span> ürün bulundu
-          </div>
+            {/* Results Count */}
+            <div className="order-1 w-full shrink-0 text-xs font-medium text-text-secondary sm:text-sm lg:order-none lg:w-auto">
+              <span className="font-semibold text-primary">{filteredProducts.length}</span> ürün bulundu
+            </div>
 
-          {/* Sorting */}
-          <div className="hidden lg:block">
-            <SortSelect />
-          </div>
+            {/* Sorting */}
+            <div className="hidden lg:block">
+              <SortSelect />
+            </div>
           </div>
         </div>
 

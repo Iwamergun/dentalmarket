@@ -94,7 +94,7 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
 
   return (
     <div
-      className={cn('fixed inset-0 z-[80] overflow-x-hidden lg:hidden', !open && 'pointer-events-none')}
+      className={cn('fixed inset-0 z-[60] overflow-x-hidden lg:hidden', !open && 'pointer-events-none')}
       aria-hidden={!open}
       role="dialog"
       aria-modal="true"
@@ -102,17 +102,17 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 z-[80] bg-black/35 transition-opacity duration-300 ease-linear',
+          'fixed inset-0 z-[60] bg-black/35 transition-opacity duration-300 ease-linear',
           open ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
       />
 
-      <div className="fixed inset-0 z-[90] flex justify-end">
+      <div className="fixed inset-0 z-[70] flex justify-end">
         {/* Panel */}
         <div
           className={cn(
-            'relative flex h-dvh w-[88vw] max-w-sm transform flex-col overflow-hidden bg-white shadow-2xl transition duration-300 ease-in-out',
+            'relative flex h-dvh w-[85vw] max-w-sm transform flex-col overflow-hidden bg-white shadow-2xl transition duration-300 ease-in-out',
             open ? 'translate-x-0' : 'translate-x-full'
           )}
         >

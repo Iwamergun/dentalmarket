@@ -20,6 +20,9 @@
 # production
 /build
 
+# Netlify build cache (must not be committed — triggers secrets scanner)
+.netlify/
+
 # misc
 .DS_Store
 *.pem

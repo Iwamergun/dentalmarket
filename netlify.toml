@@ -1,7 +1,6 @@
 # Netlify yapılandırması — Next.js (App Router)
 # Resmi Next.js Runtime eklentisi App Router, SSR, dinamik route'lar ve
-# Image Optimization'ı otomatik yönetir. Ayrıca publish/komut ayarlarını da
-# kendisi tanımladığından genellikle elle "publish" vermeye gerek yoktur.
+# Image Optimization'ı otomatik yönetir.
 
 [build]
   command = "npm run build"
@@ -12,3 +11,6 @@
 # Node sürümü: proje React 19 + Next 15 kullanıyor, bu yüzden Node 20 öneriliyor.
 [build.environment]
   NODE_VERSION = "20"
+  # R2_BUCKET_NAME is a non-sensitive bucket identifier (not a credential).
+  # Exempt it from secrets scanning so the build doesn't get blocked.
+  SECRETS_SCAN_OMIT_KEYS = "R2_BUCKET_NAME"

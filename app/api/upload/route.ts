@@ -27,7 +27,11 @@ function getR2Client() {
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY
 
   if (!endpoint || !accessKeyId || !secretAccessKey) {
-    throw new Error('R2 environment variables are not configured')
+    throw new Error('R2 environment variables are not configured: ' +
+      (!endpoint ? 'R2_ENDPOINT ' : '') +
+      (!accessKeyId ? 'R2_ACCESS_KEY_ID ' : '') +
+      (!secretAccessKey ? 'R2_SECRET_ACCESS_KEY' : '')
+    )
   }
 
   return new S3Client({
@@ -98,7 +102,8 @@ export async function POST(request: NextRequest) {
 
     const publicUrl = `${(process.env.NEXT_PUBLIC_R2_PUBLIC_URL || '').replace(/\/$/, '')}/${objectPath}`
 
-    await supabase.from('media_assets').insert({
+    // Non-blocking: log to media_assets but don't fail the upload if this errors
+    supabase.from('media_assets').insert({
       owner_profile_id: user.id,
       storage_provider: 'r2',
       bucket: bucketName,
@@ -106,13 +111,18 @@ export async function POST(request: NextRequest) {
       public_url: publicUrl,
       mime_type: file.type,
       bytes: file.size,
+    }).then(({ error }) => {
+      if (error) {
+        console.warn('media_assets insert warning (non-fatal):', error.message)
+      }
     })
 
     return NextResponse.json({ path: objectPath, publicUrl })
   } catch (error) {
     console.error('Upload error:', error)
+    const message = error instanceof Error ? error.message : 'Dosya yüklenirken bir hata oluştu'
     return NextResponse.json(
-      { error: 'Dosya yüklenirken bir hata oluştu' },
+      { error: message },
       { status: 500 }
     )
   }

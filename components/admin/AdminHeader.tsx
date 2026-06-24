@@ -27,7 +27,8 @@ export default function AdminHeader({ user, onMenuToggle }: AdminHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+    // sticky only on lg+ (desktop sidebar layout); on mobile it scrolls away
+    <header className="z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl lg:sticky lg:top-0">
       <div className="flex flex-col gap-4 px-4 py-4 md:px-6 xl:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -57,7 +58,7 @@ export default function AdminHeader({ user, onMenuToggle }: AdminHeaderProps) {
 
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 text-sm font-medium text-body-text shadow-subtle transition-colors hover:border-secondary/30 hover:text-secondary"
+              className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 text-sm font-medium text-body-text shadow-subtle transition-colors hover:border-secondary/40"
               title="Ana Sayfaya Dön"
             >
               <Home className="h-4 w-4" />

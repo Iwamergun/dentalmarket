@@ -12,7 +12,17 @@ interface ImageUploaderProps {
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+// Normalise any browser-reported MIME variant to a canonical type
+function normaliseType(raw: string): string {
+  const t = raw.toLowerCase()
+  if (t === 'image/jpg' || t === 'image/jpeg' || t === 'image/pjpeg') return 'image/jpeg'
+  if (t === 'image/png' || t === 'image/x-png') return 'image/png'
+  if (t === 'image/webp') return 'image/webp'
+  return t
+}
+
+const ALLOWED_NORMALISED = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
 export default function ImageUploader({ onUpload, currentImage, label = 'Ürün Görseli' }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
@@ -23,7 +33,7 @@ export default function ImageUploader({ onUpload, currentImage, label = 'Ürün 
   const displayImage = preview || (currentImage ? getImageUrl(currentImage) : null)
 
   const validateFile = (file: File): boolean => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!ALLOWED_NORMALISED.has(normaliseType(file.type))) {
       toast.error('Sadece JPEG, PNG ve WebP formatları desteklenir')
       return false
     }
@@ -37,13 +47,17 @@ export default function ImageUploader({ onUpload, currentImage, label = 'Ürün 
   const uploadFile = useCallback(async (file: File) => {
     if (!validateFile(file)) return
 
-    const objectUrl = URL.createObjectURL(file)
+    // Rebuild the File with a normalised MIME type so the server sees a clean value
+    const normType = normaliseType(file.type)
+    const normFile = normType !== file.type ? new File([file], file.name, { type: normType }) : file
+
+    const objectUrl = URL.createObjectURL(normFile)
     setPreview(objectUrl)
     setUploading(true)
 
     try {
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', normFile)
 
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
       const data = await res.json()
@@ -60,6 +74,7 @@ export default function ImageUploader({ onUpload, currentImage, label = 'Ürün 
     } finally {
       setUploading(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onUpload])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +167,7 @@ export default function ImageUploader({ onUpload, currentImage, label = 'Ürün 
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/jpg,image/png,image/x-png,image/webp"
         onChange={handleFileChange}
         className="hidden"
       />

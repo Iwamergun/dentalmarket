@@ -6,7 +6,24 @@ import { getAuthMetadata } from '@/lib/auth/access'
 import { canUploadMedia } from '@/lib/auth/upload-access'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+// Accept common MIME variants browsers/OSes may report
+const ALLOWED_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/pjpeg',
+  'image/png',
+  'image/x-png',
+  'image/webp',
+])
+
+// Map any variant to a canonical MIME for storage
+function canonicalMime(type: string): string {
+  const t = type.toLowerCase()
+  if (t === 'image/jpg' || t === 'image/pjpeg') return 'image/jpeg'
+  if (t === 'image/x-png') return 'image/png'
+  return t
+}
 
 function slugifyFilename(name: string): string {
   return name
@@ -67,9 +84,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Dosya bulunamadı' }, { status: 400 })
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!ALLOWED_TYPES.has(file.type.toLowerCase())) {
       return NextResponse.json(
-        { error: 'Sadece JPEG, PNG ve WebP formatları desteklenir' },
+        { error: `Desteklenmeyen format: ${file.type}. Sadece JPEG, PNG ve WebP kabul edilir.` },
         { status: 400 }
       )
     }
@@ -81,7 +98,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const mime = canonicalMime(file.type)
+    const ext = file.name.split('.').pop()?.toLowerCase() || (mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg')
     const baseName = file.name.replace(/\.[^.]+$/, '')
     const slugified = slugifyFilename(baseName)
     const timestamp = Date.now()
@@ -96,7 +114,7 @@ export async function POST(request: NextRequest) {
         Bucket: bucketName,
         Key: objectPath,
         Body: buffer,
-        ContentType: file.type,
+        ContentType: mime,
       })
     )
 
@@ -109,7 +127,7 @@ export async function POST(request: NextRequest) {
       bucket: bucketName,
       object_path: objectPath,
       public_url: publicUrl,
-      mime_type: file.type,
+      mime_type: mime,
       bytes: file.size,
     }).then(({ error }) => {
       if (error) {

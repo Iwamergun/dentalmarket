@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from 'sonner'
 import type { Database } from '@/types/database.types'
-import ImageUploader from '@/components/admin/ImageUploader'
+import MultiImageUploader, { type UploadedImage } from '@/components/admin/MultiImageUploader'
 
 function slugify(text: string) {
   return text
@@ -34,6 +34,8 @@ export default function AdminNewProductPage() {
   const [loading, setLoading] = useState(false)
   const [creatingCategory, setCreatingCategory] = useState(false)
   const [creatingBrand, setCreatingBrand] = useState(false)
+  const [images, setImages] = useState<UploadedImage[]>([])
+  const [primaryIndex, setPrimaryIndex] = useState(0)
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -44,7 +46,6 @@ export default function AdminNewProductPage() {
     primary_category_id: '',
     brand_id: '',
     is_active: true,
-    primary_image: '',
   })
 
   useEffect(() => {
@@ -153,6 +154,12 @@ export default function AdminNewProductPage() {
       return
     }
 
+    const stillUploading = images.some((img) => img.uploading)
+    if (stillUploading) {
+      toast.error('Lütfen görsellerin yüklenmesini bekleyin')
+      return
+    }
+
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -160,6 +167,8 @@ export default function AdminNewProductPage() {
         toast.error('Oturum bulunamadı')
         return
       }
+
+      const primaryImage = images[primaryIndex]?.path || null
 
       const { data: product, error: productError } = await supabase
         .from('catalog_products')
@@ -173,12 +182,32 @@ export default function AdminNewProductPage() {
           primary_category_id: form.primary_category_id || null,
           brand_id: form.brand_id || null,
           is_active: form.is_active,
-          primary_image: form.primary_image || null,
+          primary_image: primaryImage,
         })
         .select('id')
         .single()
 
       if (productError || !product) throw productError
+
+      // Insert catalog_product_images for all uploaded images that have a media_asset
+      const imageRows = images
+        .filter((img): img is typeof img & { mediaAssetId: string } => typeof img.mediaAssetId === 'string' && img.mediaAssetId.length > 0 && img.path.length > 0)
+        .map((img, i) => ({
+          product_id: product.id,
+          media_id: img.mediaAssetId,
+          sort_order: i,
+          is_primary: i === primaryIndex,
+        }))
+
+      if (imageRows.length > 0) {
+        const { error: imgError } = await supabase
+          .from('catalog_product_images')
+          .insert(imageRows)
+
+        if (imgError) {
+          console.warn('catalog_product_images insert warning:', imgError.message)
+        }
+      }
 
       toast.success('Ürün başarıyla eklendi')
       router.push('/admin/products')
@@ -331,10 +360,12 @@ export default function AdminNewProductPage() {
             />
           </div>
 
-          {/* Image */}
-          <ImageUploader
-            currentImage={form.primary_image || null}
-            onUpload={(path) => setForm((prev) => ({ ...prev, primary_image: path }))}
+          {/* Images */}
+          <MultiImageUploader
+            images={images}
+            onChange={setImages}
+            primaryIndex={primaryIndex}
+            onPrimaryChange={setPrimaryIndex}
           />
 
           {/* Active */}

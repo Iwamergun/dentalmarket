@@ -120,22 +120,29 @@ export async function POST(request: NextRequest) {
 
     const publicUrl = `${(process.env.NEXT_PUBLIC_R2_PUBLIC_URL || '').replace(/\/$/, '')}/${objectPath}`
 
-    // Non-blocking: log to media_assets but don't fail the upload if this errors
-    supabase.from('media_assets').insert({
-      owner_profile_id: user.id,
-      storage_provider: 'r2',
-      bucket: bucketName,
-      object_path: objectPath,
-      public_url: publicUrl,
-      mime_type: mime,
-      bytes: file.size,
-    }).then(({ error }) => {
-      if (error) {
-        console.warn('media_assets insert warning (non-fatal):', error.message)
-      }
-    })
+    // Insert into media_assets and return the ID so callers can link images to products
+    let mediaAssetId: string | null = null
+    const { data: mediaAsset, error: mediaError } = await supabase
+      .from('media_assets')
+      .insert({
+        owner_profile_id: user.id,
+        storage_provider: 'r2',
+        bucket: bucketName,
+        object_path: objectPath,
+        public_url: publicUrl,
+        mime_type: mime,
+        bytes: file.size,
+      })
+      .select('id')
+      .single()
 
-    return NextResponse.json({ path: objectPath, publicUrl })
+    if (mediaError) {
+      console.warn('media_assets insert warning (non-fatal):', mediaError.message)
+    } else {
+      mediaAssetId = mediaAsset.id
+    }
+
+    return NextResponse.json({ path: objectPath, publicUrl, mediaAssetId })
   } catch (error) {
     console.error('Upload error:', error)
     const message = error instanceof Error ? error.message : 'Dosya yüklenirken bir hata oluştu'

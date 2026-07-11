@@ -140,7 +140,7 @@ export function CategoryBar() {
             type="button"
             aria-label="Kategorileri sola kaydır"
             onClick={() => scrollCategories('left')}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-slate-600 shadow-sm transition-colors hover:border-primary/20 hover:text-primary"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -171,8 +171,8 @@ export function CategoryBar() {
                       className={[
                         'flex items-center gap-1 whitespace-nowrap rounded-2xl px-4 py-2 text-sm font-medium transition-all duration-200',
                         isOpen
-                          ? 'bg-white/90 text-secondary shadow-sm'
-                          : 'text-secondary-text hover:bg-white/72 hover:text-secondary',
+                          ? 'bg-white/90 text-primary shadow-sm'
+                          : 'text-secondary-text hover:bg-white/72 hover:text-primary',
                       ].join(' ')}
                     >
                       {category.name}
@@ -189,7 +189,7 @@ export function CategoryBar() {
               <div className="shrink-0 ml-3 pl-3 border-l border-primary/15">
                 <Link
                   href="/kategoriler"
-                  className="flex items-center gap-1.5 whitespace-nowrap rounded-2xl border border-secondary/25 bg-secondary/10 px-4 py-2 text-sm font-bold text-secondary transition-all duration-200 hover:bg-secondary hover:text-white"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-2xl border border-primary/15 bg-primary/[0.05] px-4 py-2 text-sm font-bold text-primary transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.08]"
                 >
                   <LayoutGrid className="h-4 w-4" />
                   Tüm Kategorileri Gör
@@ -202,7 +202,7 @@ export function CategoryBar() {
             type="button"
             aria-label="Kategorileri sağa kaydır"
             onClick={() => scrollCategories('right')}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-secondary shadow-sm transition-colors hover:border-secondary hover:text-primary"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-white/85 text-slate-600 shadow-sm transition-colors hover:border-primary/20 hover:text-primary"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -227,16 +227,16 @@ export function CategoryBar() {
             <Link
               key={child.id}
               href={`/kategoriler/${child.slug}`}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-text-secondary hover:bg-secondary/8 hover:text-secondary transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-primary/[0.05] hover:text-primary"
             >
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-secondary/40" />
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-secondary/55" />
               {child.name}
             </Link>
           ))}
           <div className="mt-1 border-t border-border pt-1">
             <Link
               href={`/kategoriler/${hoveredCategory.slug}`}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary hover:text-secondary transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-primary transition-colors hover:text-blue-700"
             >
               Tümünü Gör →
             </Link>

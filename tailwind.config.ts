@@ -31,6 +31,7 @@ export default {
         'card': '0 1px 3px rgba(0, 0, 0, 0.1)',
         'card-hover': '0 4px 6px rgba(0, 0, 0, 0.1)',
         'subtle': '0 1px 2px rgba(0, 0, 0, 0.05)',
+        'storefront': '0 24px 60px -42px rgba(15, 23, 42, 0.35)',
         'premium': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
       },
       animation: {

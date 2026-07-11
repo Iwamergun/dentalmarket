@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  /* SPARK Premium OKLCH Color System — bare params for Tailwind opacity support */
-  --background: 0.99 0.005 264;
-  --foreground: 0.15 0.02 264;
+  /* Storefront OKLCH color system — tuned for blue/slate with teal accents */
+  --background: 0.98 0.004 255;
+  --foreground: 0.21 0.034 264;
   --card: 1 0 0;
-  --primary: 0.45 0.24 264;              /* Dark purple-blue */
-  --secondary: 0.62 0.25 300;            /* Purple */
-  --accent: 0.65 0.25 30;                /* Orange */
+  --primary: 0.546 0.245 262.881;        /* Blue */
+  --secondary: 0.609 0.126 221.723;      /* Fresh cyan */
+  --accent: 0.527 0.106 201.5;           /* Deep teal */
   --destructive: 0.58 0.24 25;           /* Red */
-  --muted: 0.96 0.01 264;
-  --border: 0.90 0.01 264;
+  --muted: 0.97 0.006 255;
+  --border: 0.92 0.01 255;
   --success: 0.55 0.18 155;              /* Green */
   --warning: 0.75 0.18 85;              /* Amber */
   --info: 0.60 0.20 240;                /* Blue */
-  --body-text: 0.35 0.02 264;
-  --secondary-text: 0.52 0.02 264;
-  --gradient-start: 0.50 0.26 270;
-  --gradient-end: 0.58 0.28 300;
+  --body-text: 0.37 0.03 259;
+  --secondary-text: 0.55 0.03 257;
+  --gradient-start: 0.546 0.245 262.881;
+  --gradient-end: 0.609 0.126 221.723;
 }
 
 * {
@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Focus Styles for Accessibility */
 *:focus-visible {
-  outline: 2px solid oklch(var(--secondary));
+  outline: 2px solid oklch(var(--primary));
   outline-offset: 2px;
 }
 
@@ -118,7 +118,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .btn-outline:hover {
-    @apply border-secondary text-secondary bg-muted;
+    @apply border-primary text-primary bg-muted;
   }
   
   /* Section Titles */

@@ -11,6 +11,13 @@ interface HeroSectionProps {
   products?: BestOfferProduct[]
 }
 
+interface ShowcaseItem {
+  title: string
+  description: string
+  href: string
+  imagePath?: string | null
+}
+
 const fallbackCampaigns: Campaign[] = [
   {
     id: 'hero-fallback-1',
@@ -53,7 +60,7 @@ const fallbackCampaigns: Campaign[] = [
   },
 ]
 
-const fallbackShowcaseItems = [
+const fallbackShowcaseItems: ShowcaseItem[] = [
   {
     title: 'Yeni Gelenler',
     description: 'Son eklenen ürünleri ve kategorileri hızlıca gözden geçirin.',
@@ -79,7 +86,7 @@ export function HeroSection({ campaigns = [], products = [] }: HeroSectionProps)
     ...products.filter((product) => !product.primary_image),
   ].slice(0, 3)
 
-  const showcaseItems = showcaseProducts.length > 0
+  const showcaseItems: ShowcaseItem[] = showcaseProducts.length > 0
     ? showcaseProducts.map((product) => ({
         title: product.name,
         description: product.brand_name ?? 'Öne çıkan ürün seçkisi',
@@ -114,7 +121,7 @@ export function HeroSection({ campaigns = [], products = [] }: HeroSectionProps)
                     href={item.href}
                     className="group flex items-center gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-3.5 transition-colors hover:border-primary/20 hover:bg-primary/[0.02]"
                   >
-                    {'imagePath' in item && item.imagePath ? (
+                    {item.imagePath ? (
                       <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
                         <Image
                           src={getImageUrl(item.imagePath)}

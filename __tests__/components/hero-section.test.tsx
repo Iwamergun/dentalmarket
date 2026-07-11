@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { HeroSection } from '@/components/home/hero-section'
+import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 
 describe('HeroSection campaign placement', () => {
   it('renders fallback campaign cards inside the hero when campaign data is empty', () => {
@@ -37,5 +38,36 @@ describe('HeroSection campaign placement', () => {
 
     expect(screen.getByRole('link', { name: /İmplant Seti/i })).toHaveAttribute('href', '/kampanyalar/implant-seti')
     expect(screen.queryByText('Hazır vitrin')).not.toBeInTheDocument()
+  })
+
+  it('renders product-based showcase links when products are provided', () => {
+    const products: BestOfferProduct[] = [
+      {
+        id: 'product-1',
+        name: 'Apekstech Kanal Eğesi',
+        slug: 'apekstech-kanal-egesi',
+        primary_image: '/products/apekstech.png',
+        sku: 'APEK-1',
+        short_description: null,
+        is_active: true,
+        brand_id: 'brand-1',
+        brand_name: 'Apekstech',
+        primary_category_id: 'category-1',
+        category_name: 'Endodonti',
+        min_price: 100,
+        best_supplier_id: 'supplier-1',
+        best_stock: 10,
+        best_lead_time: 2,
+        best_shipping_cost: 0,
+        offer_count: 1,
+        price_min: 100,
+        price_max: 100,
+      },
+    ]
+
+    render(<HeroSection products={products} />)
+
+    expect(screen.getByRole('link', { name: /Apekstech Kanal Eğesi/i })).toHaveAttribute('href', '/urunler/apekstech-kanal-egesi')
+    expect(screen.queryByRole('link', { name: /Yeni Gelenler/i })).not.toBeInTheDocument()
   })
 })

@@ -114,10 +114,8 @@ export default function MultiImageUploader({
             toast.error(err instanceof Error ? err.message : `${file.name} yüklenemedi`)
             // Remove the failed placeholder
             onChange((prev: UploadedImage[]) => {
-              const next = [...prev]
               const idx = startIndex + i
-              if (next[idx]?.uploading) next.splice(idx, 1)
-              return next
+              return prev[idx]?.uploading ? prev.filter((_, i2) => i2 !== idx) : prev
             })
           }
         })

@@ -129,9 +129,9 @@ export default function AdminEditProductPage() {
           .select('id, object_path, public_url')
           .in('id', mediaIds)
 
+        type MediaRow = { id: string; object_path: string | null; public_url: string | null }
         const mediaMap = new Map(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ((mediaData as any[]) || []).map((m: { id: string; object_path: string | null; public_url: string | null }) => [
+          ((mediaData ?? []) as MediaRow[]).map((m) => [
             m.id,
             m.object_path || m.public_url || '',
           ])
@@ -223,7 +223,7 @@ export default function AdminEditProductPage() {
         .filter((img) => img.mediaAssetId && img.path)
         .map((img, i) => ({
           product_id: id,
-          media_id: img.mediaAssetId as string,
+          media_id: img.mediaAssetId!,
           sort_order: i,
           is_primary: i === primaryIndex,
         }))

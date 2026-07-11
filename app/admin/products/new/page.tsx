@@ -194,7 +194,7 @@ export default function AdminNewProductPage() {
         .filter((img) => img.mediaAssetId && img.path)
         .map((img, i) => ({
           product_id: product.id,
-          media_id: img.mediaAssetId as string,
+          media_id: img.mediaAssetId!,
           sort_order: i,
           is_primary: i === primaryIndex,
         }))

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
@@ -104,25 +104,32 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   const brandName = product.brand_name || product.brands?.name
   const hasMultipleOffers = (product.offer_count ?? 0) > 1
   const showRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
-
   return (
-    <Link
-      href={`/urunler/${product.slug}`}
-      className={`w-56 flex-shrink-0 snap-start ${productCardStyles.surface}`}
-    >
+    <div className={`w-56 flex-shrink-0 snap-start ${productCardStyles.surface}`}>
+      <WishlistButton
+        productId={product.id}
+        productName={product.name}
+        size="sm"
+        className={productCardStyles.wishlistOverlay}
+      />
+      <Link
+        href={`/urunler/${product.slug}`}
+        className={productCardStyles.link}
+      >
       <div className={productCardStyles.imageWrap}>
-        <Image
-          src={imgSrc}
-          alt={product.name}
-          fill
-          sizes="224px"
-          className={productCardStyles.image}
-          onError={() => setImgSrc(PLACEHOLDER_SVG)}
-        />
-        {hasMultipleOffers && (
-          <span className="absolute right-2 top-2 rounded-full border border-primary/20 bg-white px-2 py-0.5 text-[11px] font-semibold text-primary">
-            {product.offer_count} satıcı
-          </span>
+        {product.primary_image ? (
+          <Image
+            src={imgSrc}
+            alt={product.name}
+            fill
+            sizes="224px"
+            className={productCardStyles.image}
+            onError={() => setImgSrc(PLACEHOLDER_SVG)}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-slate-400">
+            <ImageIcon className="h-9 w-9" strokeWidth={1.5} />
+          </div>
         )}
       </div>
       <div className={productCardStyles.content}>
@@ -135,7 +142,7 @@ function ProductCard({ product }: { product: CarouselProduct }) {
         <h3 className={productCardStyles.name}>
           {product.name}
         </h3>
-        <div className="mt-2 flex min-h-[22px] items-center gap-2">
+        <div className="flex min-h-[22px] items-center gap-2">
           {authLoading ? (
             <div className="h-5 w-24 animate-pulse rounded bg-muted" />
           ) : !user ? (
@@ -154,7 +161,7 @@ function ProductCard({ product }: { product: CarouselProduct }) {
               Fiyat için giriş yapın
             </button>
           ) : validPrice ? (
-            <>
+            <div className={productCardStyles.priceRow}>
               {showRange ? (
                 <span className={productCardStyles.price}>
                   {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
@@ -165,39 +172,37 @@ function ProductCard({ product }: { product: CarouselProduct }) {
                 </span>
               )}
               {hasDiscount && product.compare_at_price !== null && (
-                <span className="text-xs text-slate-500 line-through">
+                <span className={productCardStyles.oldPrice}>
                   {formatPrice(product.compare_at_price)}
                 </span>
               )}
-            </>
+            </div>
           ) : (
             <span className={productCardStyles.emptyPrice}>
               Fiyat için iletişime geçin
             </span>
           )}
         </div>
-        {hasMultipleOffers && (
-          <p className={productCardStyles.meta}>
-            {product.offer_count} satıcıdan
-          </p>
-        )}
-        {!hasMultipleOffers && <div className="h-4" />}
-        <div className="mt-auto flex items-center gap-2 pt-2" onClick={(e) => e.preventDefault()}>
-          <WishlistButton
-            productId={product.id}
-            productName={product.name}
-            size="sm"
-            className={`!h-10 !w-auto flex-1 ${productCardStyles.quietAction}`}
-          />
+        <p className={productCardStyles.stockMeta}>
+          <span className={hasMultipleOffers ? productCardStyles.stockDot : productCardStyles.stockDotMuted} />
+          <span>
+            {hasMultipleOffers
+              ? `${product.offer_count} satıcı`
+              : (product.offer_count ?? 0) > 0
+                ? '1 satıcı'
+                : 'Satıcı bilgisi yok'}
+          </span>
+        </p>
+      </div>
+      </Link>
+      <div className={productCardStyles.actions}>
           <AddToCartButton
             productId={product.id}
             productName={product.name}
-            iconOnly
-            className={`!h-10 !w-auto flex-1 ${productCardStyles.primaryAction}`}
+            className={productCardStyles.primaryAction}
           />
-        </div>
       </div>
-    </Link>
+    </div>
   )
 }
 

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { ShoppingCart, Loader2, Check, Truck, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { WishlistButton } from '@/components/WishlistButton'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { useCart } from '@/app/contexts/CartContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
@@ -61,8 +62,13 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
   }
 
   return (
-    <div className={`min-h-[380px] ${productCardStyles.surface}`}>
-      {/* Image */}
+    <div className={productCardStyles.surface}>
+      <WishlistButton
+        productId={product.id}
+        productName={product.name}
+        size="sm"
+        className={productCardStyles.wishlistOverlay}
+      />
       <Link href={`/urunler/${product.slug}`} className="block">
         <div className={productCardStyles.imageWrap}>
           <Image
@@ -75,7 +81,6 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
         </div>
       </Link>
 
-      {/* Info */}
       <div className={productCardStyles.content}>
         {product.brand_name && (
           <p className={productCardStyles.brand}>{product.brand_name}</p>
@@ -91,8 +96,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
           <p className={productCardStyles.meta}>SKU: {product.sku}</p>
         )}
 
-        {/* Price */}
-        <div className="mt-2">
+        <div className="min-h-[1.75rem]">
           {authLoading ? (
             <div className="h-7 w-24 animate-pulse rounded bg-muted" />
           ) : !user ? (
@@ -107,15 +111,19 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
               Fiyat için giriş yapın
             </button>
           ) : (
-            <p className={productCardStyles.price}>{formatPrice(offer.price)}</p>
+            <div className={productCardStyles.priceRow}>
+              <p className={productCardStyles.price}>{formatPrice(offer.price)}</p>
+            </div>
           )}
         </div>
 
-        {/* Meta */}
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-          {offer.stock_quantity != null && (
-            <span>Stok: {offer.stock_quantity}</span>
-          )}
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+          <span className={productCardStyles.stockMeta}>
+            <span className={isInStock ? productCardStyles.stockDot : productCardStyles.stockDotMuted} />
+            {isInStock
+              ? `Stokta${offer.stock_quantity != null ? ` · ${offer.stock_quantity} adet` : ''}`
+              : 'Stokta yok'}
+          </span>
           {offer.lead_time_days != null && (
             <span className="flex items-center gap-0.5">
               <Clock className="w-3 h-3" />
@@ -130,12 +138,11 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
           )}
         </div>
 
-        {/* Add to Cart */}
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-1">
           {isInStock ? (
             <Button
               size="sm"
-              className="h-10 w-full gap-1.5 rounded-lg bg-primary text-white hover:bg-primary/90"
+              className={productCardStyles.primaryAction}
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
             >

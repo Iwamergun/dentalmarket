@@ -4,8 +4,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ImageIcon } from 'lucide-react'
 import { formatPrice } from '@/lib/utils/format'
 import { useAuth } from '@/app/contexts/AuthContext'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
+import { WishlistButton } from '@/components/WishlistButton'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
 import { productCardStyles } from '@/components/catalog/product-card-styles'
 
@@ -26,8 +29,10 @@ export function ProductImageCard({ product, href }: ProductImageCardProps) {
   const imageUrl = hasImage ? `${R2_BASE_URL}/${product.primary_image}` : null
   const hasMultipleOffers = product.offer_count > 1
   const showRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
+  const inStock = product.best_stock != null && product.best_stock > 0
+  const hasReviews = product.rating_avg != null && product.review_count != null && product.review_count > 0
 
-  const CardContent = () => (
+  const CardPreview = () => (
     <>
       <div className={productCardStyles.imageWrap}>
         {imageUrl ? (
@@ -41,19 +46,9 @@ export function ProductImageCard({ product, href }: ProductImageCardProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-slate-50">
-            <div className="text-center">
-              <svg className="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="mt-2 block text-sm text-slate-400">Resim Yok</span>
-            </div>
+          <div className="flex h-full w-full items-center justify-center text-slate-400">
+            <ImageIcon className="h-10 w-10" strokeWidth={1.5} />
           </div>
-        )}
-        {hasMultipleOffers && (
-          <span className="absolute right-2 top-2 rounded-full border border-primary/20 bg-white px-2 py-0.5 text-[11px] font-semibold text-primary">
-            {product.offer_count} satıcı
-          </span>
         )}
       </div>
       <div className={productCardStyles.content}>
@@ -61,14 +56,15 @@ export function ProductImageCard({ product, href }: ProductImageCardProps) {
           <p className={productCardStyles.brand}>{product.brand_name}</p>
         )}
         <h3 className={productCardStyles.name}>{product.name}</h3>
+        {hasReviews && (
+          <p className={productCardStyles.rating}>
+            ★ {product.rating_avg!.toFixed(1)} · {product.review_count} değerlendirme
+          </p>
+        )}
         {product.sku && (
           <p className={productCardStyles.meta}>SKU: {product.sku}</p>
         )}
-        {product.short_description && (
-          <p className="line-clamp-2 text-sm text-slate-500">{product.short_description}</p>
-        )}
-        {/* Price */}
-        <div className="mt-2">
+        <div className="min-h-[1.75rem]">
           {authLoading ? (
             <div className="h-6 w-24 animate-pulse rounded bg-muted" />
           ) : !user ? (
@@ -83,40 +79,71 @@ export function ProductImageCard({ product, href }: ProductImageCardProps) {
               Fiyat için giriş yapın
             </button>
           ) : product.min_price != null ? (
-            showRange ? (
-              <span className={productCardStyles.price}>
-                {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
-              </span>
-            ) : (
-              <span className={productCardStyles.price}>
-                {formatPrice(product.min_price)}
-              </span>
-            )
+            <div className={productCardStyles.priceRow}>
+              {showRange ? (
+                <span className={productCardStyles.price}>
+                  {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
+                </span>
+              ) : (
+                <span className={productCardStyles.price}>
+                  {formatPrice(product.min_price)}
+                </span>
+              )}
+            </div>
           ) : (
             <span className={productCardStyles.emptyPrice}>Fiyat bilgisi yok</span>
           )}
         </div>
-        {hasMultipleOffers && (
-          <p className={productCardStyles.meta}>{product.offer_count} satıcıdan teklif</p>
-        )}
+        <p className={productCardStyles.stockMeta}>
+          <span className={inStock ? productCardStyles.stockDot : productCardStyles.stockDotMuted} />
+          <span className={inStock ? 'text-green-700' : ''}>
+            {inStock
+              ? `Stokta${product.best_stock != null ? ` · ${product.best_stock} adet` : ''}`
+              : 'Stok sorunuz'}
+          </span>
+          {hasMultipleOffers && <span>· {product.offer_count} satıcı</span>}
+        </p>
       </div>
     </>
   )
 
+  const preview = href ? (
+    <Link href={href} className={productCardStyles.link}>
+      <CardPreview />
+    </Link>
+  ) : (
+    <CardPreview />
+  )
+
   if (href) {
     return (
-      <Link 
-        href={href}
-        className={productCardStyles.surface}
-      >
-        <CardContent />
-      </Link>
+      <div className={productCardStyles.surface}>
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          size="sm"
+          className={productCardStyles.wishlistOverlay}
+        />
+        {preview}
+        <div className={productCardStyles.actions}>
+          <AddToCartButton productId={product.id} productName={product.name} className={productCardStyles.primaryAction} />
+        </div>
+      </div>
     )
   }
 
   return (
     <div className={productCardStyles.surface}>
-      <CardContent />
+      <WishlistButton
+        productId={product.id}
+        productName={product.name}
+        size="sm"
+        className={productCardStyles.wishlistOverlay}
+      />
+      {preview}
+      <div className={productCardStyles.actions}>
+        <AddToCartButton productId={product.id} productName={product.name} className={productCardStyles.primaryAction} />
+      </div>
     </div>
   )
 }

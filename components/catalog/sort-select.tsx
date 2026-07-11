@@ -35,7 +35,7 @@ export function SortSelect({ className }: SortSelectProps) {
       value={currentSort}
       onChange={handleSortChange}
       className={cn(
-        'rounded-md border border-border bg-white px-3 py-2 text-sm text-text-primary focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20',
+        'h-10 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition-colors duration-200 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20',
         className
       )}
     >

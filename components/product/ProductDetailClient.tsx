@@ -39,11 +39,12 @@ export function ProductDetailClient({ product, offers = [] }: ProductDetailClien
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const { addToCart } = useCart()
 
-  // Ürün resimleri - Ana resim ve varsa ek resimler
+  // Ürün resimleri - Ana resim ve varsa ek resimler (tekrar edenleri çıkar)
   const images = [
-    product.primary_image,
-    ...(product.images || [])
-  ].filter(Boolean) as string[]
+    ...new Set(
+      [product.primary_image, ...(product.images || [])].filter(Boolean) as string[]
+    ),
+  ]
 
   if (images.length === 0) {
     images.push('/placeholder-product.jpg')

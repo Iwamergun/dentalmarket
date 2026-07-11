@@ -220,10 +220,10 @@ export default function AdminEditProductPage() {
       await supabase.from('catalog_product_images').delete().eq('product_id', id)
 
       const imageRows = images
-        .filter((img) => img.mediaAssetId && img.path)
+        .filter((img): img is typeof img & { mediaAssetId: string } => typeof img.mediaAssetId === 'string' && img.mediaAssetId.length > 0 && img.path.length > 0)
         .map((img, i) => ({
           product_id: id,
-          media_id: img.mediaAssetId!,
+          media_id: img.mediaAssetId,
           sort_order: i,
           is_primary: i === primaryIndex,
         }))

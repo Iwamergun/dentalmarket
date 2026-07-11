@@ -96,13 +96,18 @@ export default function MultiImageUploader({
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Yükleme başarısız')
 
+            const uploadedPath = typeof data.path === 'string' ? data.path : ''
+            const uploadedAssetId = typeof data.mediaAssetId === 'string' && data.mediaAssetId ? data.mediaAssetId : null
+
+            if (!uploadedPath) throw new Error('Sunucu geçersiz dosya yolu döndürdü')
+
             onChange((prev: UploadedImage[]) => {
               const next = [...prev]
               const idx = startIndex + i
               if (next[idx]) {
                 next[idx] = {
-                  path: data.path as string,
-                  mediaAssetId: (data.mediaAssetId as string | null) ?? null,
+                  path: uploadedPath,
+                  mediaAssetId: uploadedAssetId,
                   previewUrl: next[idx].previewUrl,
                   uploading: false,
                 }

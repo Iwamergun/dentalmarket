@@ -191,10 +191,10 @@ export default function AdminNewProductPage() {
 
       // Insert catalog_product_images for all uploaded images that have a media_asset
       const imageRows = images
-        .filter((img) => img.mediaAssetId && img.path)
+        .filter((img): img is typeof img & { mediaAssetId: string } => typeof img.mediaAssetId === 'string' && img.mediaAssetId.length > 0 && img.path.length > 0)
         .map((img, i) => ({
           product_id: product.id,
-          media_id: img.mediaAssetId!,
+          media_id: img.mediaAssetId,
           sort_order: i,
           is_primary: i === primaryIndex,
         }))

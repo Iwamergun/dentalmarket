@@ -1,6 +1,6 @@
 import React from 'react'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { Header } from '@/components/layout/header'
 
 const pushMock = vi.fn()
@@ -75,6 +75,31 @@ describe('Header brand area', () => {
     expect(container.querySelector('a[href="/kategoriler"]')).toBeInTheDocument()
     expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
     expect(container.querySelector('a[href="/urunler?inStock=true"]')).toBeInTheDocument()
+  })
+
+  it('keeps desktop mega menu open long enough to move pointer into dropdown', () => {
+    vi.useFakeTimers()
+    const { container } = render(<Header />)
+    const desktopArea = container.querySelector('nav')?.parentElement
+
+    fireEvent.mouseEnter(container.querySelector('nav a[href="/kategoriler"]')!)
+    const dropdownLink = container.querySelector('a[href="/urunler?sort=name-asc"]')
+    expect(dropdownLink).toBeInTheDocument()
+
+    fireEvent.mouseLeave(desktopArea!)
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(90)
+    })
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(40)
+    })
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).not.toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 
   it('should hide the search card on scroll and reopen it from the search icon', () => {

@@ -23,14 +23,15 @@ export function BrandProductsClient({
   currentBrandId 
 }: BrandProductsClientProps) {
   const searchParams = useSearchParams()
+  const searchParamsKey = searchParams.toString()
 
   const filteredProducts = React.useMemo(() => {
-    const filters = parseCatalogFilters(searchParams)
+    const filters = parseCatalogFilters(new URLSearchParams(searchParamsKey))
     return filterAndSortProducts(products, filters)
-  }, [products, searchParams])
+  }, [products, searchParamsKey])
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
       {/* Desktop Sidebar - Hidden on mobile */}
       <aside className="hidden lg:block">
         <div className="sticky top-[160px]">
@@ -43,7 +44,7 @@ export function BrandProductsClient({
       </aside>
 
       {/* Main Content */}
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Mobile Filter Button and Sorting */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
           {/* Mobile Filter Button (FilterSidebar ships its own dialog) */}
@@ -56,7 +57,7 @@ export function BrandProductsClient({
           </div>
 
           {/* Results Count */}
-          <div className="text-xs text-text-secondary sm:text-sm">
+          <div className="text-xs text-slate-500 sm:text-sm">
             <span className="font-semibold text-primary">{filteredProducts.length}</span> ürün bulundu
           </div>
 

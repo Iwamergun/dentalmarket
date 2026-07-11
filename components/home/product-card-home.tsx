@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Product } from '@/types/catalog.types'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { WishlistButton } from '@/components/WishlistButton'
+import { productCardStyles } from '@/components/catalog/product-card-styles'
 
 interface ProductCardHomeProps {
   product: Product
@@ -13,14 +14,14 @@ interface ProductCardHomeProps {
 export function ProductCardHome({ product, featured = false }: ProductCardHomeProps) {
   return (
     <div
-      className={`group card-base min-h-[420px] overflow-hidden flex flex-col border border-border/70 bg-white shadow-sm transition-all hover:border-primary/30 hover:shadow-premium ${
+      className={`group min-h-[380px] ${productCardStyles.surface} ${
         featured ? 'md:col-span-2 md:row-span-2' : ''
       }`}
     >
       {/* Clickable area for product details */}
-      <Link href={`/urunler/${product.slug}`} className="flex-1 flex flex-col">
+      <Link href={`/urunler/${product.slug}`} className={productCardStyles.link}>
         {/* Image Placeholder */}
-        <div className={`relative m-3 flex items-center justify-center overflow-hidden rounded-2xl bg-background-elevated ${
+        <div className={`relative m-3 flex items-center justify-center overflow-hidden rounded-lg bg-slate-50 ${
           featured ? 'aspect-square md:aspect-auto md:h-64' : 'aspect-square'
         }`}>
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15">
@@ -29,29 +30,20 @@ export function ProductCardHome({ product, featured = false }: ProductCardHomePr
             </svg>
           </div>
           
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-          
-          {/* Quick View Button */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-            <span className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200">
-              İncele
-            </span>
-          </div>
         </div>
 
         {/* Content */}
-        <div className="p-4 flex-1 flex flex-col">
+        <div className={productCardStyles.content}>
           {product.sku && (
-            <span className="text-xs text-text-muted mb-1">SKU: {product.sku}</span>
+            <span className={productCardStyles.meta}>SKU: {product.sku}</span>
           )}
           
-          <h3 className="font-medium text-text-primary line-clamp-2 group-hover:text-primary transition-colors duration-200">
+          <h3 className={productCardStyles.name}>
             {product.name}
           </h3>
           
           {product.short_description && (
-            <p className="mt-2 text-sm text-text-secondary line-clamp-2 flex-1">
+            <p className="line-clamp-2 flex-1 text-sm text-slate-500">
               {product.short_description}
             </p>
           )}
@@ -59,18 +51,18 @@ export function ProductCardHome({ product, featured = false }: ProductCardHomePr
       </Link>
       
       {/* Add to Cart Button - Outside Link to prevent nesting issues */}
-      <div className="mt-auto flex items-center gap-2 px-4 pb-4">
+      <div className={productCardStyles.actions}>
         <WishlistButton
           productId={product.id}
           productName={product.name}
           size="sm"
-          className="!h-10 !w-auto flex-1 !rounded-xl border-border bg-white shadow-sm hover:border-red-200 hover:bg-red-50 sm:!h-11"
+          className={`!w-auto flex-1 ${productCardStyles.quietAction}`}
         />
         <AddToCartButton
           productId={product.id}
           productName={product.name}
           iconOnly
-          className="!w-auto flex-1"
+          className={`!w-auto flex-1 ${productCardStyles.primaryAction}`}
         />
       </div>
     </div>

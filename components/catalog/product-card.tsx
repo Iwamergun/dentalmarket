@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { WishlistButton } from '@/components/WishlistButton'
+import { ImageIcon } from 'lucide-react'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { useRouter } from 'next/navigation'
@@ -23,11 +24,17 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasPrice = product.min_price != null && product.min_price > 0
   const isRange = hasMultipleOffers && product.price_min != null && product.price_max != null && product.price_min !== product.price_max
   const inStock = product.best_stock != null && product.best_stock > 0
+  const hasReviews = product.rating_avg != null && product.review_count != null && product.review_count > 0
 
   return (
     <Card className={productCardStyles.surface}>
+      <WishlistButton
+        productId={product.id}
+        productName={product.name}
+        size="sm"
+        className={productCardStyles.wishlistOverlay}
+      />
       <Link href={`/urunler/${product.slug}`} className={productCardStyles.link}>
-        {/* Ürün Görseli */}
         <div className={productCardStyles.imageWrap}>
           {product.primary_image ? (
             <Image
@@ -39,25 +46,26 @@ export function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-slate-300">
-              <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <ImageIcon className="h-10 w-10" strokeWidth={1.5} />
               <span className="mt-1 text-xs text-slate-400">Görsel Yok</span>
             </div>
           )}
         </div>
 
         <CardContent className={productCardStyles.content}>
-          {/* Marka */}
           {product.brand_name && (
             <p className={productCardStyles.brand} title={product.brand_name}>{product.brand_name}</p>
           )}
 
-          {/* Ürün adı */}
-          <p className={productCardStyles.name}>{product.name}</p>
+          <h3 className={productCardStyles.name}>{product.name}</h3>
 
-          {/* Fiyat */}
-          <div className="mt-1 min-h-[1.75rem]">
+          {hasReviews && (
+            <p className={productCardStyles.rating}>
+              ★ {product.rating_avg!.toFixed(1)} · {product.review_count} değerlendirme
+            </p>
+          )}
+
+          <div className="min-h-[1.75rem]">
             {authLoading ? (
               <div className="h-5 w-16 animate-pulse rounded bg-muted" />
             ) : !user ? (
@@ -72,40 +80,35 @@ export function ProductCard({ product }: ProductCardProps) {
                 Fiyat için giriş yapın
               </button>
             ) : hasPrice ? (
-              <span className={productCardStyles.price}>
-                {isRange
-                  ? `${formatPrice(product.price_min!)} – ${formatPrice(product.price_max!)}`
-                  : formatPrice(product.min_price!)}
-              </span>
+              <div className={productCardStyles.priceRow}>
+                <span className={productCardStyles.price}>
+                  {isRange
+                    ? `${formatPrice(product.price_min!)} – ${formatPrice(product.price_max!)}`
+                    : formatPrice(product.min_price!)}
+                </span>
+              </div>
             ) : (
               <span className={productCardStyles.emptyPrice}>Fiyat bilgisi yok</span>
             )}
           </div>
 
-          {/* Stok + satıcı sayısı */}
-          <p className={productCardStyles.meta}>
+          <p className={productCardStyles.stockMeta}>
+            <span className={inStock ? productCardStyles.stockDot : productCardStyles.stockDotMuted} />
             <span className={inStock ? 'text-green-700' : ''}>
-              {inStock ? 'Stokta' : 'Stok sorunuz'}
+              {inStock
+                ? `Stokta${product.best_stock != null ? ` · ${product.best_stock} adet` : ''}`
+                : 'Stok sorunuz'}
             </span>
-            {hasMultipleOffers && (
-              <span> · {product.offer_count} satıcı</span>
-            )}
+            {hasMultipleOffers && <span>· {product.offer_count} satıcı</span>}
           </p>
         </CardContent>
       </Link>
 
       <CardFooter className={productCardStyles.actions}>
-        <WishlistButton
-          productId={product.id}
-          productName={product.name}
-          size="sm"
-          className={productCardStyles.quietAction}
-        />
         <AddToCartButton
           productId={product.id}
           productName={product.name}
-          iconOnly
-          className={`flex-1 ${productCardStyles.primaryAction}`}
+          className={productCardStyles.primaryAction}
         />
       </CardFooter>
     </Card>

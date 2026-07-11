@@ -60,24 +60,24 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className="md:hidden min-h-screen bg-[#F8FAFC] pb-24">
+      <div className="min-h-screen bg-slate-50 pb-24 md:hidden">
         <div className="space-y-4 px-2.5 pb-7 pt-3 sm:px-3">
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <HeroSection campaigns={campaigns} products={products} />
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <ProductCarousel fallbackProducts={products} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
+          <section className="rounded-2xl border border-slate-200 bg-white p-3.5">
             <ProductGroupBand groups={productGroups} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
+          <section className="rounded-2xl border border-slate-200 bg-white p-3.5">
             <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kategoriler</h2>
-              <Link href="/kategoriler" className="text-xs font-semibold text-[#2563EB]">
+              <Link href="/kategoriler" className="text-xs font-semibold text-primary">
                 Tümünü Gör
               </Link>
             </div>
@@ -89,7 +89,7 @@ export default async function HomePage() {
                   <Link
                     key={category.id}
                     href={`/kategoriler/${category.slug}`}
-                    className="min-w-[118px] rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-3 transition-colors hover:border-[#2563EB]/35"
+                    className="min-w-[118px] rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-3 transition-colors hover:border-primary/35"
                   >
                     <span className="text-xl leading-none">{icon}</span>
                     <p className="mt-2 line-clamp-2 text-xs font-semibold text-slate-800">{category.name}</p>
@@ -99,14 +99,14 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-0.5">
+          <section className="rounded-2xl border border-slate-200 bg-white p-0.5">
             <FeaturedProducts products={products} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
+          <section className="rounded-2xl border border-slate-200 bg-white p-3.5">
             <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kampanyalar</h2>
-              <Link href="/kampanyalar" className="text-xs font-semibold text-[#2563EB]">
+              <Link href="/kampanyalar" className="text-xs font-semibold text-primary">
                 Tümü
               </Link>
             </div>
@@ -115,7 +115,7 @@ export default async function HomePage() {
                 <Link
                   key={campaign.id}
                   href={campaign.href || '/kampanyalar'}
-                  className="w-[84%] shrink-0 snap-start overflow-hidden rounded-xl border border-[#E5E7EB] bg-white"
+                  className="w-[84%] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-200 bg-white"
                 >
                   <div className="relative aspect-[16/9] bg-slate-100">
                     {campaign.image_path ? (
@@ -141,11 +141,11 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <BrandLogos brands={brands} />
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <TrustSection />
           </section>
         </div>
@@ -156,11 +156,11 @@ export default async function HomePage() {
         <HeroSection campaigns={campaigns} products={products} />
 
         {/* Product Carousel */}
-        <div className="border-y border-slate-300 bg-[#F4F7FB] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+        <div className="border-y border-slate-200 bg-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
           <ProductCarousel fallbackProducts={products} />
         </div>
 
-        <div className="border-b border-slate-300 bg-[#F8FAFC]">
+        <div className="border-b border-slate-200 bg-slate-50">
           <div className="container-main">
             <ProductGroupBand groups={productGroups} />
           </div>
@@ -190,7 +190,7 @@ export default async function HomePage() {
           </div>
           
           {/* Brand Logos */}
-          <div className="border-b border-slate-300 bg-[#F6F8FB]">
+          <div className="border-b border-slate-200 bg-slate-50">
             <BrandLogos brands={brands} />
           </div>
           

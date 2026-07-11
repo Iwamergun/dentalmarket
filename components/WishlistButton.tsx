@@ -94,14 +94,16 @@ export function WishlistButton({
       onClick={handleToggle}
       disabled={loading}
       className={cn(
-        'flex items-center justify-center rounded-full transition-all',
+        'flex items-center justify-center rounded-full transition-colors duration-200',
         'disabled:opacity-50 disabled:cursor-not-allowed',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2',
         sizeClasses[size],
         isFavorite
           ? 'bg-red-50 text-red-500 hover:bg-red-100'
           : 'bg-background-card text-text-muted hover:text-red-500 hover:bg-red-50 border border-border',
         className
       )}
+      aria-label={isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
       title={isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
     >
       {loading ? (

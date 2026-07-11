@@ -81,7 +81,7 @@ export function AddToCartButton({
       variant={variant}
       size={size}
       className={cn(
-        'gap-2 transition-all duration-300',
+        'gap-2 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2',
         fullWidth && 'w-full',
         iconOnly
           ? cn(

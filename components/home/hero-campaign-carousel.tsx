@@ -37,6 +37,21 @@ function formatCampaignDateLabel(campaign: Campaign) {
   return `${formatter.format(new Date(campaign.starts_at!))} itibarıyla aktif`
 }
 
+function shouldAutoRotateCampaigns({
+  campaignCount,
+  paused,
+  prefersReducedMotion,
+  showFallbackTag,
+}: {
+  campaignCount: number
+  paused: boolean
+  prefersReducedMotion: boolean
+  showFallbackTag: boolean
+}) {
+  if (showFallbackTag || prefersReducedMotion || paused) return false
+  return campaignCount > 1
+}
+
 export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: HeroCampaignCarouselProps) {
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -97,8 +112,12 @@ export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: Her
   }, [])
 
   useEffect(() => {
-    const shouldAutoRotateCampaigns = !showFallbackTag && !prefersReducedMotion && !paused && campaigns.length > 1
-    if (!shouldAutoRotateCampaigns) return
+    if (!shouldAutoRotateCampaigns({
+      campaignCount: campaigns.length,
+      paused,
+      prefersReducedMotion,
+      showFallbackTag,
+    })) return
 
     const timer = setInterval(next, 7000)
     return () => clearInterval(timer)

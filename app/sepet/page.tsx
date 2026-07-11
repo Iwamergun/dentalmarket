@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 
+/** Ücretsiz kargo eşiği (TRY) ve sepet özeti ilerleme hesabı için kullanılan mevcut iş kuralı. */
 const FREE_SHIPPING_THRESHOLD = 500
 
 function CartItemRow({ item, onUpdateQuantity, onRemove }: {

@@ -196,6 +196,7 @@ export function FilterSidebar({
     params.delete('maxPrice')
     params.delete('minRating')
     params.delete('inStock')
+    // Reset pagination when filters change.
     params.delete('page')
 
     // Add new filters - support multiple categories and brands

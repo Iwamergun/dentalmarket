@@ -104,6 +104,8 @@ const megaMenuLinksByHref: Record<(typeof desktopNavItems)[number]['href'], Mega
   ],
 }
 
+const MEGA_MENU_CLOSE_DELAY = 120
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isTabletNavOpen, setIsTabletNavOpen] = useState(false)
@@ -205,7 +207,7 @@ export function Header() {
     clearMegaCloseTimeout()
     megaCloseTimeoutRef.current = setTimeout(() => {
       setActiveMegaHref(null)
-    }, 120)
+    }, MEGA_MENU_CLOSE_DELAY)
   }
 
   const submitSearch = (event?: React.FormEvent<HTMLFormElement>) => {

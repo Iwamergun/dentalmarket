@@ -1,6 +1,6 @@
 import React from 'react'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { Header } from '@/components/layout/header'
 
 const pushMock = vi.fn()
@@ -78,6 +78,7 @@ describe('Header brand area', () => {
   })
 
   it('keeps desktop mega menu open long enough to move pointer into dropdown', () => {
+    vi.useFakeTimers()
     const { container } = render(<Header />)
     const desktopArea = container.querySelector('nav')?.parentElement
 
@@ -87,8 +88,18 @@ describe('Header brand area', () => {
 
     fireEvent.mouseLeave(desktopArea!)
     expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
-    fireEvent.mouseEnter(dropdownLink!)
+
+    act(() => {
+      vi.advanceTimersByTime(90)
+    })
     expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(40)
+    })
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).not.toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 
   it('should hide the search card on scroll and reopen it from the search icon', () => {

@@ -68,7 +68,7 @@ describe('parseCatalogFilters', () => {
     })
   })
 
-  it('tekrarlanan query parametrelerini de birlestirir', () => {
+  it('tekrarlanan query parametrelerini de birleştirir', () => {
     const params = new URLSearchParams('category=cat-root&category=cat-child&brand=brand-a&brand=brand-b')
 
     expect(parseCatalogFilters(params)).toMatchObject({

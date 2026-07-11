@@ -19,6 +19,10 @@ export interface FilterableBestOfferProduct extends BestOfferProduct {
   review_count?: number
 }
 
+/**
+ * Narrow type compatible with real URLSearchParams and test doubles.
+ * Some mocks only implement `get`, so `getAll` stays optional.
+ */
 type SearchParamsLike = Pick<URLSearchParams, 'get'> & Partial<Pick<URLSearchParams, 'getAll'>>
 
 export function parseCatalogFilters(searchParams: SearchParamsLike): CatalogFilters {

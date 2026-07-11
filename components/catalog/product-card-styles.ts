@@ -6,6 +6,7 @@ export const productCardStyles = {
   image: 'object-contain p-3',
   content: 'flex flex-1 flex-col gap-2 px-3 pb-3 pt-2.5',
   brand: 'truncate text-xs text-slate-500',
+  // 2.75rem keeps card heights aligned for two-line names with leading-5 text.
   name: 'line-clamp-2 min-h-[2.75rem] text-sm font-medium leading-5 text-slate-900',
   price: 'text-base font-bold text-slate-900',
   emptyPrice: 'text-xs italic text-slate-500',

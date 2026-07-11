@@ -8,6 +8,7 @@ import { useAuth } from '@/app/contexts/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { getAuthMetadata, hasAdminAccess } from '@/lib/auth/access'
 import { BrandLogo } from '@/components/brand/BrandLogo'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { Shield, Menu, X, Search, Heart, ChevronDown, Home, Grid2X2, PackageSearch, Megaphone, PhoneCall, Truck } from 'lucide-react'
 
 const desktopNavItems = [
@@ -106,6 +107,17 @@ const megaMenuLinksByHref: Record<(typeof desktopNavItems)[number]['href'], Mega
 
 const MEGA_MENU_CLOSE_DELAY = 120
 
+function getUserAvatarUrl(user: ReturnType<typeof useAuth>['user']) {
+  const candidates = [
+    user?.user_metadata?.avatar_url,
+    user?.user_metadata?.picture,
+    user?.user_metadata?.photo_url,
+    user?.user_metadata?.image,
+  ]
+
+  return candidates.find((value): value is string => typeof value === 'string' && value.trim().length > 0) ?? null
+}
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isTabletNavOpen, setIsTabletNavOpen] = useState(false)
@@ -124,6 +136,10 @@ export function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, loading } = useAuth()
+  const userDisplayName = typeof user?.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim().length > 0
+    ? user.user_metadata.full_name.trim()
+    : 'Kullanıcı'
+  const userAvatarUrl = getUserAvatarUrl(user)
 
   // Check admin role
   useEffect(() => {
@@ -432,14 +448,19 @@ export function Header() {
               ) : user ? (
                 <div className="relative" ref={profileRef}>
                   <button
+                    type="button"
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:gap-2 md:p-1.5"
+                    className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 md:gap-2 md:p-1.5"
+                    aria-haspopup="menu"
+                    aria-expanded={isProfileOpen}
+                    aria-controls="header-profile-menu"
+                    aria-label={isProfileOpen ? 'Hesap menüsünü kapat' : 'Hesap menüsünü aç'}
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-secondary to-primary shadow-md md:h-10 md:w-10">
-                      <span className="text-white text-sm font-semibold">
-                        {user.email?.charAt(0).toUpperCase() || 'U'}
-                      </span>
-                    </div>
+                    <UserAvatar
+                      src={userAvatarUrl}
+                      name={userDisplayName}
+                      className="h-8 w-8 border-slate-200 bg-slate-50 text-slate-500 md:h-10 md:w-10"
+                    />
                     <svg 
                       className={`h-3.5 w-3.5 transition-transform duration-200 md:h-4 md:w-4 ${isProfileOpen ? 'rotate-180' : ''}`} 
                       fill="none" 
@@ -451,11 +472,15 @@ export function Header() {
                   </button>
 
                   {isProfileOpen && (
-                    <div className="absolute right-0 z-50 mt-3 w-60 overflow-hidden rounded-[1.5rem] border border-primary/10 bg-white py-1.5 text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.18)] ring-1 ring-slate-950/5 animate-fade-in">
-                      <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-br from-primary/8 via-secondary/8 to-transparent" />
+                    <div
+                      id="header-profile-menu"
+                      role="menu"
+                      className="absolute right-0 z-50 mt-3 w-60 overflow-hidden rounded-[1.5rem] border border-primary/10 bg-white py-1.5 text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.18)] ring-1 ring-slate-950/5 animate-fade-in"
+                    >
+                      <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-br from-primary/8 via-sky-100 to-transparent" />
                       <div className="relative border-b border-slate-200/80 px-4 py-2.5">
                         <p className="text-sm font-bold text-slate-900 truncate">
-                          {user.user_metadata?.full_name || 'Kullanıcı'}
+                          {userDisplayName}
                         </p>
                         <p className="text-xs text-slate-500 truncate">
                           {user.email}
@@ -466,6 +491,7 @@ export function Header() {
                         <Link
                           href="/profil"
                           onClick={() => setIsProfileOpen(false)}
+                          role="menuitem"
                           className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
                           <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -476,6 +502,7 @@ export function Header() {
                         <Link
                           href="/profil/siparislerim"
                           onClick={() => setIsProfileOpen(false)}
+                          role="menuitem"
                           className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
                           <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -486,6 +513,7 @@ export function Header() {
                         <Link
                           href="/profil/favorilerim"
                           onClick={() => setIsProfileOpen(false)}
+                          role="menuitem"
                           className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
                           <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -496,6 +524,7 @@ export function Header() {
                         <Link
                           href="/profil/adreslerim"
                           onClick={() => setIsProfileOpen(false)}
+                          role="menuitem"
                           className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                         >
                           <svg className="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,6 +540,7 @@ export function Header() {
                           <Link
                             href="/admin/dashboard"
                             onClick={() => setIsProfileOpen(false)}
+                            role="menuitem"
                             className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
                           >
                             <Shield className="h-5 w-5 text-slate-500" />
@@ -523,6 +553,7 @@ export function Header() {
                         <Link
                           href="/cikis"
                           onClick={() => setIsProfileOpen(false)}
+                          role="menuitem"
                           className="mx-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-red-600 transition-colors hover:bg-red-50"
                         >
                           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

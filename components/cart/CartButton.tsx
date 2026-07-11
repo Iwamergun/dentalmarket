@@ -10,7 +10,7 @@ export function CartButton() {
   return (
     <Link 
       href="/sepet" 
-      className="relative p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-background-card transition-all duration-200"
+      className="relative inline-flex rounded-full border border-slate-200 bg-white p-1.5 text-secondary-text transition duration-200 hover:border-primary/30 hover:text-primary md:p-2"
       aria-label={`Sepet${itemCount > 0 ? ` (${itemCount} ürün)` : ''}`}
     >
       <ShoppingCart className="w-6 h-6" />

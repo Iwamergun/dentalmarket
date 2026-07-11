@@ -8,9 +8,10 @@ describe('HeroSection campaign placement', () => {
 
     expect(screen.getByText('Öne çıkan kampanyalar')).toBeInTheDocument()
     // Slide 0 is visible (active), slides 1+ are aria-hidden — use hidden:true to query all
-    expect(screen.getByRole('link', { name: /Yaz Fırsatları/i })).toHaveAttribute('href', '/kampanyalar')
-    expect(screen.getByRole('link', { name: /Yeni Üye Avantajı/i, hidden: true })).toHaveAttribute('href', '/kampanyalar')
-    expect(screen.getByText('Demo kartlar')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Kliniğinizi Yenileyin/i })).toHaveAttribute('href', '/kategoriler')
+    expect(screen.getByRole('link', { name: /Haftanın Fırsatları/i, hidden: true })).toHaveAttribute('href', '/kampanyalar')
+    expect(screen.getByText('Hazır vitrin')).toBeInTheDocument()
+    expect(screen.getByText('Öne çıkan seçki')).toBeInTheDocument()
   })
 
   it('renders real campaign cards in the hero area when campaigns are provided', () => {
@@ -35,6 +36,6 @@ describe('HeroSection campaign placement', () => {
     )
 
     expect(screen.getByRole('link', { name: /İmplant Seti/i })).toHaveAttribute('href', '/kampanyalar/implant-seti')
-    expect(screen.queryByText('Demo kartlar')).not.toBeInTheDocument()
+    expect(screen.queryByText('Hazır vitrin')).not.toBeInTheDocument()
   })
 })

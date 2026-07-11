@@ -35,14 +35,14 @@ export function MobileBottomNav() {
               className={[
                 'relative flex h-[62px] flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-1.5 py-2 text-[11px] font-semibold leading-none transition-all duration-200',
                 isActive
-                  ? 'border-secondary/20 bg-gradient-to-br from-secondary/15 to-accent/10 text-primary ring-1 ring-secondary/20 shadow-[0_8px_20px_-10px_rgba(37,99,235,0.45)]'
+                  ? 'border-primary/15 bg-gradient-to-br from-primary/[0.08] via-white to-secondary/[0.10] text-primary ring-1 ring-primary/10 shadow-[0_8px_20px_-10px_rgba(37,99,235,0.35)]'
                   : 'text-slate-500',
               ].join(' ')}
             >
               <span
                 className={[
                   'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
-                  isActive ? 'bg-secondary/10' : 'bg-transparent active:bg-slate-100',
+                  isActive ? 'bg-primary/10 text-primary' : 'bg-transparent active:bg-slate-100',
                 ].join(' ')}
               >
                 <Icon className="h-4 w-4" />
@@ -62,14 +62,14 @@ export function MobileBottomNav() {
           className={[
             'flex h-[62px] flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-1.5 py-2 text-[11px] font-semibold leading-none transition-all duration-200',
             profileActive
-              ? 'border-secondary/20 bg-gradient-to-br from-secondary/15 to-accent/10 text-primary ring-1 ring-secondary/20 shadow-[0_8px_20px_-10px_rgba(37,99,235,0.45)]'
+              ? 'border-primary/15 bg-gradient-to-br from-primary/[0.08] via-white to-secondary/[0.10] text-primary ring-1 ring-primary/10 shadow-[0_8px_20px_-10px_rgba(37,99,235,0.35)]'
               : 'text-slate-500',
           ].join(' ')}
         >
           <span
             className={[
               'flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
-              profileActive ? 'bg-secondary/10' : 'bg-transparent active:bg-slate-100',
+              profileActive ? 'bg-primary/10 text-primary' : 'bg-transparent active:bg-slate-100',
             ].join(' ')}
           >
             <UserRound className="h-4 w-4" />

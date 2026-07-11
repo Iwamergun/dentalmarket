@@ -5,20 +5,29 @@ import { Header } from '@/components/layout/header'
 
 const pushMock = vi.fn()
 const pathnameMock = vi.fn(() => '/')
+const authState = {
+  user: null as Record<string, unknown> | null,
+  loading: false,
+}
 
 vi.mock('@/components/cart/CartButton', () => ({
   CartButton: () => <button type="button">Cart</button>,
 }))
 
 vi.mock('@/app/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: null,
-    loading: false,
-  }),
+  useAuth: () => authState,
 }))
 
 vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(),
+  createClient: () => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          single: vi.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
+        }),
+      }),
+    }),
+  }),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -32,6 +41,8 @@ describe('Header brand area', () => {
   beforeEach(() => {
     pushMock.mockClear()
     pathnameMock.mockReturnValue('/')
+    authState.user = null
+    authState.loading = false
     Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true })
   })
 
@@ -119,5 +130,40 @@ describe('Header brand area', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Arama panelini aç' }))
 
     expect(screen.queryByPlaceholderText('Ürün, marka veya kategori ara...')).not.toBeInTheDocument()
+  })
+
+  it('renders a neutral fallback avatar and keeps the profile menu accessible', () => {
+    authState.user = {
+      id: 'user-1',
+      email: 'member@example.com',
+      user_metadata: {
+        full_name: 'Member User',
+      },
+    }
+
+    const { container } = render(<Header />)
+
+    const profileButton = screen.getByRole('button', { name: 'Hesap menüsünü aç' })
+    expect(container.querySelector('svg.lucide-circle-user-round')).toBeInTheDocument()
+
+    fireEvent.click(profileButton)
+
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Profilim' })).toBeInTheDocument()
+  })
+
+  it('uses the user avatar image when one is available', () => {
+    authState.user = {
+      id: 'user-2',
+      email: 'avatar@example.com',
+      user_metadata: {
+        full_name: 'Avatar User',
+        avatar_url: 'https://example.com/avatar.png',
+      },
+    }
+
+    render(<Header />)
+
+    expect(screen.getByAltText('Avatar User profil fotoğrafı')).toHaveAttribute('src', 'https://example.com/avatar.png')
   })
 })

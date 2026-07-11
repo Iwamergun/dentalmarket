@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/utils/format'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 
+const FREE_SHIPPING_THRESHOLD = 500
+
 function CartItemRow({ item, onUpdateQuantity, onRemove }: {
   item: CartItem
   onUpdateQuantity: (itemId: string, quantity: number) => Promise<void>
@@ -393,7 +395,7 @@ function CartSummary({
   onRemoveDiscount: () => void
 }) {
   const { user, loading: authLoading } = useAuth()
-  const remainingForFreeShipping = Math.max(0, 500 - subtotal)
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
 
   return (
     <div className="sticky top-28 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.35)]">
@@ -435,12 +437,12 @@ function CartSummary({
           <div className="mt-1">
             <div className="mb-1 flex justify-between text-xs text-slate-500">
               <span>Ücretsiz kargoya {formatPrice(remainingForFreeShipping)} kaldı</span>
-              <span>500 ₺</span>
+              <span>{FREE_SHIPPING_THRESHOLD} ₺</span>
             </div>
             <div className="h-1.5 w-full rounded-full bg-slate-100">
               <div
                 className="h-1.5 rounded-full bg-primary transition-all"
-                style={{ width: `${Math.min(100, (subtotal / 500) * 100)}%` }}
+                style={{ width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}
               />
             </div>
           </div>
@@ -449,7 +451,7 @@ function CartSummary({
         {user && shipping_cost === 0 && (
           <p className="flex items-center gap-1 text-xs text-green-600">
             <Truck className="w-3.5 h-3.5" />
-            500 ₺ üzeri siparişlerde kargo ücretsiz!
+            {FREE_SHIPPING_THRESHOLD} ₺ üzeri siparişlerde kargo ücretsiz!
           </p>
         )}
 

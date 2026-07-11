@@ -97,8 +97,8 @@ export function HeroCampaignCarousel({ campaigns, showFallbackTag = false }: Her
   }, [])
 
   useEffect(() => {
-    const shouldAutoRotate = !showFallbackTag && !prefersReducedMotion && !paused && campaigns.length > 1
-    if (!shouldAutoRotate) return
+    const shouldAutoRotateCampaigns = !showFallbackTag && !prefersReducedMotion && !paused && campaigns.length > 1
+    if (!shouldAutoRotateCampaigns) return
 
     const timer = setInterval(next, 7000)
     return () => clearInterval(timer)

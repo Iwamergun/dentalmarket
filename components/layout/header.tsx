@@ -116,6 +116,7 @@ export function Header() {
   const profileRef = useRef<HTMLDivElement>(null)
   const tabletNavRef = useRef<HTMLDivElement>(null)
   const desktopNavRef = useRef<HTMLDivElement>(null)
+  const megaCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mobileSearchInputRef = useRef<HTMLInputElement>(null)
   const searchPanelInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
@@ -188,6 +189,25 @@ export function Header() {
     })
   }, [isSearchOpen])
 
+  const clearMegaCloseTimeout = () => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current)
+      megaCloseTimeoutRef.current = null
+    }
+  }
+
+  const openMegaMenu = (href: string) => {
+    clearMegaCloseTimeout()
+    setActiveMegaHref(href)
+  }
+
+  const scheduleMegaMenuClose = () => {
+    clearMegaCloseTimeout()
+    megaCloseTimeoutRef.current = setTimeout(() => {
+      setActiveMegaHref(null)
+    }, 120)
+  }
+
   const submitSearch = (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault()
     const query = searchQuery.trim()
@@ -207,13 +227,17 @@ export function Header() {
     setIsSearchOpen(false)
   }, [pathname])
 
+  useEffect(() => {
+    return () => clearMegaCloseTimeout()
+  }, [])
+
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur">
-      <div className="container-main px-2 py-2 sm:px-3 md:px-6 md:py-4 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div className="container-main px-2 py-2 sm:px-3 md:px-6 md:py-3 lg:px-8">
         <div
           className={[
-            'rounded-xl border border-slate-200/70 bg-white/95 shadow-sm transition-all duration-300 md:rounded-[20px] md:border-slate-200/80 md:bg-white/90 md:shadow-[0_14px_40px_-24px_rgba(15,23,42,0.3)]',
-            isScrolled ? 'shadow-md md:border-slate-200 md:shadow-[0_24px_52px_-30px_rgba(15,23,42,0.34)]' : '',
+            'rounded-xl border border-slate-200/90 bg-white transition-colors duration-300 md:rounded-2xl',
+            isScrolled ? 'border-slate-300' : '',
           ].join(' ')}
         >
           <div className="relative flex min-h-[52px] items-center gap-1.5 px-2 py-1.5 md:min-h-[76px] md:gap-2 md:px-5 md:py-2">
@@ -229,9 +253,18 @@ export function Header() {
             <div
               ref={desktopNavRef}
               className="relative hidden min-w-0 flex-1 justify-center px-2 lg:flex"
-              onMouseLeave={() => setActiveMegaHref(null)}
+              onMouseLeave={scheduleMegaMenuClose}
             >
-              <nav className="flex max-w-full items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/80 px-1.5 py-1.5 text-[13px] font-semibold text-slate-700">
+              <nav
+                className="flex max-w-full items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/80 px-1.5 py-1.5 text-[13px] font-semibold text-slate-700"
+                onMouseEnter={clearMegaCloseTimeout}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    clearMegaCloseTimeout()
+                    setActiveMegaHref(null)
+                  }
+                }}
+              >
                 {desktopNavItems.map((item) => {
                   const isActive = isNavItemActive(item.href)
 
@@ -240,8 +273,8 @@ export function Header() {
                       key={item.href}
                       href={item.href}
                       aria-current={isActive ? 'page' : undefined}
-                      onMouseEnter={() => setActiveMegaHref(item.href)}
-                      onFocus={() => setActiveMegaHref(item.href)}
+                      onMouseEnter={() => openMegaMenu(item.href)}
+                      onFocus={() => openMegaMenu(item.href)}
                       className={[
                         'group relative rounded-xl px-3.5 py-2 transition-all duration-200',
                         isActive
@@ -264,12 +297,17 @@ export function Header() {
 
               {activeMegaItem && (
                 <div
-                  className="pointer-events-none absolute left-1/2 top-[calc(100%+14px)] z-50 w-[min(92vw,860px)] -translate-x-1/2 translate-y-0 opacity-100 transition-all duration-250"
-                  onMouseEnter={() => {
-                    if (activeMegaHref) setActiveMegaHref(activeMegaHref)
+                  className="absolute left-1/2 top-full z-50 w-[min(92vw,860px)] -translate-x-1/2 pt-1"
+                  onMouseEnter={clearMegaCloseTimeout}
+                  onMouseLeave={scheduleMegaMenuClose}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      clearMegaCloseTimeout()
+                      setActiveMegaHref(null)
+                    }
                   }}
                 >
-                  <div className="pointer-events-auto grid grid-cols-1 gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-[0_34px_72px_-34px_rgba(15,23,42,0.35)] xl:grid-cols-[260px_1fr]">
+                  <div className="grid grid-cols-1 gap-4 rounded-[20px] border border-slate-200 bg-white p-5 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.3)] xl:grid-cols-[260px_1fr]">
                     <div className="rounded-2xl border border-primary/10 bg-gradient-to-b from-primary/10 to-primary/5 p-5">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">One Cikan Alan</p>
                       <h3 className="mt-2 text-lg font-semibold text-slate-900">{activeMegaItem.label}</h3>

@@ -12,6 +12,7 @@ import { useCart } from '@/app/contexts/CartContext'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { formatPrice } from '@/lib/utils/format'
 import { toast } from 'sonner'
+import { productCardStyles } from '@/components/catalog/product-card-styles'
 
 interface SupplierProductCardProps {
   offer: {
@@ -60,34 +61,34 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
   }
 
   return (
-    <div className="flex min-h-[420px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+    <div className={`min-h-[380px] ${productCardStyles.surface}`}>
       {/* Image */}
       <Link href={`/urunler/${product.slug}`} className="block">
-        <div className="relative aspect-square bg-gray-100">
+        <div className={productCardStyles.imageWrap}>
           <Image
             src={getImageUrl(product.primary_image)}
             alt={product.name}
             fill
-            className="object-cover"
+            className={productCardStyles.image}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         </div>
       </Link>
 
       {/* Info */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className={productCardStyles.content}>
         {product.brand_name && (
-          <Badge variant="secondary" className="text-[10px] w-fit mb-1">{product.brand_name}</Badge>
+          <p className={productCardStyles.brand}>{product.brand_name}</p>
         )}
 
         <Link href={`/urunler/${product.slug}`} className="block">
-          <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-primary transition-colors">
+          <h3 className={productCardStyles.name}>
             {product.name}
           </h3>
         </Link>
 
         {product.sku && (
-          <p className="text-[11px] text-gray-400 mt-0.5">SKU: {product.sku}</p>
+          <p className={productCardStyles.meta}>SKU: {product.sku}</p>
         )}
 
         {/* Price */}
@@ -98,7 +99,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
             <button
               type="button"
               onClick={() => router.push('/giris')}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+              className={productCardStyles.authPrompt}
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -106,12 +107,12 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
               Fiyat için giriş yapın
             </button>
           ) : (
-            <p className="text-lg font-bold text-primary">{formatPrice(offer.price)}</p>
+            <p className={productCardStyles.price}>{formatPrice(offer.price)}</p>
           )}
         </div>
 
         {/* Meta */}
-        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[11px] text-gray-500">
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
           {offer.stock_quantity != null && (
             <span>Stok: {offer.stock_quantity}</span>
           )}
@@ -134,7 +135,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
           {isInStock ? (
             <Button
               size="sm"
-              className="h-12 w-full gap-1.5 rounded-xl bg-accent text-white shadow-md hover:bg-accent/90 hover:shadow-lg"
+              className="h-10 w-full gap-1.5 rounded-lg bg-primary text-white hover:bg-primary/90"
               onClick={handleAddToCart}
               disabled={isAdding || isAdded}
             >
@@ -153,7 +154,7 @@ export function SupplierProductCard({ offer }: SupplierProductCardProps) {
               )}
             </Button>
           ) : (
-            <Badge variant="danger" className="text-xs w-full justify-center py-1">Stokta Yok</Badge>
+            <Badge variant="danger" className="w-full justify-center py-1 text-xs">Stokta Yok</Badge>
           )}
         </div>
       </div>

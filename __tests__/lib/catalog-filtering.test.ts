@@ -67,6 +67,15 @@ describe('parseCatalogFilters', () => {
       sort: 'price-asc',
     })
   })
+
+  it('tekrarlanan query parametrelerini de birlestirir', () => {
+    const params = new URLSearchParams('category=cat-root&category=cat-child&brand=brand-a&brand=brand-b')
+
+    expect(parseCatalogFilters(params)).toMatchObject({
+      categoryIds: ['cat-root', 'cat-child'],
+      brandIds: ['brand-a', 'brand-b'],
+    })
+  })
 })
 
 describe('filterAndSortProducts', () => {

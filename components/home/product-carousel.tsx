@@ -11,6 +11,7 @@ import { formatPrice } from '@/lib/utils/format'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { WishlistButton } from '@/components/WishlistButton'
 import type { BestOfferProduct } from '@/lib/supabase/queries/products'
+import { productCardStyles } from '@/components/catalog/product-card-styles'
 
 interface CarouselProduct {
   id: string
@@ -74,8 +75,8 @@ function getUserFirstName(user: ReturnType<typeof useAuth>['user']) {
 
 function SkeletonCard() {
   return (
-    <div className="w-56 flex-shrink-0 rounded-2xl border border-border bg-white shadow-lg overflow-hidden animate-pulse">
-      <div className="aspect-square bg-muted/40" />
+    <div className="w-56 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white animate-pulse">
+      <div className="aspect-[4/3] bg-muted/40" />
       <div className="p-4 space-y-2">
         <div className="h-3 bg-muted/40 rounded w-1/3" />
         <div className="h-4 bg-muted/40 rounded w-full" />
@@ -107,31 +108,31 @@ function ProductCard({ product }: { product: CarouselProduct }) {
   return (
     <Link
       href={`/urunler/${product.slug}`}
-      className="flex h-[414px] w-56 flex-shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm transition-all duration-300 hover:scale-[1.03] hover:border-primary/30 hover:shadow-premium group"
+      className={`w-56 flex-shrink-0 snap-start ${productCardStyles.surface}`}
     >
-      <div className="relative m-3 aspect-square overflow-hidden rounded-2xl bg-background">
+      <div className={productCardStyles.imageWrap}>
         <Image
           src={imgSrc}
           alt={product.name}
           fill
           sizes="224px"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className={productCardStyles.image}
           onError={() => setImgSrc(PLACEHOLDER_SVG)}
         />
         {hasMultipleOffers && (
-          <span className="absolute top-2 right-2 bg-primary/90 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+          <span className="absolute right-2 top-2 rounded-full border border-primary/20 bg-white px-2 py-0.5 text-[11px] font-semibold text-primary">
             {product.offer_count} satıcı
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-4">
+      <div className={productCardStyles.content}>
         {brandName && (
-          <p className="h-4 truncate text-[11px] font-medium uppercase tracking-wide text-secondary-text">
+          <p className={productCardStyles.brand}>
             {brandName}
           </p>
         )}
-        {!brandName && <div className="h-4" />}
-        <h3 className="mt-1 min-h-[40px] text-sm font-bold leading-snug text-body-text line-clamp-2">
+        {!brandName && <div className="h-0.5" />}
+        <h3 className={productCardStyles.name}>
           {product.name}
         </h3>
         <div className="mt-2 flex min-h-[22px] items-center gap-2">
@@ -145,7 +146,7 @@ function ProductCard({ product }: { product: CarouselProduct }) {
                 e.stopPropagation()
                 router.push('/giris')
               }}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+              className={productCardStyles.authPrompt}
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -155,44 +156,44 @@ function ProductCard({ product }: { product: CarouselProduct }) {
           ) : validPrice ? (
             <>
               {showRange ? (
-                <span className="text-sm font-extrabold text-primary">
+                <span className={productCardStyles.price}>
                   {formatPrice(product.price_min!)} – {formatPrice(product.price_max!)}
                 </span>
               ) : (
-                <span className="text-sm font-extrabold text-primary">
+                <span className={productCardStyles.price}>
                   {formatPrice(product.price!)}
                 </span>
               )}
               {hasDiscount && product.compare_at_price !== null && (
-                <span className="text-xs text-secondary-text line-through">
+                <span className="text-xs text-slate-500 line-through">
                   {formatPrice(product.compare_at_price)}
                 </span>
               )}
             </>
           ) : (
-            <span className="text-xs text-secondary-text italic">
+            <span className={productCardStyles.emptyPrice}>
               Fiyat için iletişime geçin
             </span>
           )}
         </div>
         {hasMultipleOffers && (
-          <p className="mt-1 min-h-[16px] text-[11px] text-secondary-text">
+          <p className={productCardStyles.meta}>
             {product.offer_count} satıcıdan
           </p>
         )}
-        {!hasMultipleOffers && <div className="mt-1 min-h-[16px]" />}
-        <div className="mt-auto flex items-center gap-2 pt-3" onClick={(e) => e.preventDefault()}>
+        {!hasMultipleOffers && <div className="h-4" />}
+        <div className="mt-auto flex items-center gap-2 pt-2" onClick={(e) => e.preventDefault()}>
           <WishlistButton
             productId={product.id}
             productName={product.name}
             size="sm"
-            className="!h-10 !w-auto flex-1 !rounded-xl !border !border-slate-200 bg-white shadow-sm hover:!border-red-200 hover:bg-red-50"
+            className={`!h-10 !w-auto flex-1 ${productCardStyles.quietAction}`}
           />
           <AddToCartButton
             productId={product.id}
             productName={product.name}
             iconOnly
-            className="!h-10 !w-auto flex-1"
+            className={`!h-10 !w-auto flex-1 ${productCardStyles.primaryAction}`}
           />
         </div>
       </div>
@@ -272,22 +273,22 @@ export function ProductCarousel({ fallbackProducts = [] }: ProductCarouselProps)
   const displayTitle = user ? (firstName ? `${firstName}, Sana Özel Ürünler` : 'Sana Özel Ürünler') : title
 
   return (
-    <section className="bg-muted py-10 shadow-[inset_0_1px_0_rgba(84,48,165,0.04)]">
+    <section className="bg-slate-50 py-8">
       <div className="container-main">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-extrabold text-foreground">{displayTitle}</h2>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-slate-900">{displayTitle}</h2>
           {products.length > 0 && (
             <div className="flex gap-2">
               <button
                 onClick={scrollLeft}
-                className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-colors shadow-sm"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors hover:border-slate-300 hover:bg-slate-100"
                 aria-label="Sola kaydır"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={scrollRight}
-                className="w-10 h-10 rounded-full border border-border bg-white flex items-center justify-center hover:bg-primary hover:text-white transition-colors shadow-sm"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors hover:border-slate-300 hover:bg-slate-100"
                 aria-label="Sağa kaydır"
               >
                 <ChevronRight className="w-5 h-5" />

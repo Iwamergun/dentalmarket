@@ -77,6 +77,20 @@ describe('Header brand area', () => {
     expect(container.querySelector('a[href="/urunler?inStock=true"]')).toBeInTheDocument()
   })
 
+  it('keeps desktop mega menu open long enough to move pointer into dropdown', () => {
+    const { container } = render(<Header />)
+    const desktopArea = container.querySelector('nav')?.parentElement
+
+    fireEvent.mouseEnter(container.querySelector('nav a[href="/kategoriler"]')!)
+    const dropdownLink = container.querySelector('a[href="/urunler?sort=name-asc"]')
+    expect(dropdownLink).toBeInTheDocument()
+
+    fireEvent.mouseLeave(desktopArea!)
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+    fireEvent.mouseEnter(dropdownLink!)
+    expect(container.querySelector('a[href="/urunler?sort=name-asc"]')).toBeInTheDocument()
+  })
+
   it('should hide the search card on scroll and reopen it from the search icon', () => {
     render(<Header />)
 

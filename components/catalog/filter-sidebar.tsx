@@ -36,16 +36,16 @@ function FilterSection({ title, defaultOpen = true, children, className }: Filte
   const [open, setOpen] = React.useState(defaultOpen)
 
   return (
-    <div className={cn('border-b border-border py-4 lg:py-6', className)}>
+    <div className={cn('border-b border-slate-200 py-4 lg:py-5', className)}>
       <h3 className="-my-3 flow-root">
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="group flex w-full items-center justify-between py-3 text-sm text-text-secondary transition-colors hover:text-primary"
+          className="group flex w-full items-center justify-between py-3 text-sm text-slate-600 transition-colors hover:text-primary"
           aria-expanded={open}
         >
           <span className="text-sm font-bold text-primary">{title}</span>
-          <span className="ml-6 flex items-center">
+          <span className="ml-6 flex items-center text-slate-500">
             {open ? (
               <Minus className="h-5 w-5" aria-hidden="true" />
             ) : (
@@ -54,7 +54,7 @@ function FilterSection({ title, defaultOpen = true, children, className }: Filte
           </span>
         </button>
       </h3>
-      {open && <div className="pt-4 lg:pt-6">{children}</div>}
+      {open && <div className="pt-4 lg:pt-5">{children}</div>}
     </div>
   )
 }
@@ -102,7 +102,7 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 z-[60] bg-black/35 transition-opacity duration-300 ease-linear',
+          'fixed inset-0 z-[60] bg-slate-900/30 transition-opacity duration-300 ease-linear',
           open ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
@@ -112,11 +112,11 @@ function MobileFilterDialog({ open, onClose, children }: MobileFilterDialogProps
         {/* Panel */}
         <div
           className={cn(
-            'relative flex h-dvh w-[85vw] max-w-sm transform flex-col overflow-hidden bg-white shadow-2xl transition duration-300 ease-in-out',
+            'relative flex h-dvh w-[85vw] max-w-sm transform flex-col overflow-hidden bg-white shadow-lg transition duration-300 ease-in-out',
             open ? 'translate-x-0' : 'translate-x-full'
           )}
         >
-          <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3.5">
             <h2 className="text-lg font-bold text-primary">Filtreler</h2>
             <button
               type="button"
@@ -196,6 +196,7 @@ export function FilterSidebar({
     params.delete('maxPrice')
     params.delete('minRating')
     params.delete('inStock')
+    params.delete('page')
 
     // Add new filters - support multiple categories and brands
     if (selectedCategories.length > 0) {
@@ -392,10 +393,10 @@ export function FilterSidebar({
       </FilterSection>
 
       {/* Action Buttons */}
-      <div className="sticky bottom-0 -mx-4 space-y-3 border-t border-border bg-white px-4 pb-4 pt-3 lg:static lg:mx-0 lg:border-0 lg:px-0 lg:pb-6 lg:pt-6">
+      <div className="sticky bottom-0 -mx-4 space-y-3 border-t border-slate-200 bg-white px-4 pb-4 pt-3 lg:static lg:mx-0 lg:border-0 lg:px-0 lg:pb-6 lg:pt-5">
         <Button
           onClick={applyFilters}
-          className="h-11 w-full rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
+          className="h-11 w-full rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
           size="md"
         >
           Filtreleri Uygula
@@ -404,7 +405,7 @@ export function FilterSidebar({
           <Button
             onClick={clearFilters}
             variant="outline"
-            className="h-11 w-full rounded-xl border-border bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+            className="h-11 w-full rounded-lg border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             size="md"
           >
             <X className="mr-2 h-4 w-4" />
@@ -423,7 +424,7 @@ export function FilterSidebar({
           type="button"
           onClick={() => setMobileFiltersOpen(true)}
           variant="outline"
-          className="h-11 w-full rounded-xl border-border bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+          className="h-11 w-full rounded-lg border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           size="md"
         >
           <Filter className="mr-2 h-4 w-4" />
@@ -438,7 +439,7 @@ export function FilterSidebar({
       </MobileFilterDialog>
 
       {/* Masaüstü sidebar (büyük ekranlarda görünür) */}
-      <div className={cn('hidden rounded-2xl border border-border bg-white px-6 shadow-card lg:block', className)}>
+      <div className={cn('hidden rounded-xl border border-slate-200 bg-white px-5 lg:block', className)}>
         {filterContent}
       </div>
     </>

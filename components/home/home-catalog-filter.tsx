@@ -12,7 +12,7 @@ export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps
   return (
     <div className="w-full lg:w-80 lg:flex-shrink-0">
       <div className="lg:hidden">
-        <div className="rounded-2xl border border-border bg-white/90 p-4 shadow-sm backdrop-blur">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Hizli Katalog</p>
           <h2 className="mt-1.5 text-xl font-bold text-primary">Filtreleyip urun listesine gecin</h2>
           <p className="mt-1.5 text-sm text-text-secondary">
@@ -27,7 +27,7 @@ export function HomeCatalogFilter({ categories, brands }: HomeCatalogFilterProps
 
       <aside className="hidden lg:block">
         <div className="sticky top-[132px] space-y-4">
-          <div className="rounded-[32px] border border-primary/10 bg-white p-6 shadow-card">
+          <div className="rounded-xl border border-slate-200 bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-secondary">Hizli Katalog</p>
             <h2 className="mt-2 text-2xl font-bold text-primary">Dogru urune daha hizli ulasin</h2>
             <p className="mt-3 text-sm leading-6 text-text-secondary">

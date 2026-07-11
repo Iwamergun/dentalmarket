@@ -19,16 +19,19 @@ export interface FilterableBestOfferProduct extends BestOfferProduct {
   review_count?: number
 }
 
-type SearchParamsLike = Pick<URLSearchParams, 'get'>
+type SearchParamsLike = Pick<URLSearchParams, 'get'> & Partial<Pick<URLSearchParams, 'getAll'>>
 
 export function parseCatalogFilters(searchParams: SearchParamsLike): CatalogFilters {
-  const parseIds = (value: string | null) =>
-    value
-      ? value
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean)
-      : []
+  const parseIds = (key: string) => {
+    const values = typeof searchParams.getAll === 'function'
+      ? searchParams.getAll(key)
+      : [searchParams.get(key)].filter((value): value is string => Boolean(value))
+
+    return values
+      .flatMap((value) => value.split(','))
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
 
   const parseNumber = (value: string | null) => {
     if (!value) return null
@@ -40,8 +43,8 @@ export function parseCatalogFilters(searchParams: SearchParamsLike): CatalogFilt
 
   return {
     query: (searchParams.get('q') || '').trim(),
-    categoryIds: parseIds(searchParams.get('category')),
-    brandIds: parseIds(searchParams.get('brand')),
+    categoryIds: parseIds('category'),
+    brandIds: parseIds('brand'),
     minPrice: parseNumber(searchParams.get('minPrice')),
     maxPrice: parseNumber(searchParams.get('maxPrice')),
     minRating: parseNumber(searchParams.get('minRating')),

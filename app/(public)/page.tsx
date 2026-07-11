@@ -62,19 +62,19 @@ export default async function HomePage() {
     <>
       <div className="md:hidden min-h-screen bg-[#F8FAFC] pb-24">
         <div className="space-y-4 px-2.5 pb-7 pt-3 sm:px-3">
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.28)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
             <HeroSection campaigns={campaigns} products={products} />
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
             <ProductCarousel fallbackProducts={products} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
             <ProductGroupBand groups={productGroups} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
             <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kategoriler</h2>
               <Link href="/kategoriler" className="text-xs font-semibold text-[#2563EB]">
@@ -99,11 +99,11 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-0.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-0.5">
             <FeaturedProducts products={products} />
           </section>
 
-          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="rounded-2xl border border-[#E5E7EB]/90 bg-white p-3.5">
             <div className="mb-2.5 flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-[0.04em] text-slate-900">Kampanyalar</h2>
               <Link href="/kampanyalar" className="text-xs font-semibold text-[#2563EB]">
@@ -141,11 +141,11 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
             <BrandLogos brands={brands} />
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white shadow-[0_10px_24px_-18px_rgba(15,23,42,0.24)]">
+          <section className="overflow-hidden rounded-2xl border border-[#E5E7EB]/90 bg-white">
             <TrustSection />
           </section>
         </div>

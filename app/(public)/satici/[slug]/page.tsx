@@ -8,6 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getImageUrl } from '@/lib/utils/imageHelper'
 import { Star, Package, Phone, Truck } from 'lucide-react'
+import { productCardStyles } from '@/components/catalog/product-card-styles'
 
 interface SaticiPageProps {
   params: Promise<{ slug: string }>
@@ -223,16 +224,16 @@ export default async function SaticiPage({ params }: SaticiPageProps) {
           {offers.map((offer) => (
             <div
               key={offer.offer_id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+              className={productCardStyles.surface}
             >
               <Link href={`/urunler/${offer.product.slug}`}>
-                <div className="aspect-square bg-gray-50 flex items-center justify-center relative">
+                <div className={productCardStyles.imageWrap}>
                   {offer.product.primary_image ? (
                     <Image
                       src={getImageUrl(offer.product.primary_image)}
                       alt={offer.product.name}
                       fill
-                      className="object-contain p-2"
+                      className={productCardStyles.image}
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
                     />
                   ) : (
@@ -240,9 +241,9 @@ export default async function SaticiPage({ params }: SaticiPageProps) {
                   )}
                 </div>
               </Link>
-              <div className="p-4 flex flex-col flex-1">
+              <div className={productCardStyles.content}>
                 <Link href={`/urunler/${offer.product.slug}`}>
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-blue-600 transition-colors">
+                  <h3 className={productCardStyles.name}>
                     {offer.product.name}
                   </h3>
                 </Link>
@@ -250,15 +251,15 @@ export default async function SaticiPage({ params }: SaticiPageProps) {
                 {/* Fiyat ve Stok */}
                 <div className="mt-auto pt-3">
                   {isAuthenticated ? (
-                    <p className="text-lg font-bold text-blue-600">
+                    <p className={productCardStyles.price}>
                       ₺{offer.price.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
                     </p>
                   ) : (
-                    <p className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+                    <p className={productCardStyles.authPrompt}>
                       Fiyat için giriş yapın
                     </p>
                   )}
-                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                  <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
                     {isAuthenticated && (
                       <span className="flex items-center gap-1">
                         <Truck className="w-3 h-3" />

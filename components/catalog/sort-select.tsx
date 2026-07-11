@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc'
@@ -12,6 +12,7 @@ interface SortSelectProps {
 
 export function SortSelect({ className }: SortSelectProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentSort = (searchParams.get('sort') as SortOption) || 'newest'
 
@@ -25,7 +26,8 @@ export function SortSelect({ className }: SortSelectProps) {
       params.set('sort', newSort)
     }
     
-    router.push(`?${params.toString()}`, { scroll: false })
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
   }
 
   return (

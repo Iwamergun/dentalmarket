@@ -49,7 +49,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardContent className="flex flex-1 flex-col gap-1 px-3 pb-2 pt-2.5">
           {/* Marka */}
           {product.brand_name && (
-            <p className="truncate text-xs text-muted-foreground">{product.brand_name}</p>
+            <p className="truncate text-xs text-muted-foreground" title={product.brand_name}>{product.brand_name}</p>
           )}
 
           {/* Ürün adı */}
@@ -83,7 +83,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Stok + satıcı sayısı */}
           <p className="text-xs text-muted-foreground">
-            <span className={inStock ? 'text-green-700' : undefined}>
+            <span className={inStock ? 'text-green-700' : ''}>
               {inStock ? 'Stokta' : 'Stok sorunuz'}
             </span>
             {hasMultipleOffers && (

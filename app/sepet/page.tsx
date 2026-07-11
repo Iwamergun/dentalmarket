@@ -432,7 +432,7 @@ function CartSummary({
         </div>
 
         {/* Free shipping progress bar */}
-        {user && shipping_cost > 0 && (
+        {user && shipping_cost > 0 && remainingForFreeShipping > 0 && (
           <div className="mt-1">
             <div className="mb-1 flex justify-between text-xs text-slate-500">
               <span>Ücretsiz kargoya {formatPrice(remainingForFreeShipping)} kaldı</span>
